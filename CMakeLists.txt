@@ -3,7 +3,11 @@ project (ket_cpp CXX)
 
 set(serial 0.0)
 
-add_executable (ket_cpp main.cc)
+file(GLOB_RECURSE SRCS src/*.cc)
+
+include_directories(${PROJECT_SOURCE_DIR}/src)
+
+add_executable (ket_cpp main.cc ${SRCS})
 
 set_property(TARGET ket_cpp PROPERTY CXX_STANDARD 14)
 set_property(TARGET ket_cpp PROPERTY CXX_STANDARD_REQUIRED TRUE)
