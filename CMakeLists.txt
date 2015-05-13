@@ -3,6 +3,11 @@ project (ket_cpp CXX)
 
 set(serial 0.0)
 
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+find_package(Eigen3)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
 file(GLOB_RECURSE SRCS src/*.cc)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
