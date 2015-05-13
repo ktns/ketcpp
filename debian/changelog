@@ -1,5 +1,8 @@
-ketcpp (0.0) unstable; urgency=low
+ketcpp (0.0~1.gbpc1c898) UNRELEASED; urgency=low
+
+  ** SNAPSHOT build @c1c8985e33e454686757fb7c0a2f482394260757 **
 
   * Initial Release.
+  * UNRELEASED
 
- -- Katsuhiko Nishimra <ktns.87@gmail.com>  Wed, 13 May 2015 21:01:05 +0900
+ -- Katsuhiko Nishimra <ktns.87@gmail.com>  Wed, 13 May 2015 23:13:02 +0900
