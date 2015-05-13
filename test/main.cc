@@ -17,7 +17,7 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <igloo/igloo.h>
-using namespace igloo;
+#include <bandit/bandit.h>
+using namespace bandit;
 
-int main(int argc, char *argv[]) { return TestRunner::RunAllTests(argc, argv); }
+int main(int argc, char *argv[]) { return bandit::run(argc, argv); }

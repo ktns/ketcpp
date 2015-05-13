@@ -20,10 +20,13 @@
 #include "test.h"
 using namespace ketcpp;
 
-#include <igloo/igloo.h>
-using namespace igloo;
+#include <bandit/bandit.h>
+using namespace bandit;
 
-Context(a_test) {
-  Spec(should_return_true) { Assert::That(value, Is().EqualTo(true)); }
-  bool value = test();
-};
+go_bandit([]() {
+  describe("test()", []() {
+    bool value = test();
+    it("should return true",
+       [value]() { Assert::That(value, Is().EqualTo(true)); });
+  });
+});
