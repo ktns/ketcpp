@@ -9,5 +9,10 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable (ket_cpp main.cc ${SRCS})
 
-set_property(TARGET ket_cpp PROPERTY CXX_STANDARD 14)
-set_property(TARGET ket_cpp PROPERTY CXX_STANDARD_REQUIRED TRUE)
+file(GLOB_RECURSE TEST_SRCS test/*.cc)
+
+add_executable (run_tests ${SRCS} ${TEST_SRCS})
+target_include_directories(run_tests PRIVATE extlib/igloo)
+
+set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 14)
+set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
