@@ -1,8 +1,10 @@
-ketcpp (0.0~1.gbpc1c898) UNRELEASED; urgency=low
+ketcpp (0.0~2.gbp6669e2) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @c1c8985e33e454686757fb7c0a2f482394260757 **
+  ** SNAPSHOT build @6669e22772b7f270f50afdfed817d4eaca5115c4 **
 
   * Initial Release.
-  * UNRELEASED
+  * Add igloo as submodule (https://github.com/joakimkarlsson/igloo).
+  * Include submodules into source tarball.
+  * Configure install target.
 
- -- Katsuhiko Nishimra <ktns.87@gmail.com>  Wed, 13 May 2015 23:13:02 +0900
+ -- Katsuhiko Nishimra <ktns.87@gmail.com>  Thu, 14 May 2015 04:01:17 +0900
