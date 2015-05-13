@@ -21,4 +21,4 @@
 
 using namespace ketcpp;
 
-int main(void){return test() ? 0 : 1;}
+int main(void) { return test() ? 0 : 1; }
