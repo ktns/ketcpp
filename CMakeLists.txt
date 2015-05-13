@@ -18,3 +18,5 @@ add_test(NAME run_tests COMMAND $<TARGET_FILE:run_tests>)
 
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 14)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
+
+install(TARGETS ket_cpp DESTINATION bin COMPONENT runtime)
