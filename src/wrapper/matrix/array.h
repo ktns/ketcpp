@@ -29,7 +29,9 @@ namespace ketcpp {
         array storage;
 
       public:
-        MatrixArray() {}
+        template <typename... E>
+        MatrixArray(E &&... e)
+            : storage{{std::forward<E>(e)...}} {}
         ~MatrixArray() {}
       };
     }

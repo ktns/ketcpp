@@ -28,5 +28,11 @@ go_bandit([]() {
     it("should not be abstract class", []() {
       std::is_abstract<MatrixArray<float, 3, 3>>::value must_not be_truthy;
     });
+
+    it("should be initialized with list", []() {
+      []() {
+        MatrixArray<float, 2, 2> array = {1.f, 2.f, 3.f, 4.f};
+      } must_not throw_exception;
+    });
   });
 });

@@ -20,7 +20,11 @@
 namespace ketcpp {
   namespace wrapper {
     namespace matrix {
-      template <typename T> class MatrixBase { virtual ~MatrixBase() = 0; };
+      template <typename T> class MatrixBase {
+      public:
+        virtual ~MatrixBase() = 0;
+      };
+      template <typename T> MatrixBase<T>::~MatrixBase() {}
     }
   }
 }
