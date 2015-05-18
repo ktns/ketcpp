@@ -18,6 +18,7 @@
  */
 
 #include <array>
+#include <iterator>
 #include "wrapper/matrix/base.h"
 
 namespace ketcpp {
@@ -29,10 +30,63 @@ namespace ketcpp {
         array storage;
 
       public:
+        class row_element_iterator
+            : public std::iterator<std::random_access_iterator_tag, T> {
+          typename array::iterator iterator;
+          friend MatrixArray<T, m, n>;
+          friend class row_iterator;
+          row_element_iterator(const typename array::iterator &i)
+              : iterator(i) {}
+          row_element_iterator(const row_element_iterator &i)
+              : iterator(i.iterator) {}
+
+        public:
+          ~row_element_iterator() {}
+          T operator*() { return *iterator; }
+        };
+
+        class row_iterator
+            : public std::iterator<std::random_access_iterator_tag,
+                                   row_element_iterator> {
+          typename array::iterator iterator;
+          friend MatrixArray<T, m, n>;
+          row_iterator(const typename array::iterator &i) : iterator(i) {}
+
+        public:
+          row_iterator(const row_iterator &i) : iterator(i.iterator) {}
+          ~row_iterator() {}
+
+          bool operator==(const row_iterator &rhs) {
+            return iterator == rhs.iterator;
+          }
+          bool operator!=(const row_iterator &rhs) {
+            return iterator != rhs.iterator;
+          }
+          row_iterator operator++() {
+            iterator += n;
+            return *this;
+          }
+          row_iterator operator++(int) {
+            auto tmp = *this;
+            iterator += n;
+            return tmp;
+          }
+
+          row_element_iterator begin() {
+            return row_element_iterator(iterator);
+          }
+          row_element_iterator end() {
+            return row_element_iterator(iterator + n);
+          }
+        };
+
         template <typename... E>
         MatrixArray(E &&... e)
             : storage{{std::forward<E>(e)...}} {}
         ~MatrixArray() {}
+
+        row_iterator row_begin() { return row_iterator(storage.begin()); }
+        row_iterator row_end() { return row_iterator(storage.end()); }
       };
     }
   }
