@@ -34,5 +34,16 @@ go_bandit([]() {
         MatrixArray<float, 2, 2> array = {1.f, 2.f, 3.f, 4.f};
       } must_not throw_exception;
     });
+    describe(".rows", []() {
+      MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+
+      it("should iterate as many times as number of rows", [&array]() {
+        int n = 0;
+        for (auto i : array.rows()) {
+          ++n must be_lte(3);
+        }
+        n must equal(3);
+      });
+    });
   });
 });

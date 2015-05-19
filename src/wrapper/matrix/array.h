@@ -71,6 +71,7 @@ namespace ketcpp {
             iterator += n;
             return tmp;
           }
+          row_iterator operator*() { return *this; }
 
           row_element_iterator begin() {
             return row_element_iterator(iterator);
@@ -80,13 +81,26 @@ namespace ketcpp {
           }
         };
 
+      private:
+        row_iterator row_begin() { return row_iterator(storage.begin()); }
+        row_iterator row_end() { return row_iterator(storage.end()); }
+
+      public:
+        class rows_t {
+          MatrixArray &matrix;
+
+        public:
+          rows_t(MatrixArray &mat) : matrix(mat) {}
+          row_iterator begin() { return matrix.row_begin(); }
+          row_iterator end() { return matrix.row_end(); }
+        };
+        friend rows_t;
+        rows_t rows() { return rows_t(*this); }
+
         template <typename... E>
         MatrixArray(E &&... e)
             : storage{{std::forward<E>(e)...}} {}
         ~MatrixArray() {}
-
-        row_iterator row_begin() { return row_iterator(storage.begin()); }
-        row_iterator row_end() { return row_iterator(storage.end()); }
       };
     }
   }
