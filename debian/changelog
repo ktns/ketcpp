@@ -1,10 +1,15 @@
-ketcpp (0.0~3.gbp2bbe15) UNRELEASED; urgency=low
+ketcpp (0.0~4.gbp92d9fe) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @2bbe15f5153d5a81017e7a431cc4cb00d3b89d38 **
+  ** SNAPSHOT build @92d9fee62d1377799db3530415cf7727f9077d8d **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
   * Include submodules into source tarball.
   * Configure install target.
+  * Add dependency on Eigen3
+  * Defined abstract wrapper class MatrixBase.
+  * Defined concrete wrapper class MatrixArray.
+  * Make MatrixArray initializeble with an initializer list.
+  * MatrixArray::rows() returns a range of row_vectors.
 
- -- Katsuhiko Nishimra <ktns.87@gmail.com>  Thu, 14 May 2015 04:18:18 +0900
+ -- Katsuhiko Nishimra <ktns.87@gmail.com>  Tue, 19 May 2015 18:06:37 +0900
