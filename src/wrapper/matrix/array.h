@@ -37,11 +37,26 @@ namespace ketcpp {
           friend class row_iterator;
           row_element_iterator(const typename array::iterator &i)
               : iterator(i) {}
-          row_element_iterator(const row_element_iterator &i)
-              : iterator(i.iterator) {}
 
         public:
+          row_element_iterator(const row_element_iterator &i)
+              : iterator(i.iterator) {}
           ~row_element_iterator() {}
+          bool operator==(const row_element_iterator &rhs) {
+            return iterator == rhs.iterator;
+          }
+          bool operator!=(const row_element_iterator &rhs) {
+            return iterator != rhs.iterator;
+          }
+          row_element_iterator operator++() {
+            iterator += n;
+            return *this;
+          }
+          row_element_iterator operator++(int) {
+            auto tmp = *this;
+            iterator += n;
+            return tmp;
+          }
           T operator*() { return *iterator; }
         };
 

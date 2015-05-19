@@ -38,11 +38,19 @@ go_bandit([]() {
       MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
 
       it("should iterate as many times as number of rows", [&array]() {
-        int n = 0;
+        size_t n = 0;
         for (auto i : array.rows()) {
           ++n must be_lte(3);
         }
         n must equal(3);
+      });
+
+      it("should all row vectors", [&array]() {
+        float v[3][2] = {{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}};
+        size_t k = 0;
+        for (auto i : array.rows()) {
+          std::equal(i.begin(), i.end(), &v[k++][0]) must be_truthy;
+        }
       });
     });
   });
