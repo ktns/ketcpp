@@ -34,8 +34,8 @@ go_bandit([]() {
         MatrixArray<float, 2, 2> array = {1.f, 2.f, 3.f, 4.f};
       } must_not throw_exception;
     });
-    describe(".rows", []() {
-      MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+    MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+    describe(".rows", [&array]() {
 
       it("should iterate as many times as number of rows", [&array]() {
         size_t n = 0;
@@ -49,6 +49,24 @@ go_bandit([]() {
         float v[3][2] = {{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}};
         size_t k = 0;
         for (auto i : array.rows()) {
+          std::equal(i.begin(), i.end(), &v[k++][0]) must be_truthy;
+        }
+      });
+    });
+
+    describe(".columns", [&array]() {
+      it("should iterate as many times as number of columns", [&array]() {
+        size_t n = 0;
+        for (auto i : array.columns()) {
+          ++n must be_lte(2);
+        }
+        n must equal(2);
+      });
+
+      it("should all row vectors", [&array]() {
+        float v[2][3] = {{1.f, 3.f, 5.f}, {2.f, 4.f, 6.f}};
+        size_t k = 0;
+        for (auto i : array.columns()) {
           std::equal(i.begin(), i.end(), &v[k++][0]) must be_truthy;
         }
       });

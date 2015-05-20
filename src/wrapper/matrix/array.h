@@ -96,9 +96,81 @@ namespace ketcpp {
           }
         };
 
+        class column_element_iterator
+            : public std::iterator<std::random_access_iterator_tag, T> {
+          typename array::iterator iterator;
+          friend MatrixArray<T, m, n>;
+          friend class column_iterator;
+          column_element_iterator(const typename array::iterator &i)
+              : iterator(i) {}
+
+        public:
+          column_element_iterator(const row_element_iterator &i)
+              : iterator(i.iterator) {}
+          ~column_element_iterator() {}
+          bool operator==(const column_element_iterator &rhs) {
+            return iterator == rhs.iterator;
+          }
+          bool operator!=(const column_element_iterator &rhs) {
+            return iterator != rhs.iterator;
+          }
+          column_element_iterator operator++() {
+            iterator += n;
+            return *this;
+          }
+          column_element_iterator operator++(int) {
+            auto tmp = *this;
+            iterator += n;
+            return tmp;
+          }
+          T operator*() { return *iterator; }
+        };
+
+        class column_iterator
+            : public std::iterator<std::random_access_iterator_tag,
+                                   column_element_iterator> {
+          typename array::iterator iterator;
+          friend MatrixArray<T, m, n>;
+          column_iterator(const typename array::iterator &i) : iterator(i) {}
+
+        public:
+          column_iterator(const row_iterator &i) : iterator(i.iterator) {}
+          ~column_iterator() {}
+
+          bool operator==(const column_iterator &rhs) {
+            return iterator == rhs.iterator;
+          }
+          bool operator!=(const column_iterator &rhs) {
+            return iterator != rhs.iterator;
+          }
+          column_iterator operator++() {
+            iterator++;
+            return *this;
+          }
+          column_iterator operator++(int) {
+            auto tmp = *this;
+            iterator++;
+            return tmp;
+          }
+          column_iterator operator*() { return *this; }
+
+          column_element_iterator begin() {
+            return column_element_iterator(iterator);
+          }
+          column_element_iterator end() {
+            return column_element_iterator(iterator + n);
+          }
+        };
+
       private:
         row_iterator row_begin() { return row_iterator(storage.begin()); }
         row_iterator row_end() { return row_iterator(storage.end()); }
+        column_iterator column_begin() {
+          return column_iterator(storage.begin());
+        }
+        column_iterator column_end() {
+          return column_iterator(storage.begin() + n);
+        }
 
       public:
         class rows_t {
@@ -111,6 +183,17 @@ namespace ketcpp {
         };
         friend rows_t;
         rows_t rows() { return rows_t(*this); }
+
+        class columns_t {
+          MatrixArray &matrix;
+
+        public:
+          columns_t(MatrixArray &mat) : matrix(mat) {}
+          column_iterator begin() { return matrix.column_begin(); }
+          column_iterator end() { return matrix.column_end(); }
+        };
+        friend columns_t;
+        columns_t columns() { return columns_t(*this); }
 
         template <typename... E>
         MatrixArray(E &&... e)
