@@ -32,6 +32,7 @@ go_bandit([]() {
     it("should be initialized with list", []() {
       []() {
         MatrixArray<float, 2, 2> array = {1.f, 2.f, 3.f, 4.f};
+        MatrixArray<float, 2, 2> array2 = {{1.f, 2.f}, {3.f, 4.f}};
       } must_not throw_exception;
     });
     MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};

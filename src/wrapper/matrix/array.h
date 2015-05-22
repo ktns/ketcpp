@@ -195,9 +195,17 @@ namespace ketcpp {
         friend columns_t;
         columns_t columns() { return columns_t(*this); }
 
-        template <typename... E>
-        MatrixArray(E &&... e)
-            : storage{{std::forward<E>(e)...}} {}
+        MatrixArray(
+            const std::initializer_list<std::initializer_list<float>> &list)
+            : storage() {
+          auto dest = storage.begin();
+          for (auto i : list) {
+            std::copy(i.begin(), i.end(), dest);
+          }
+        }
+        MatrixArray(const std::initializer_list<float> &list) : storage() {
+          std::copy(list.begin(), list.end(), storage.begin());
+        }
         ~MatrixArray() {}
       };
     }
