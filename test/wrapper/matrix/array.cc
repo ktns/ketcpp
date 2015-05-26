@@ -85,6 +85,26 @@ go_bandit([]() {
         n must equal(2);
       });
 
+      describe(".begin", [&array]() {
+        it("should iterate as many times as number of rows", [&array]() {
+          size_t n = 0;
+          for (float i : array.columns().begin()) {
+            ++n must be_lte(3);
+          }
+          n must equal(3);
+        });
+      });
+
+      describe(".end", [&array]() {
+        it("should iterate as many times as number of rows", [&array]() {
+          size_t n = 0;
+          for (float i : array.columns().end()) {
+            ++n must be_lte(3);
+          }
+          n must equal(3);
+        });
+      });
+
       it("should all column vectors", [&array]() {
         float v[2][3] = {{1.f, 3.f, 5.f}, {2.f, 4.f, 6.f}};
         size_t k = 0;
