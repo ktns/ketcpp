@@ -228,6 +228,13 @@ namespace ketcpp {
                          [rhs](T l) -> T { return l * rhs; });
           return *this;
         }
+        template <typename T2>
+        typename std::enable_if<std::is_convertible<T2, T>::value,
+                                MatrixArray>::type
+        operator*(T2 rhs) {
+          auto new_matrix = *this;
+          return new_matrix *= rhs;
+        }
         ~MatrixArray() {}
       };
     }

@@ -113,5 +113,19 @@ go_bandit([]() {
         });
       });
     });
+    describe("::operator*", [&array, &array2]() {
+      describe("(float)", [&array, &array2]() {
+        it("should return a multiplied matrix", [&array, &array2]() {
+          auto array3 = array * 2.f;
+          array3 == array2 must be_truthy;
+        });
+      });
+      describe("(unsinged int)", [&array, &array2]() {
+        it("should return a multiplied matrix", [&array, &array2]() {
+          auto array3 = array * 2u;
+          array3 == array2 must be_truthy;
+        });
+      });
+    });
   });
 });
