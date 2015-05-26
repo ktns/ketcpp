@@ -36,7 +36,8 @@ go_bandit([]() {
       } must_not throw_exception;
     });
     MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
-    MatrixArray<float, 3, 2> array2 = {2.f, 4.f, 6.f, 8.f, 10.f, 12.f};
+    auto array2 = array * 2;
+    auto array3 = array * 3;
     describe(".rows", [&array]() {
 
       it("should iterate as many times as number of rows", [&array]() {
@@ -84,14 +85,13 @@ go_bandit([]() {
          [&array, &array2]() { (array == array2) must be_falsy; });
     });
 
-    describe("::operator+=", [&array, &array2]() {
-      it("should change elements", [&array, &array2]() {
-        auto array3 = array;
-        MatrixArray<float, 3, 2> array4 = {3.f, 6.f, 9.f, 12.f, 15.f, 18.f};
+    describe("::operator+=", [&array, &array2, &array3]() {
+      it("should change elements", [&array, &array2, &array3]() {
+        auto array4 = array;
 
-        (array3 == array) must be_truthy;
-        array3 += array2;
-        (array3 == array4) must be_truthy;
+        (array4 == array) must be_truthy;
+        array4 += array2;
+        (array4 == array3) must be_truthy;
       });
     });
 
