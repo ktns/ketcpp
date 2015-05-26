@@ -83,5 +83,16 @@ go_bandit([]() {
       it("should false true for same matrix",
          [&array, &array2]() { (array == array2) must be_falsy; });
     });
+
+    describe("::operator+=", [&array, &array2]() {
+      it("should change elements", [&array, &array2]() {
+        auto array3 = array;
+        MatrixArray<float, 3, 2> array4 = {3.f, 6.f, 9.f, 12.f, 15.f, 18.f};
+
+        (array3 == array) must be_truthy;
+        array3 += array2;
+        (array3 == array4) must be_truthy;
+      });
+    });
   });
 });
