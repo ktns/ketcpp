@@ -85,7 +85,7 @@ go_bandit([]() {
         n must equal(2);
       });
 
-      it("should all row vectors", [&array]() {
+      it("should all column vectors", [&array]() {
         float v[2][3] = {{1.f, 3.f, 5.f}, {2.f, 4.f, 6.f}};
         size_t k = 0;
         for (auto i : array.columns()) {
