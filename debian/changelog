@@ -1,6 +1,6 @@
-ketcpp (0.0~4.gbp92d9fe) UNRELEASED; urgency=low
+ketcpp (0.0~5.gbpa53101) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @92d9fee62d1377799db3530415cf7727f9077d8d **
+  ** SNAPSHOT build @a53101c113f486948ffc2b3e4a40e8a43205f094 **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
@@ -10,6 +10,11 @@ ketcpp (0.0~4.gbp92d9fe) UNRELEASED; urgency=low
   * Defined abstract wrapper class MatrixBase.
   * Defined concrete wrapper class MatrixArray.
   * Make MatrixArray initializeble with an initializer list.
-  * MatrixArray::rows() returns a range of row_vectors.
+  * Implemented column- and row-based iterators.
+  * Implement Arithmetic operators for MatrixArray
+    - operator ==
+    - operator +=
+    - operator*= for scalars
+    - operator* for scalars
 
  -- Katsuhiko Nishimra <ktns.87@gmail.com>  Tue, 19 May 2015 18:06:37 +0900
