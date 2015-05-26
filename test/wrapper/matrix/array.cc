@@ -39,13 +39,32 @@ go_bandit([]() {
     auto array2 = array * 2;
     auto array3 = array * 3;
     describe(".rows", [&array]() {
-
       it("should iterate as many times as number of rows", [&array]() {
         size_t n = 0;
         for (auto i : array.rows()) {
           ++n must be_lte(3);
         }
         n must equal(3);
+      });
+
+      describe(".begin", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().begin()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
+      });
+
+      describe(".end", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().end()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
       });
 
       it("should all row vectors", [&array]() {
