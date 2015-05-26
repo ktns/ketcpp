@@ -49,12 +49,12 @@ namespace ketcpp {
             return iterator != rhs.iterator;
           }
           row_element_iterator operator++() {
-            iterator += n;
+            iterator++;
             return *this;
           }
           row_element_iterator operator++(int) {
             auto tmp = *this;
-            iterator += n;
+            iterator++;
             return tmp;
           }
           T operator*() { return *iterator; }
@@ -158,7 +158,7 @@ namespace ketcpp {
             return column_element_iterator(iterator);
           }
           column_element_iterator end() {
-            return column_element_iterator(iterator + n);
+            return column_element_iterator(iterator + m * n);
           }
         };
 
