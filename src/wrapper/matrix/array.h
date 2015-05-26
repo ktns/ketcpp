@@ -206,6 +206,11 @@ namespace ketcpp {
         MatrixArray(const std::initializer_list<float> &list) : storage() {
           std::copy(list.begin(), list.end(), storage.begin());
         }
+
+        bool operator==(const MatrixArray &rhs) const {
+          return std::equal(this->storage.cbegin(), this->storage.cend(),
+                            rhs.storage.cbegin());
+        }
         ~MatrixArray() {}
       };
     }

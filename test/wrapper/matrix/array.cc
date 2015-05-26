@@ -36,6 +36,7 @@ go_bandit([]() {
       } must_not throw_exception;
     });
     MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+    MatrixArray<float, 3, 2> array2 = {2.f, 4.f, 6.f, 8.f, 10.f, 12.f};
     describe(".rows", [&array]() {
 
       it("should iterate as many times as number of rows", [&array]() {
@@ -71,6 +72,16 @@ go_bandit([]() {
           std::equal(i.begin(), i.end(), &v[k++][0]) must be_truthy;
         }
       });
+    });
+
+    describe("::operator==", [&array, &array2]() {
+      it("should return true for same matrix", [&array]() {
+        auto array2 = array;
+        (array == array2) must be_truthy;
+      });
+
+      it("should false true for same matrix",
+         [&array, &array2]() { (array == array2) must be_falsy; });
     });
   });
 });
