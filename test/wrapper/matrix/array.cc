@@ -94,5 +94,24 @@ go_bandit([]() {
         (array3 == array4) must be_truthy;
       });
     });
+
+    describe("::operator*=", [&array, &array2]() {
+      describe("(float)", [&array, &array2]() {
+        it("should change elements", [&array, &array2]() {
+          auto array3 = array;
+          (array3 == array) must be_truthy;
+          array3 *= 2.0f;
+          (array3 == array2) must be_truthy;
+        });
+      });
+      describe("(unsinged int)", [&array, &array2]() {
+        it("should change elements", [&array, &array2]() {
+          auto array3 = array;
+          (array3 == array) must be_truthy;
+          array3 *= 2u;
+          (array3 == array2) must be_truthy;
+        });
+      });
+    });
   });
 });
