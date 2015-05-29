@@ -17,8 +17,13 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <array>
+#include <iostream>
 #include <iterator>
+#include <sstream>
+
+#include <infix_iterator.h>
 #include "wrapper/matrix/base.h"
 
 namespace ketcpp {
@@ -39,6 +44,9 @@ namespace ketcpp {
               : iterator(i) {}
 
         public:
+          typedef typename std::iterator<std::random_access_iterator_tag,
+                                         row_element_iterator>::difference_type
+              diff_t;
           row_element_iterator(const row_element_iterator &i)
               : iterator(i.iterator) {}
           ~row_element_iterator() {}
@@ -47,6 +55,9 @@ namespace ketcpp {
           }
           bool operator!=(const row_element_iterator &rhs) {
             return iterator != rhs.iterator;
+          }
+          diff_t operator-(const row_element_iterator &rhs) {
+            return iterator - rhs.iterator;
           }
           row_element_iterator operator++() {
             iterator++;
@@ -237,6 +248,24 @@ namespace ketcpp {
         }
         ~MatrixArray() {}
       };
+
+      template <typename T, int m, int n>
+      std::ostream &operator<<(std::ostream &out, MatrixArray<T, m, n> matrix) {
+        infix_ostream_iterator<std::string> lines(out, "\n");
+        std::transform(
+            matrix.rows().begin(), matrix.rows().end(), lines,
+            [&out](const typename MatrixArray<T, m, n>::row_iterator &row_c)
+                -> std::string {
+                  auto row = row_c;
+                  std::stringstream ss;
+                  ss << "(";
+                  infix_ostream_iterator<T> line(ss, ", ");
+                  std::copy(row.begin(), row.end(), line);
+                  ss << ")";
+                  return ss.str();
+                });
+        return out;
+      }
     }
   }
 }
