@@ -31,6 +31,7 @@ namespace ketcpp {
     namespace matrix {
       template <typename T, int m, int n = m>
       class MatrixArray : public MatrixBase<T> {
+      private:
         using array = std::array<T, m * n>;
         array storage;
 
