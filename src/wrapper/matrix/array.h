@@ -251,20 +251,19 @@ namespace ketcpp {
 
       template <typename T, int m, int n>
       std::ostream &operator<<(std::ostream &out, MatrixArray<T, m, n> matrix) {
-        infix_ostream_iterator<std::string> lines(out, "\n");
+        infix_ostream_iterator<std::string> lines(out, "}, {");
+        out << "{{";
         std::transform(
             matrix.rows().begin(), matrix.rows().end(), lines,
             [&out](const typename MatrixArray<T, m, n>::row_iterator &row_c)
                 -> std::string {
                   auto row = row_c;
                   std::stringstream ss;
-                  ss << "(";
                   infix_ostream_iterator<T> line(ss, ", ");
                   std::copy(row.begin(), row.end(), line);
-                  ss << ")";
                   return ss.str();
                 });
-        return out;
+        return out << "}}";
       }
     }
   }
