@@ -2,7 +2,7 @@ Source: ketcpp
 Section: unknown
 Priority: optional
 Maintainer: Katsuhiko Nishimra <ktns.87@gmail.com>
-Build-Depends: debhelper (>= 9), cmake (>= 3.1), c++-compiler, libeigen3-dev
+Build-Depends: debhelper (>= 9), cmake (>= 3.1), clang (>= 3.4) | g++ (>=4.8) | c++-compiler, libeigen3-dev
 Standards-Version: 3.9.6
 Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://anonscm.debian.org/collab-maint/ketcpp.git
