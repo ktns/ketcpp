@@ -5,6 +5,11 @@ set(serial 0.0)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+find_package(PkgConfig)
+pkg_check_modules(EIGEN3_PC eigen3)
+if(EIGEN3_PC_FOUND)
+  set(EIGEN3_INCLUDE_DIR ${EIGEN3_PC_INCLUDE_DIRS})
+endif(EIGEN3_PC_FOUND)
 find_package(Eigen3)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
