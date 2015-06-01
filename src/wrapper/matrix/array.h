@@ -21,6 +21,7 @@
 #include <array>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <sstream>
 
 #include <infix_iterator.h>
@@ -40,179 +41,71 @@ namespace ketcpp {
       private:
         using array = std::array<T, m * n>;
         array storage;
+        using Base = MatrixBase<T>;
+        typedef typename Base::BaseIterator BaseIterator;
+        typedef typename Base::RowVectorIterator RowVectorIterator;
+        typedef typename Base::RowElementIterator RowElementIterator;
+        typedef typename Base::ColumnVectorIterator ColumnVectorIterator;
+        typedef typename Base::ColumnElementIterator ColumnElementIterator;
 
-      public:
-        class row_element_iterator
-            : public std::iterator<std::random_access_iterator_tag, T> {
-          typename array::iterator iterator;
-          friend MatrixArray<T, m, n>;
-          friend class row_iterator;
-          row_element_iterator(const typename array::iterator &i)
-              : iterator(i) {}
+        class Iterator : public BaseIterator {
+          using unique_ptr = std::unique_ptr<BaseIterator>;
+          typename MatrixArray::array::iterator iterator;
+          constexpr static size_t row_size = MatrixArray::row_size;
+          constexpr static size_t column_size = MatrixArray::column_size;
 
-        public:
-          typedef typename std::iterator<std::random_access_iterator_tag,
-                                         row_element_iterator>::difference_type
-              diff_t;
-          row_element_iterator(const row_element_iterator &i)
-              : iterator(i.iterator) {}
-          ~row_element_iterator() {}
-          bool operator==(const row_element_iterator &rhs) {
-            return iterator == rhs.iterator;
+        protected:
+          void advance_in_column() { this->iterator += row_size; }
+          void advance_in_row() { this->iterator++; }
+          unique_ptr row_begin() {
+            return std::move(std::make_unique<Iterator>(this->iterator));
           }
-          bool operator!=(const row_element_iterator &rhs) {
-            return iterator != rhs.iterator;
+          unique_ptr row_end() {
+            return std::move(
+                std::make_unique<Iterator>(this->iterator + row_size));
           }
-          diff_t operator-(const row_element_iterator &rhs) {
-            return iterator - rhs.iterator;
+          unique_ptr column_begin() {
+            return std::move(std::make_unique<Iterator>(this->iterator));
           }
-          row_element_iterator operator++() {
-            iterator++;
-            return *this;
+          unique_ptr column_end() {
+            return std::move(std::make_unique<Iterator>(
+                this->iterator + row_size * column_size));
           }
-          row_element_iterator operator++(int) {
-            auto tmp = *this;
-            iterator++;
-            return tmp;
+          unique_ptr copy() {
+            return std::move(std::make_unique<Iterator>(this->iterator));
           }
-          T operator*() { return *iterator; }
-        };
-
-        class row_iterator
-            : public std::iterator<std::random_access_iterator_tag,
-                                   row_element_iterator> {
-          typename array::iterator iterator;
-          friend MatrixArray<T, m, n>;
-          row_iterator(const typename array::iterator &i) : iterator(i) {}
+          bool operator==(BaseIterator &rhs) throw(std::bad_cast &) {
+            auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
+            return this->iterator == rhs_cast.iterator;
+          }
+          bool operator!=(BaseIterator &rhs) throw(std::bad_cast &) {
+            auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
+            return this->iterator != rhs_cast.iterator;
+          }
+          T &operator*() { return *iterator; }
 
         public:
-          row_iterator(const row_iterator &i) : iterator(i.iterator) {}
-          ~row_iterator() {}
-
-          bool operator==(const row_iterator &rhs) {
-            return iterator == rhs.iterator;
-          }
-          bool operator!=(const row_iterator &rhs) {
-            return iterator != rhs.iterator;
-          }
-          row_iterator operator++() {
-            iterator += n;
-            return *this;
-          }
-          row_iterator operator++(int) {
-            auto tmp = *this;
-            iterator += n;
-            return tmp;
-          }
-          row_iterator operator*() { return *this; }
-
-          row_element_iterator begin() {
-            return row_element_iterator(iterator);
-          }
-          row_element_iterator end() {
-            return row_element_iterator(iterator + n);
-          }
+          Iterator(const decltype(iterator) &src) : iterator(src) {}
         };
 
-        class column_element_iterator
-            : public std::iterator<std::random_access_iterator_tag, T> {
-          typename array::iterator iterator;
-          friend MatrixArray<T, m, n>;
-          friend class column_iterator;
-          column_element_iterator(const typename array::iterator &i)
-              : iterator(i) {}
-
-        public:
-          column_element_iterator(const row_element_iterator &i)
-              : iterator(i.iterator) {}
-          ~column_element_iterator() {}
-          bool operator==(const column_element_iterator &rhs) {
-            return iterator == rhs.iterator;
-          }
-          bool operator!=(const column_element_iterator &rhs) {
-            return iterator != rhs.iterator;
-          }
-          column_element_iterator operator++() {
-            iterator += n;
-            return *this;
-          }
-          column_element_iterator operator++(int) {
-            auto tmp = *this;
-            iterator += n;
-            return tmp;
-          }
-          T operator*() { return *iterator; }
-        };
-
-        class column_iterator
-            : public std::iterator<std::random_access_iterator_tag,
-                                   column_element_iterator> {
-          typename array::iterator iterator;
-          friend MatrixArray<T, m, n>;
-          column_iterator(const typename array::iterator &i) : iterator(i) {}
-
-        public:
-          column_iterator(const row_iterator &i) : iterator(i.iterator) {}
-          ~column_iterator() {}
-
-          bool operator==(const column_iterator &rhs) {
-            return iterator == rhs.iterator;
-          }
-          bool operator!=(const column_iterator &rhs) {
-            return iterator != rhs.iterator;
-          }
-          column_iterator operator++() {
-            iterator++;
-            return *this;
-          }
-          column_iterator operator++(int) {
-            auto tmp = *this;
-            iterator++;
-            return tmp;
-          }
-          column_iterator operator*() { return *this; }
-
-          column_element_iterator begin() {
-            return column_element_iterator(iterator);
-          }
-          column_element_iterator end() {
-            return column_element_iterator(iterator + m * n);
-          }
-        };
-
-      private:
-        row_iterator row_begin() { return row_iterator(storage.begin()); }
-        row_iterator row_end() { return row_iterator(storage.end()); }
-        column_iterator column_begin() {
-          return column_iterator(storage.begin());
+      protected:
+        RowVectorIterator row_begin() {
+          return RowVectorIterator(std::make_unique<Iterator>(storage.begin()));
         }
-        column_iterator column_end() {
-          return column_iterator(storage.begin() + n);
+        RowVectorIterator row_end() {
+          return RowVectorIterator(
+              std::move(std::make_unique<Iterator>(storage.end())));
+        }
+        ColumnVectorIterator column_begin() {
+          return ColumnVectorIterator(
+              std::move(std::make_unique<Iterator>(storage.begin())));
+        }
+        ColumnVectorIterator column_end() {
+          return ColumnVectorIterator(std::move(
+              std::make_unique<Iterator>(storage.begin() + row_size)));
         }
 
       public:
-        class rows_t {
-          MatrixArray &matrix;
-
-        public:
-          rows_t(MatrixArray &mat) : matrix(mat) {}
-          row_iterator begin() { return matrix.row_begin(); }
-          row_iterator end() { return matrix.row_end(); }
-        };
-        friend rows_t;
-        rows_t rows() { return rows_t(*this); }
-
-        class columns_t {
-          MatrixArray &matrix;
-
-        public:
-          columns_t(MatrixArray &mat) : matrix(mat) {}
-          column_iterator begin() { return matrix.column_begin(); }
-          column_iterator end() { return matrix.column_end(); }
-        };
-        friend columns_t;
-        columns_t columns() { return columns_t(*this); }
-
         MatrixArray(
             const std::initializer_list<std::initializer_list<float>> &list)
             : storage() {
