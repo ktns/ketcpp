@@ -1,12 +1,15 @@
-ketcpp (0.0~5.gbpa53101) UNRELEASED; urgency=low
+ketcpp (0.0~6.gbpb631a8) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @a53101c113f486948ffc2b3e4a40e8a43205f094 **
+  ** SNAPSHOT build @b631a8e323864185c0b2b3a8dc691767c0a7e62a **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
+  * Import infix_iterator.h
+    (http://codereview.stackexchange.com/questions/13176/infix-iterator-code)
   * Include submodules into source tarball.
   * Configure install target.
-  * Add dependency on Eigen3
+  * Build-Depends on eigen3, cmake
+  * Build-Depends on c++ compiler that supports c++14.
   * Defined abstract wrapper class MatrixBase.
   * Defined concrete wrapper class MatrixArray.
   * Make MatrixArray initializeble with an initializer list.
@@ -16,5 +19,6 @@ ketcpp (0.0~5.gbpa53101) UNRELEASED; urgency=low
     - operator +=
     - operator*= for scalars
     - operator* for scalars
+  * Overload operator ostream << MatrixArray
 
  -- Katsuhiko Nishimra <ktns.87@gmail.com>  Tue, 19 May 2015 18:06:37 +0900
