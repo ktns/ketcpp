@@ -29,8 +29,12 @@
 namespace ketcpp {
   namespace wrapper {
     namespace matrix {
-      template <typename T, int m, int n = m>
+      template <typename T, size_t m, size_t n = m>
       class MatrixArray : public MatrixBase<T> {
+      public:
+        constexpr static size_t row_size = n;
+        constexpr static size_t column_size = m;
+
       private:
         using array = std::array<T, m * n>;
         array storage;
@@ -250,7 +254,7 @@ namespace ketcpp {
         ~MatrixArray() {}
       };
 
-      template <typename T, int m, int n>
+      template <typename T, size_t m, size_t n>
       std::ostream &operator<<(std::ostream &out, MatrixArray<T, m, n> matrix) {
         infix_ostream_iterator<std::string> lines(out, "}, {");
         out << "{{";
