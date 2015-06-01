@@ -32,6 +32,8 @@ namespace ketcpp {
       template <typename T, size_t m, size_t n = m>
       class MatrixArray : public MatrixBase<T> {
       public:
+        constexpr static size_t num_rows = m;
+        constexpr static size_t num_columns = n;
         constexpr static size_t row_size = n;
         constexpr static size_t column_size = m;
 
