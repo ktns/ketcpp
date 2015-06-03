@@ -1,6 +1,6 @@
-ketcpp (0.0~6.gbpb631a8) UNRELEASED; urgency=low
+ketcpp (0.0~7.gbpfaae1b) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @b631a8e323864185c0b2b3a8dc691767c0a7e62a **
+  ** SNAPSHOT build @faae1ba0276cb14fb96cbf5015b9b5a3cf924c84 **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
@@ -10,6 +10,7 @@ ketcpp (0.0~6.gbpb631a8) UNRELEASED; urgency=low
   * Configure install target.
   * Build-Depends on eigen3, cmake
   * Build-Depends on c++ compiler that supports c++14.
+  * Output details of the test on failure.
   * Defined abstract wrapper class MatrixBase.
   * Defined concrete wrapper class MatrixArray.
   * Make MatrixArray initializeble with an initializer list.
