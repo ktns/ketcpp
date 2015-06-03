@@ -27,7 +27,7 @@ namespace ketcpp {
         using iter_traits = std::iterator<std::random_access_iterator_tag, T>;
 
       protected:
-        class BaseIterator {
+        template <bool is_const> class BaseIterator {
           using unique_ptr = std::unique_ptr<BaseIterator>;
 
         public:
@@ -42,12 +42,15 @@ namespace ketcpp {
           virtual bool operator!=(BaseIterator &rhs) throw(std::bad_cast &) {
             return !(*this == rhs);
           }
-          virtual T &operator*() = 0;
+          virtual typename std::conditional<is_const, const T &, T &>::type
+          operator*() = 0;
         };
+        template <bool is_const>
         class BaseDelegateIterator : public iter_traits {
         protected:
+          using BaseIterator = BaseIterator<is_const>;
           using unique_ptr = std::unique_ptr<BaseIterator>;
-          std::unique_ptr<BaseIterator> iterator;
+          unique_ptr iterator;
           BaseDelegateIterator(const BaseDelegateIterator &src)
               : iterator(std::move(src.iterator->copy())) {}
           BaseDelegateIterator(const BaseIterator &src) {
@@ -68,23 +71,31 @@ namespace ketcpp {
         };
 
       public:
-        class RowElementIterator : public BaseDelegateIterator {
+        template <bool is_const>
+        class RowElementGenericIterator
+            : public BaseDelegateIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
-          RowElementIterator(unique_ptr &&src)
+          RowElementGenericIterator(unique_ptr &&src)
               : BaseDelegateIterator(std::move(src)) {}
           auto &operator++() {
             this->iterator->advance_in_row();
             return *this;
           }
-          T &operator*() { return **this->iterator; }
+          typename std::conditional<is_const, const T &, T &>::type
+          operator*() {
+            return **this->iterator;
+          }
         };
-        class RowVectorIterator : public BaseDelegateIterator {
+        template <bool is_const>
+        class RowVectorGenericIterator : public BaseDelegateIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
-          RowVectorIterator(unique_ptr &&src)
+          RowVectorGenericIterator(unique_ptr &&src)
               : BaseDelegateIterator(std::move(src)) {}
           auto &operator++() {
             this->iterator->advance_in_column();
@@ -93,30 +104,39 @@ namespace ketcpp {
           auto &operator*() { return *this; }
           auto begin() {
             auto new_ptr = std::move(this->iterator->row_begin());
-            return RowElementIterator(std::move(new_ptr));
+            return RowElementGenericIterator<is_const>(std::move(new_ptr));
           }
           auto end() {
             auto new_ptr = std::move(this->iterator->row_end());
-            return RowElementIterator(std::move(new_ptr));
+            return RowElementGenericIterator<is_const>(std::move(new_ptr));
           }
         };
-        class ColumnElementIterator : public BaseDelegateIterator {
+        template <bool is_const>
+        class ColumnElementGenericIterator
+            : public BaseDelegateIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
-          ColumnElementIterator(unique_ptr &&src)
+          ColumnElementGenericIterator(unique_ptr &&src)
               : BaseDelegateIterator(std::move(src)) {}
           auto &operator++() {
             this->iterator->advance_in_column();
             return *this;
           }
-          T &operator*() { return **this->iterator; }
+          typename std::conditional<is_const, const T &, T &>::type
+          operator*() {
+            return **this->iterator;
+          }
         };
-        class ColumnVectorIterator : public BaseDelegateIterator {
+        template <bool is_const>
+        class ColumnVectorGenericIterator
+            : public BaseDelegateIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
-          ColumnVectorIterator(unique_ptr &&src)
+          ColumnVectorGenericIterator(unique_ptr &&src)
               : BaseDelegateIterator(std::move(src)) {}
           auto &operator++() {
             this->iterator->advance_in_row();
@@ -125,42 +145,78 @@ namespace ketcpp {
           auto &operator*() { return *this; }
           auto begin() {
             auto new_ptr = std::move(this->iterator->column_begin());
-            return ColumnElementIterator(std::move(new_ptr));
+            return ColumnElementGenericIterator<is_const>(std::move(new_ptr));
           }
           auto end() {
             auto new_ptr = std::move(this->iterator->column_end());
-            return ColumnElementIterator(std::move(new_ptr));
+            return ColumnElementGenericIterator<is_const>(std::move(new_ptr));
           }
         };
+        typedef RowVectorGenericIterator<false> RowVectorIterator;
+        typedef RowElementGenericIterator<false> RowElementIterator;
+        typedef ColumnVectorGenericIterator<false> ColumnVectorIterator;
+        typedef ColumnElementGenericIterator<false> ColumnElementIterator;
+        typedef RowVectorGenericIterator<true> RowVectorConstIterator;
+        typedef RowElementGenericIterator<true> RowElementConstIterator;
+        typedef ColumnVectorGenericIterator<true> ColumnVectorConstIterator;
+        typedef ColumnElementGenericIterator<true> ColumnElementConstIterator;
 
       protected:
         virtual RowVectorIterator row_begin() = 0;
         virtual RowVectorIterator row_end() = 0;
         virtual ColumnVectorIterator column_begin() = 0;
         virtual ColumnVectorIterator column_end() = 0;
+        virtual RowVectorConstIterator row_cbegin() const = 0;
+        virtual RowVectorConstIterator row_cend() const = 0;
+        virtual ColumnVectorConstIterator column_cbegin() const = 0;
+        virtual ColumnVectorConstIterator column_cend() const = 0;
+        virtual RowVectorConstIterator row_begin() const {
+          return row_cbegin();
+        }
+        virtual RowVectorConstIterator row_end() const { return row_cend(); }
+        virtual ColumnVectorConstIterator column_begin() const {
+          return column_cbegin();
+        }
+        virtual ColumnVectorConstIterator column_end() const {
+          return column_cend();
+        }
 
       public:
-        class rows_t {
-          MatrixBase &matrix;
+        template <bool is_const> class rows_t {
+          using MatrixRef =
+              typename std::conditional<is_const, const MatrixBase &,
+                                        MatrixBase &>::type;
+          MatrixRef matrix;
 
         public:
-          rows_t(MatrixBase &mat) : matrix(mat) {}
-          auto begin() { return matrix.row_begin(); }
-          auto end() { return matrix.row_end(); }
+          rows_t(MatrixRef mat) : matrix(mat) {}
+          auto begin() const { return matrix.row_begin(); }
+          auto end() const { return matrix.row_end(); }
+          auto cbegin() const { return matrix.row_cbegin(); }
+          auto cend() const { return matrix.row_cend(); }
         };
-        friend rows_t;
-        rows_t rows() { return rows_t(*this); }
+        friend rows_t<true>;
+        friend rows_t<false>;
+        auto rows() { return rows_t<false>(*this); }
+        auto rows() const { return rows_t<true>(*this); }
 
-        class columns_t {
-          MatrixBase &matrix;
+        template <bool is_const> class columns_t {
+          using MatrixRef =
+              typename std::conditional<is_const, const MatrixBase &,
+                                        MatrixBase &>::type;
+          MatrixRef matrix;
 
         public:
-          columns_t(MatrixBase &mat) : matrix(mat) {}
-          auto begin() { return matrix.column_begin(); }
-          auto end() { return matrix.column_end(); }
+          columns_t(MatrixRef &mat) : matrix(mat) {}
+          auto begin() const { return matrix.column_begin(); }
+          auto end() const { return matrix.column_end(); }
+          auto cbegin() const { return matrix.column_cbegin(); }
+          auto cend() const { return matrix.column_cend(); }
         };
-        friend columns_t;
-        auto columns() { return columns_t(*this); }
+        friend columns_t<true>;
+        friend columns_t<false>;
+        auto columns() { return columns_t<false>(*this); }
+        auto columns() const { return columns_t<true>(*this); }
 
         virtual ~MatrixBase() = 0;
       };

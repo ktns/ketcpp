@@ -57,10 +57,30 @@ go_bandit([]() {
         });
       });
 
+      describe(".cbegin", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().cbegin()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
+      });
+
       describe(".end", [&array]() {
         it("should iterate as many times as number of columns", [&array]() {
           size_t n = 0;
           for (float i : array.rows().end()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
+      });
+
+      describe(".cend", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().cend()) {
             ++n must be_lte(2);
           }
           n must equal(2);
@@ -76,7 +96,125 @@ go_bandit([]() {
       });
     });
 
+    describe(".rows const", [&array2]() {
+      const auto &array = array2;
+      it("should iterate as many times as number of rows", [&array]() {
+        size_t n = 0;
+        for (auto i : array.rows()) {
+          ++n must be_lte(3);
+        }
+        n must equal(3);
+      });
+
+      describe(".begin", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().begin()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
+      });
+
+      describe(".cbegin", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().cbegin()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
+      });
+
+      describe(".end", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().end()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
+      });
+
+      describe(".cend", [&array]() {
+        it("should iterate as many times as number of columns", [&array]() {
+          size_t n = 0;
+          for (float i : array.rows().cend()) {
+            ++n must be_lte(2);
+          }
+          n must equal(2);
+        });
+      });
+
+      it("should all row vectors", [&array]() {
+        float v[3][2] = {{2.f, 4.f}, {6.f, 8.f}, {10.f, 12.f}};
+        size_t k = 0;
+        for (auto i : array.rows()) {
+          std::equal(i.begin(), i.end(), &v[k++][0]) must be_truthy;
+        }
+      });
+    });
+
     describe(".columns", [&array]() {
+      it("should iterate as many times as number of columns", [&array]() {
+        size_t n = 0;
+        for (auto i : array.columns()) {
+          ++n must be_lte(2);
+        }
+        n must equal(2);
+      });
+
+      describe(".begin", [&array]() {
+        it("should iterate as many times as number of rows", [&array]() {
+          size_t n = 0;
+          for (float i : array.columns().begin()) {
+            ++n must be_lte(3);
+          }
+          n must equal(3);
+        });
+      });
+
+      describe(".cbegin", [&array]() {
+        it("should iterate as many times as number of rows", [&array]() {
+          size_t n = 0;
+          for (float i : array.columns().cbegin()) {
+            ++n must be_lte(3);
+          }
+          n must equal(3);
+        });
+      });
+
+      describe(".end", [&array]() {
+        it("should iterate as many times as number of rows", [&array]() {
+          size_t n = 0;
+          for (float i : array.columns().end()) {
+            ++n must be_lte(3);
+          }
+          n must equal(3);
+        });
+      });
+
+      describe(".cend", [&array]() {
+        it("should iterate as many times as number of rows", [&array]() {
+          size_t n = 0;
+          for (float i : array.columns().cend()) {
+            ++n must be_lte(3);
+          }
+          n must equal(3);
+        });
+      });
+
+      it("should all column vectors", [&array]() {
+        float v[2][3] = {{1.f, 3.f, 5.f}, {2.f, 4.f, 6.f}};
+        size_t k = 0;
+        for (auto i : array.columns()) {
+          std::equal(i.begin(), i.end(), &v[k++][0]) must be_truthy;
+        }
+      });
+    });
+
+    describe(".columns const", [&array2]() {
+      const auto &array = array2;
       it("should iterate as many times as number of columns", [&array]() {
         size_t n = 0;
         for (auto i : array.columns()) {
@@ -106,7 +244,7 @@ go_bandit([]() {
       });
 
       it("should all column vectors", [&array]() {
-        float v[2][3] = {{1.f, 3.f, 5.f}, {2.f, 4.f, 6.f}};
+        float v[2][3] = {{2.f, 6.f, 10.f}, {4.f, 8.f, 12.f}};
         size_t k = 0;
         for (auto i : array.columns()) {
           std::equal(i.begin(), i.end(), &v[k++][0]) must be_truthy;

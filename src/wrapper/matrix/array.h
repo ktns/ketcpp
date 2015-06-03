@@ -42,15 +42,24 @@ namespace ketcpp {
         using array = std::array<T, m * n>;
         array storage;
         using Base = MatrixBase<T>;
-        typedef typename Base::BaseIterator BaseIterator;
         typedef typename Base::RowVectorIterator RowVectorIterator;
         typedef typename Base::RowElementIterator RowElementIterator;
         typedef typename Base::ColumnVectorIterator ColumnVectorIterator;
         typedef typename Base::ColumnElementIterator ColumnElementIterator;
+        typedef typename Base::RowVectorConstIterator RowVectorConstIterator;
+        typedef typename Base::RowElementConstIterator RowElementConstIterator;
+        typedef
+            typename Base::ColumnVectorConstIterator ColumnVectorConstIterator;
+        typedef typename Base::ColumnElementConstIterator
+            ColumnElementConstIterator;
 
-        class Iterator : public BaseIterator {
+        template <bool is_const>
+        class GenericIterator : public Base::template BaseIterator<is_const> {
+          using BaseIterator = typename Base::template BaseIterator<is_const>;
           using unique_ptr = std::unique_ptr<BaseIterator>;
-          typename MatrixArray::array::iterator iterator;
+          typename std::conditional<
+              is_const, typename MatrixArray::array::const_iterator,
+              typename MatrixArray::array::iterator>::type iterator;
           constexpr static size_t row_size = MatrixArray::row_size;
           constexpr static size_t column_size = MatrixArray::column_size;
 
@@ -58,21 +67,21 @@ namespace ketcpp {
           void advance_in_column() { this->iterator += row_size; }
           void advance_in_row() { this->iterator++; }
           unique_ptr row_begin() {
-            return std::move(std::make_unique<Iterator>(this->iterator));
+            return std::move(std::make_unique<GenericIterator>(this->iterator));
           }
           unique_ptr row_end() {
             return std::move(
-                std::make_unique<Iterator>(this->iterator + row_size));
+                std::make_unique<GenericIterator>(this->iterator + row_size));
           }
           unique_ptr column_begin() {
-            return std::move(std::make_unique<Iterator>(this->iterator));
+            return std::move(std::make_unique<GenericIterator>(this->iterator));
           }
           unique_ptr column_end() {
-            return std::move(std::make_unique<Iterator>(
+            return std::move(std::make_unique<GenericIterator>(
                 this->iterator + row_size * column_size));
           }
           unique_ptr copy() {
-            return std::move(std::make_unique<Iterator>(this->iterator));
+            return std::move(std::make_unique<GenericIterator>(this->iterator));
           }
           bool operator==(BaseIterator &rhs) throw(std::bad_cast &) {
             auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
@@ -82,13 +91,34 @@ namespace ketcpp {
             auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
             return this->iterator != rhs_cast.iterator;
           }
-          T &operator*() { return *iterator; }
+          typename std::conditional<is_const, const T &, T &>::type
+          operator*() {
+            return *iterator;
+          }
 
         public:
-          Iterator(const decltype(iterator) &src) : iterator(src) {}
+          GenericIterator(decltype(iterator) src) : iterator(src) {}
         };
+        using Iterator = GenericIterator<false>;
+        using ConstIterator = GenericIterator<true>;
 
       protected:
+        RowVectorConstIterator row_cbegin() const {
+          return RowVectorConstIterator(
+              std::make_unique<ConstIterator>(storage.cbegin()));
+        }
+        RowVectorConstIterator row_cend() const {
+          return RowVectorConstIterator(
+              std::move(std::make_unique<ConstIterator>(storage.cend())));
+        }
+        ColumnVectorConstIterator column_cbegin() const {
+          return ColumnVectorConstIterator(
+              std::move(std::make_unique<ConstIterator>(storage.cbegin())));
+        }
+        ColumnVectorConstIterator column_cend() const {
+          return ColumnVectorConstIterator(std::move(
+              std::make_unique<ConstIterator>(storage.cbegin() + row_size)));
+        }
         RowVectorIterator row_begin() {
           return RowVectorIterator(std::make_unique<Iterator>(storage.begin()));
         }
