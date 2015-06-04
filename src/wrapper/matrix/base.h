@@ -20,6 +20,8 @@
 #include <functional>
 #include <memory>
 
+#include <infix_iterator.h>
+
 namespace ketcpp {
   namespace wrapper {
     namespace matrix {
@@ -224,6 +226,22 @@ namespace ketcpp {
         virtual ~MatrixBase() = 0;
       };
       template <typename T> MatrixBase<T>::~MatrixBase() {}
+
+      template <typename T>
+      std::ostream &operator<<(std::ostream &out, const MatrixBase<T> &matrix) {
+        infix_ostream_iterator<std::string> lines(out, "}, {");
+        out << "{{";
+        std::transform(
+            matrix.rows().cbegin(), matrix.rows().cend(), lines,
+            [&out](typename MatrixBase<T>::RowVectorConstIterator &row)
+                -> std::string {
+                  std::stringstream ss;
+                  infix_ostream_iterator<T> line(ss, ", ");
+                  std::copy(row.begin(), row.end(), line);
+                  return ss.str();
+                });
+        return out << "}}";
+      }
     }
   }
 }

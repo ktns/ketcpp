@@ -24,7 +24,6 @@
 #include <memory>
 #include <sstream>
 
-#include <infix_iterator.h>
 #include "wrapper/matrix/base.h"
 
 namespace ketcpp {
@@ -184,22 +183,6 @@ namespace ketcpp {
         }
         ~MatrixArray() {}
       };
-
-      template <typename T, size_t m, size_t n>
-      std::ostream &operator<<(std::ostream &out, MatrixArray<T, m, n> matrix) {
-        infix_ostream_iterator<std::string> lines(out, "}, {");
-        out << "{{";
-        std::transform(
-            matrix.rows().cbegin(), matrix.rows().cend(), lines,
-            [&out](typename MatrixBase<T>::RowVectorConstIterator &row)
-                -> std::string {
-                  std::stringstream ss;
-                  infix_ostream_iterator<T> line(ss, ", ");
-                  std::copy(row.begin(), row.end(), line);
-                  return ss.str();
-                });
-        return out << "}}";
-      }
     }
   }
 }
