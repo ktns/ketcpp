@@ -31,6 +31,8 @@ namespace ketcpp {
           using unique_ptr = std::unique_ptr<BaseIterator>;
 
         public:
+          using difference_type = typename iter_traits::difference_type;
+
           virtual void advance_in_column() = 0;
           virtual void advance_in_row() = 0;
           virtual unique_ptr row_begin() = 0;
@@ -44,6 +46,7 @@ namespace ketcpp {
           }
           virtual typename std::conditional<is_const, const T &, T &>::type
           operator*() = 0;
+          virtual difference_type operator-(const BaseIterator &) const = 0;
         };
         template <bool is_const>
         class BaseDelegateIterator : public iter_traits {

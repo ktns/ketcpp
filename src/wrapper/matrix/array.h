@@ -91,6 +91,11 @@ namespace ketcpp {
             auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
             return this->iterator != rhs_cast.iterator;
           }
+          typename BaseIterator::difference_type
+          operator-(const BaseIterator &rhs) const throw(std::bad_cast &) {
+            auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
+            return this->iterator - rhs_cast.iterator;
+          }
           typename std::conditional<is_const, const T &, T &>::type
           operator*() {
             return *iterator;
