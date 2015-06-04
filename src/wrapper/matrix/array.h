@@ -53,8 +53,10 @@ namespace ketcpp {
             ColumnElementConstIterator;
 
         template <bool is_const>
-        class GenericIterator : public Base::template BaseIterator<is_const> {
-          using BaseIterator = typename Base::template BaseIterator<is_const>;
+        class GenericIterator
+            : public Base::template BaseGenericIterator<is_const> {
+          using BaseIterator =
+              typename Base::template BaseGenericIterator<is_const>;
           using unique_ptr = std::unique_ptr<BaseIterator>;
           typename std::conditional<
               is_const, typename MatrixArray::array::const_iterator,

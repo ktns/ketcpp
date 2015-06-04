@@ -29,8 +29,8 @@ namespace ketcpp {
         using iter_traits = std::iterator<std::random_access_iterator_tag, T>;
 
       protected:
-        template <bool is_const> class BaseIterator {
-          using unique_ptr = std::unique_ptr<BaseIterator>;
+        template <bool is_const> class BaseGenericIterator {
+          using unique_ptr = std::unique_ptr<BaseGenericIterator>;
 
         public:
           using difference_type = typename iter_traits::difference_type;
@@ -42,35 +42,39 @@ namespace ketcpp {
           virtual unique_ptr column_begin() = 0;
           virtual unique_ptr column_end() = 0;
           virtual unique_ptr copy() = 0;
-          virtual bool operator==(BaseIterator &rhs) throw(std::bad_cast &) = 0;
-          virtual bool operator!=(BaseIterator &rhs) throw(std::bad_cast &) {
+          virtual bool
+          operator==(BaseGenericIterator &rhs) throw(std::bad_cast &) = 0;
+          virtual bool
+          operator!=(BaseGenericIterator &rhs) throw(std::bad_cast &) {
             return !(*this == rhs);
           }
           virtual typename std::conditional<is_const, const T &, T &>::type
           operator*() = 0;
-          virtual difference_type operator-(const BaseIterator &) const = 0;
+          virtual difference_type
+          operator-(const BaseGenericIterator &) const = 0;
         };
         template <bool is_const>
-        class BaseDelegateIterator : public iter_traits {
+        class BaseDelegateGenericIterator : public iter_traits {
         protected:
-          using BaseIterator = BaseIterator<is_const>;
+          using BaseIterator = BaseGenericIterator<is_const>;
           using unique_ptr = std::unique_ptr<BaseIterator>;
           unique_ptr iterator;
-          BaseDelegateIterator(const BaseDelegateIterator &src)
+          BaseDelegateGenericIterator(const BaseDelegateGenericIterator &src)
               : iterator(std::move(src.iterator->copy())) {}
-          BaseDelegateIterator(const BaseIterator &src) {
+          BaseDelegateGenericIterator(const BaseIterator &src) {
             src.copy_to(iterator);
           }
-          BaseDelegateIterator(unique_ptr &&src) : iterator(std::move(src)) {}
+          BaseDelegateGenericIterator(unique_ptr &&src)
+              : iterator(std::move(src)) {}
 
         public:
-          bool operator==(const BaseDelegateIterator &rhs) {
+          bool operator==(const BaseDelegateGenericIterator &rhs) {
             *iterator == *rhs.iterator;
           }
-          bool operator!=(const BaseDelegateIterator &rhs) {
+          bool operator!=(const BaseDelegateGenericIterator &rhs) {
             return *iterator != *rhs.iterator;
           }
-          auto operator-(const BaseDelegateIterator &rhs) {
+          auto operator-(const BaseDelegateGenericIterator &rhs) {
             return *iterator - *rhs.iterator;
           }
         };
@@ -78,8 +82,8 @@ namespace ketcpp {
       public:
         template <bool is_const>
         class RowElementGenericIterator
-            : public BaseDelegateIterator<is_const> {
-          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
+            : public BaseDelegateGenericIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateGenericIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
@@ -95,8 +99,9 @@ namespace ketcpp {
           }
         };
         template <bool is_const>
-        class RowVectorGenericIterator : public BaseDelegateIterator<is_const> {
-          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
+        class RowVectorGenericIterator
+            : public BaseDelegateGenericIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateGenericIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
@@ -118,8 +123,8 @@ namespace ketcpp {
         };
         template <bool is_const>
         class ColumnElementGenericIterator
-            : public BaseDelegateIterator<is_const> {
-          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
+            : public BaseDelegateGenericIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateGenericIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
@@ -136,8 +141,8 @@ namespace ketcpp {
         };
         template <bool is_const>
         class ColumnVectorGenericIterator
-            : public BaseDelegateIterator<is_const> {
-          using BaseDelegateIterator = BaseDelegateIterator<is_const>;
+            : public BaseDelegateGenericIterator<is_const> {
+          using BaseDelegateIterator = BaseDelegateGenericIterator<is_const>;
           typedef typename BaseDelegateIterator::unique_ptr unique_ptr;
 
         public:
