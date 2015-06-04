@@ -1,6 +1,6 @@
-ketcpp (0.0~7.gbpfaae1b) UNRELEASED; urgency=low
+ketcpp (0.0~8.gbp8632a6) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @faae1ba0276cb14fb96cbf5015b9b5a3cf924c84 **
+  ** SNAPSHOT build @8632a6f78c879d1330053e82451ce648e8b91746 **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
@@ -12,14 +12,15 @@ ketcpp (0.0~7.gbpfaae1b) UNRELEASED; urgency=low
   * Build-Depends on c++ compiler that supports c++14.
   * Output details of the test on failure.
   * Defined abstract wrapper class MatrixBase.
+    - Overload operator ostream << MatrixBase
+    - Implemented column- and row-based iterators.
   * Defined concrete wrapper class MatrixArray.
-  * Make MatrixArray initializeble with an initializer list.
-  * Implemented column- and row-based iterators.
-  * Implement Arithmetic operators for MatrixArray
-    - operator ==
-    - operator +=
-    - operator*= for scalars
-    - operator* for scalars
-  * Overload operator ostream << MatrixArray
+    - Make MatrixArray initializeble with an initializer list.
+    - Implement Arithmetic operators for MatrixArray
+      - operator ==
+      - operator +=
+      - operator*= for scalars
+      - operator* for scalars
+      - operator* for MatrixArray
 
  -- Katsuhiko Nishimra <ktns.87@gmail.com>  Tue, 19 May 2015 18:06:37 +0900
