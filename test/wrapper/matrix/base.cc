@@ -23,9 +23,9 @@ using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
 
-go_bandit([]() {
-  describe("MatrixBase", []() {
+go_bandit([] {
+  describe("MatrixBase", [] {
     it("Should be abstract class",
-       []() { std::is_abstract<MatrixBase<float>>::value must be_truthy; });
+       [] { std::is_abstract<MatrixBase<float>>::value must be_truthy; });
   });
 });
