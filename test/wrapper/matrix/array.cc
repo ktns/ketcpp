@@ -266,9 +266,9 @@ go_bandit([]() {
       it("should change elements", [&array, &array2, &array3]() {
         auto array4 = array;
 
-        (array4 == array) must be_truthy;
+        array must equal(array4);
         array4 += array2;
-        (array4 == array3) must be_truthy;
+        array4 must equal(array3);
       });
     });
 
@@ -276,17 +276,17 @@ go_bandit([]() {
       describe("(float)", [&array, &array2]() {
         it("should change elements", [&array, &array2]() {
           auto array3 = array;
-          (array3 == array) must be_truthy;
+          array3 must equal(array);
           array3 *= 2.0f;
-          (array3 == array2) must be_truthy;
+          array3 must equal(array2);
         });
       });
       describe("(unsinged int)", [&array, &array2]() {
         it("should change elements", [&array, &array2]() {
           auto array3 = array;
-          (array3 == array) must be_truthy;
+          array3 must equal(array);
           array3 *= 2u;
-          (array3 == array2) must be_truthy;
+          array3 must equal(array2);
         });
       });
     });
@@ -294,13 +294,13 @@ go_bandit([]() {
       describe("(float)", [&array, &array2]() {
         it("should return a multiplied matrix", [&array, &array2]() {
           auto array3 = array * 2.f;
-          array3 == array2 must be_truthy;
+          array3 must equal(array2);
         });
       });
       describe("(unsinged int)", [&array, &array2]() {
         it("should return a multiplied matrix", [&array, &array2]() {
           auto array3 = array * 2u;
-          array3 == array2 must be_truthy;
+          array3 must equal(array2);
         });
       });
     });
