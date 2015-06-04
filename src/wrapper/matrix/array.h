@@ -190,10 +190,9 @@ namespace ketcpp {
         infix_ostream_iterator<std::string> lines(out, "}, {");
         out << "{{";
         std::transform(
-            matrix.rows().begin(), matrix.rows().end(), lines,
-            [&out](const typename MatrixArray<T, m, n>::row_iterator &row_c)
+            matrix.rows().cbegin(), matrix.rows().cend(), lines,
+            [&out](typename MatrixBase<T>::RowVectorConstIterator &row)
                 -> std::string {
-                  auto row = row_c;
                   std::stringstream ss;
                   infix_ostream_iterator<T> line(ss, ", ");
                   std::copy(row.begin(), row.end(), line);
