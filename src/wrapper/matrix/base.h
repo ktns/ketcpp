@@ -228,9 +228,8 @@ namespace ketcpp {
         auto columns() { return columns_t<false>(*this); }
         auto columns() const { return columns_t<true>(*this); }
 
-        virtual ~MatrixBase() = 0;
+        ~MatrixBase(){};
       };
-      template <typename T> MatrixBase<T>::~MatrixBase() {}
 
       template <typename T>
       std::ostream &operator<<(std::ostream &out, const MatrixBase<T> &matrix) {
