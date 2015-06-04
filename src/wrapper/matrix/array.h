@@ -181,6 +181,19 @@ namespace ketcpp {
           auto new_matrix = *this;
           return new_matrix *= rhs;
         }
+        template <size_t l>
+        MatrixArray<T, m, l> operator*(const MatrixArray<T, n, l> &rhs) const {
+          MatrixArray<T, m, l> buf;
+          auto lr = this->rows().begin();
+          for (auto br = buf.rows().begin(); br != buf.rows().end();
+               ++br, ++lr) {
+            auto rc = rhs.columns().begin();
+            for (auto b = br.begin(); b != br.end(); ++b, ++rc) {
+              *b = std::inner_product(lr.begin(), lr.end(), rc.begin(), 0);
+            }
+          }
+          return std::move(buf);
+        }
         ~MatrixArray() {}
       };
     }
