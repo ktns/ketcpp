@@ -258,7 +258,7 @@ go_bandit([] {
         (array == array2) must be_truthy;
       });
 
-      it("should false true for same matrix",
+      it("should false true for different matrix",
          [&array, &array2] { (array == array2) must be_falsy; });
     });
 
