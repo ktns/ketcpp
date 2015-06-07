@@ -71,7 +71,7 @@ namespace ketcpp {
 
         public:
           bool operator==(const BaseDelegateGenericIterator &rhs) {
-            *iterator == *rhs.iterator;
+            return *iterator == *rhs.iterator;
           }
           bool operator!=(const BaseDelegateGenericIterator &rhs) {
             return *iterator != *rhs.iterator;
