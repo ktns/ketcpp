@@ -178,12 +178,11 @@ namespace ketcpp {
                          [rhs](T l) -> T { return l * rhs; });
           return *this;
         }
-        template <typename T2>
-        typename std::enable_if<std::is_convertible<T2, T>::value,
-                                MatrixArray>::type
-        operator*(T2 rhs) {
-          auto new_matrix = *this;
-          return new_matrix *= rhs;
+        std::unique_ptr<MatrixBase<T>> operator*(T rhs) {
+          auto new_ptr = std::move(this->copy());
+          auto &new_matrix = dynamic_cast<decltype(*this) &>(*new_ptr);
+          new_matrix *= rhs;
+          return std::move(new_ptr);
         }
         template <size_t l>
         MatrixArray<T, m, l> operator*(const MatrixArray<T, n, l> &rhs) const {
@@ -198,6 +197,13 @@ namespace ketcpp {
           }
           return std::move(buf);
         }
+
+        std::unique_ptr<MatrixBase<T>> copy() const {
+          std::unique_ptr<MatrixBase<T>> copy;
+          copy.reset(new MatrixArray(*this));
+          return std::move(copy);
+        }
+
         ~MatrixArray() {}
       };
     }

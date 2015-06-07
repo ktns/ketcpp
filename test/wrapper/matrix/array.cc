@@ -36,8 +36,10 @@ go_bandit([] {
       } must_not throw_exception;
     });
     MatrixArray<float, 3, 2> array = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
-    auto array2 = array * 2;
-    auto array3 = array * 3;
+    auto array2 = array;
+    array2 *= 2;
+    auto array3 = array;
+    array3 *= 3;
     describe(".rows", [&array] {
       it("should iterate as many times as number of rows", [&array] {
         size_t n = 0;
@@ -294,13 +296,13 @@ go_bandit([] {
       describe("(float)", [&array, &array2] {
         it("should return a multiplied matrix", [&array, &array2] {
           auto array3 = array * 2.f;
-          array3 must equal(array2);
+          *array3 must equal(array2);
         });
       });
       describe("(unsinged int)", [&array, &array2] {
         it("should return a multiplied matrix", [&array, &array2] {
           auto array3 = array * 2u;
-          array3 must equal(array2);
+          *array3 must equal(array2);
         });
       });
       describe("(MatrixArray)", [] {

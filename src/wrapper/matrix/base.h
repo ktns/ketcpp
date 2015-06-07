@@ -230,6 +230,22 @@ namespace ketcpp {
         auto columns() { return columns_t<false>(*this); }
         auto columns() const { return columns_t<true>(*this); }
 
+        virtual std::unique_ptr<MatrixBase> operator*(T rhs) = 0;
+
+        virtual bool operator==(const MatrixBase &rhs) const {
+          for (auto iters = std::make_pair(rows().begin(), rhs.rows().begin());
+               iters.first != rows().end() && iters.second != rhs.rows().end();
+               ++iters.first, ++iters.second) {
+            auto &l = iters.first, &r = iters.second;
+            if (!std::equal(l.begin(), l.end(), r.begin(), r.end())) {
+              return false;
+            }
+          }
+          return true;
+        }
+
+        virtual std::unique_ptr<MatrixBase> copy() const = 0;
+
         ~MatrixBase(){};
       };
 
