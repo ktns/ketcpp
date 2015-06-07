@@ -169,10 +169,7 @@ namespace ketcpp {
           return *this;
         }
 
-        template <typename T2>
-        typename std::enable_if<std::is_convertible<T2, T>::value,
-                                MatrixArray>::type &
-        operator*=(T2 rhs) {
+        Base &operator*=(T rhs) {
           std::transform(this->storage.cbegin(), this->storage.cend(),
                          this->storage.begin(),
                          [rhs](T l) -> T { return l * rhs; });

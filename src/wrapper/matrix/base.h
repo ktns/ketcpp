@@ -231,6 +231,7 @@ namespace ketcpp {
         auto columns() const { return columns_t<true>(*this); }
 
         virtual std::unique_ptr<MatrixBase> operator*(T rhs) = 0;
+        virtual MatrixBase &operator*=(T rhs) = 0;
 
         virtual bool operator==(const MatrixBase &rhs) const {
           for (auto iters = std::make_pair(rows().begin(), rhs.rows().begin());
