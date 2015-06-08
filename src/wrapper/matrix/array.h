@@ -86,11 +86,11 @@ namespace ketcpp {
           unique_ptr copy() {
             return std::move(std::make_unique<GenericIterator>(this->iterator));
           }
-          bool operator==(BaseIterator &rhs) throw(std::bad_cast &) {
+          bool operator==(BaseIterator &rhs) const throw(std::bad_cast &) {
             auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
             return this->iterator == rhs_cast.iterator;
           }
-          bool operator!=(BaseIterator &rhs) throw(std::bad_cast &) {
+          bool operator!=(BaseIterator &rhs) const throw(std::bad_cast &) {
             auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
             return this->iterator != rhs_cast.iterator;
           }

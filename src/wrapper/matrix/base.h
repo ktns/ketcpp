@@ -44,10 +44,10 @@ namespace ketcpp {
           virtual unique_ptr column_begin() = 0;
           virtual unique_ptr column_end() = 0;
           virtual unique_ptr copy() = 0;
-          virtual bool
-          operator==(BaseGenericIterator &rhs) throw(std::bad_cast &) = 0;
-          virtual bool
-          operator!=(BaseGenericIterator &rhs) throw(std::bad_cast &) {
+          virtual bool operator==(BaseGenericIterator &rhs) const
+              throw(std::bad_cast &) = 0;
+          virtual bool operator!=(BaseGenericIterator &rhs) const
+              throw(std::bad_cast &) {
             return !(*this == rhs);
           }
           virtual typename std::conditional<is_const, const T &, T &>::type
@@ -70,13 +70,13 @@ namespace ketcpp {
               : iterator(std::move(src)) {}
 
         public:
-          bool operator==(const BaseDelegateGenericIterator &rhs) {
+          bool operator==(const BaseDelegateGenericIterator &rhs) const {
             return *iterator == *rhs.iterator;
           }
-          bool operator!=(const BaseDelegateGenericIterator &rhs) {
+          bool operator!=(const BaseDelegateGenericIterator &rhs) const {
             return *iterator != *rhs.iterator;
           }
-          auto operator-(const BaseDelegateGenericIterator &rhs) {
+          auto operator-(const BaseDelegateGenericIterator &rhs) const {
             return *iterator - *rhs.iterator;
           }
         };
