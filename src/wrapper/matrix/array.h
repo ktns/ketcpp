@@ -169,7 +169,7 @@ namespace ketcpp {
                            [](T l, T r) -> T { return l + r; });
             return *this;
           } catch (std::bad_cast &ex) {
-            throw ex; // FIXME
+            return Base::operator+=(rhsbase);
           }
         }
 

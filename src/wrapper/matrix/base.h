@@ -231,7 +231,23 @@ namespace ketcpp {
         auto columns() const { return columns_t<true>(*this); }
 
         virtual std::unique_ptr<MatrixBase> operator*(T rhs) = 0;
-        virtual MatrixBase &operator+=(const MatrixBase &rhs) = 0;
+        virtual MatrixBase &operator+=(const MatrixBase &rhs) {
+          for (auto riters = std::make_pair(rows().begin(), rhs.rows().begin());
+               riters.first != rows().end() &&
+                   riters.second != rhs.rows().end();
+               ++riters.first, ++riters.second) {
+            auto &lr = riters.first;
+            auto &rr = riters.second;
+            for (auto citers = std::make_pair(lr.begin(), rr.begin());
+                 citers.first != lr.end() && citers.second != rr.end();
+                 ++citers.first, ++citers.second) {
+              auto &l = citers.first;
+              auto &r = citers.second;
+              *l += *r;
+            }
+          }
+          return *this;
+        };
         MatrixBase &operator+=(const std::unique_ptr<MatrixBase> &rhs) {
           return *this += *rhs;
         }
