@@ -149,7 +149,7 @@ namespace ketcpp {
             : storage() {
           auto dest = storage.begin();
           for (auto i : list) {
-            std::copy(i.begin(), i.end(), dest);
+            dest = std::copy(i.begin(), i.end(), dest);
           }
         }
         MatrixArray(const std::initializer_list<float> &list) : storage() {
