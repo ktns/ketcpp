@@ -1,6 +1,6 @@
-ketcpp (0.0~8.gbp8632a6) UNRELEASED; urgency=low
+ketcpp (0.0~9.gbpf8aad4) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @8632a6f78c879d1330053e82451ce648e8b91746 **
+  ** SNAPSHOT build @f8aad4dbab9917839327a7494707c39f419177a1 **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
@@ -14,6 +14,11 @@ ketcpp (0.0~8.gbp8632a6) UNRELEASED; urgency=low
   * Defined abstract wrapper class MatrixBase.
     - Overload operator ostream << MatrixBase
     - Implemented column- and row-based iterators.
+    - Make operators overridable.
+      - operator*(scalar)
+      - operator*=(scalar)
+      - operator+=(MatrixBase)
+    - Implement MatrixBase+=MatrixBase.
   * Defined concrete wrapper class MatrixArray.
     - Make MatrixArray initializeble with an initializer list.
     - Implement Arithmetic operators for MatrixArray
@@ -22,5 +27,7 @@ ketcpp (0.0~8.gbp8632a6) UNRELEASED; urgency=low
       - operator*= for scalars
       - operator* for scalars
       - operator* for MatrixArray
+  * Defined wrapper class Matrix<T>.
+  * Implemented make_matrix for fixed size matrices.
 
  -- Katsuhiko Nishimra <ktns.87@gmail.com>  Tue, 19 May 2015 18:06:37 +0900
