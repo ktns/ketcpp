@@ -19,7 +19,7 @@
 
 #include <bandit/bandit.h>
 #include "wrapper/matrix/matrix.h"
-#include "wrapper/matrix/array.h"
+#include "wrapper/matrix/default.h"
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
@@ -29,7 +29,8 @@ go_bandit([] {
     it("Should not be abstract class",
        [] { std::is_abstract<Matrix<float>>::value must be_falsy; });
 
-    Matrix<float> matrix(MatrixArray<float, 3, 2>({1, 2, 3, 4, 5, 6}));
+    Matrix<float> matrix =
+        std::move(make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}}));
     Matrix<float> matrix2 = matrix * 2;
     Matrix<float> matrix3 = matrix * 3;
     Matrix<float> matrix4 = matrix * 4;
