@@ -231,6 +231,10 @@ namespace ketcpp {
         auto columns() const { return columns_t<true>(*this); }
 
         virtual std::unique_ptr<MatrixBase> operator*(T rhs) = 0;
+        virtual MatrixBase &operator+=(const MatrixBase &rhs) = 0;
+        MatrixBase &operator+=(const std::unique_ptr<MatrixBase> &rhs) {
+          return *this += *rhs;
+        }
         virtual MatrixBase &operator*=(T rhs) = 0;
 
         virtual bool operator==(const MatrixBase &rhs) const {

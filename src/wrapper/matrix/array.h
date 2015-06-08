@@ -161,12 +161,16 @@ namespace ketcpp {
           return std::equal(this->storage.cbegin(), this->storage.cend(),
                             rhs.storage.cbegin());
         }
-
-        MatrixArray &operator+=(const MatrixArray &rhs) {
-          std::transform(this->storage.cbegin(), this->storage.cend(),
-                         rhs.storage.cbegin(), this->storage.begin(),
-                         [](T l, T r) -> T { return l + r; });
-          return *this;
+        Base &operator+=(const Base &rhsbase) {
+          try {
+            auto &rhs = dynamic_cast<const MatrixArray &>(rhsbase);
+            std::transform(this->storage.cbegin(), this->storage.cend(),
+                           rhs.storage.cbegin(), this->storage.begin(),
+                           [](T l, T r) -> T { return l + r; });
+            return *this;
+          } catch (std::bad_cast &ex) {
+            throw ex; // FIXME
+          }
         }
 
         Base &operator*=(T rhs) {
