@@ -28,6 +28,13 @@ namespace ketcpp {
   namespace wrapper {
     namespace matrix {
       template <typename T> class MatrixBase {
+      public:
+        virtual size_t get_num_rows() const = 0;
+        virtual size_t get_num_columns() const = 0;
+        virtual size_t get_row_size() const = 0;
+        virtual size_t get_column_size() const = 0;
+
+      private:
         using iter_traits = std::iterator<std::random_access_iterator_tag, T>;
 
       protected:

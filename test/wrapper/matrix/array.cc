@@ -47,6 +47,24 @@ go_bandit([] {
     array2 *= 2;
     auto array3 = array;
     array3 *= 3;
+
+    describe(".get_num_rows", [&array] {
+      it("should return the correct number of rows",
+         [&array] { array.get_num_rows() must equal(3); });
+    });
+    describe(".get_num_columns", [&array] {
+      it("should return the correct number of columns",
+         [&array] { array.get_num_columns() must equal(2); });
+    });
+    describe(".get_row_size", [&array] {
+      it("should return the correct size of rows",
+         [&array] { array.get_row_size() must equal(2); });
+    });
+    describe(".get_column_size", [&array] {
+      it("should return the correct size of columns",
+         [&array] { array.get_column_size() must equal(3); });
+    });
+
     describe(".rows", [&array] {
       it("should iterate as many times as number of rows", [&array] {
         size_t n = 0;

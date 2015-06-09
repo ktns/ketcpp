@@ -38,6 +38,11 @@ namespace ketcpp {
         Matrix(Matrix &&src) : base(std::move(src.base)) {}
         Matrix(std::unique_ptr<Base> &&src) : base(std::move(src)) {}
 
+        size_t get_num_rows() const { return base->get_num_rows(); }
+        size_t get_num_columns() const { return base->get_num_columns(); }
+        size_t get_row_size() const { return base->get_row_size(); }
+        size_t get_column_size() const { return base->get_column_size(); }
+
         auto rows() { return base->rows(); }
         auto rows() const { return base->rows(); }
         auto columns() { return base->columns(); }

@@ -38,6 +38,10 @@ namespace ketcpp {
         constexpr static size_t num_columns = n;
         constexpr static size_t row_size = n;
         constexpr static size_t column_size = m;
+        size_t get_num_rows() const { return num_rows; }
+        size_t get_num_columns() const { return num_columns; }
+        size_t get_row_size() const { return row_size; }
+        size_t get_column_size() const { return column_size; }
 
       private:
         using array = std::array<T, m * n>;

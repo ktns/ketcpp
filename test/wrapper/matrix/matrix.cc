@@ -35,6 +35,23 @@ go_bandit([] {
     Matrix<float> matrix3 = matrix * 3;
     Matrix<float> matrix4 = matrix * 4;
 
+    describe(".get_num_rows", [&matrix] {
+      it("should return the correct number of rows",
+         [&matrix] { matrix.get_num_rows() must equal(3); });
+    });
+    describe(".get_num_columns", [&matrix] {
+      it("should return the correct number of columns",
+         [&matrix] { matrix.get_num_columns() must equal(2); });
+    });
+    describe(".get_row_size", [&matrix] {
+      it("should return the correct size of rows",
+         [&matrix] { matrix.get_row_size() must equal(2); });
+    });
+    describe(".get_column_size", [&matrix] {
+      it("should return the correct size of columns",
+         [&matrix] { matrix.get_column_size() must equal(3); });
+    });
+
     describe(".rows", [&matrix] {
       it("should iterate as many times as number of rows", [&matrix] {
         size_t n = 0;
