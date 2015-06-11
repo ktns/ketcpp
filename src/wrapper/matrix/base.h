@@ -274,7 +274,7 @@ namespace ketcpp {
 
         virtual std::unique_ptr<MatrixBase> copy() const = 0;
 
-        ~MatrixBase(){};
+        virtual ~MatrixBase(){};
       };
 
       template <typename T>
