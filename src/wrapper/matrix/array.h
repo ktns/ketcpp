@@ -183,12 +183,7 @@ namespace ketcpp {
                          [rhs](T l) -> T { return l * rhs; });
           return *this;
         }
-        std::unique_ptr<MatrixBase<T>> operator*(T rhs) {
-          auto new_ptr = std::move(this->copy());
-          auto &new_matrix = dynamic_cast<decltype(*this) &>(*new_ptr);
-          new_matrix *= rhs;
-          return std::move(new_ptr);
-        }
+        using MatrixBase<T>::operator*;
         template <size_t l>
         MatrixArray<T, m, l> operator*(const MatrixArray<T, n, l> &rhs) const {
           MatrixArray<T, m, l> buf;

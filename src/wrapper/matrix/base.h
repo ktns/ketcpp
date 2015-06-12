@@ -237,7 +237,18 @@ namespace ketcpp {
         auto columns() { return columns_t<false>(*this); }
         auto columns() const { return columns_t<true>(*this); }
 
-        virtual std::unique_ptr<MatrixBase> operator*(T rhs) = 0;
+        virtual std::unique_ptr<MatrixBase> operator+(const MatrixBase &rhs) {
+          auto new_ptr = std::move(this->copy());
+          auto &new_matrix = *new_ptr;
+          new_matrix += rhs;
+          return std::move(new_ptr);
+        }
+        virtual std::unique_ptr<MatrixBase> operator*(T rhs) {
+          auto new_ptr = std::move(this->copy());
+          auto &new_matrix = *new_ptr;
+          new_matrix *= rhs;
+          return std::move(new_ptr);
+        }
         virtual MatrixBase &operator+=(const MatrixBase &rhs) {
           for (auto riters = std::make_pair(rows().begin(), rhs.rows().begin());
                riters.first != rows().end() &&
