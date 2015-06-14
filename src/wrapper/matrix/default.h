@@ -24,6 +24,7 @@
 
 #include "wrapper/matrix/matrix.h"
 #include "wrapper/matrix/array.h"
+#include "wrapper/matrix/vector.h"
 
 namespace ketcpp {
   namespace wrapper {
@@ -33,6 +34,14 @@ namespace ketcpp {
       make_matrix(std::initializer_list<std::initializer_list<T>> list) {
         std::unique_ptr<MatrixBase<T>> ptr;
         ptr.reset(new MatrixArray<T, m, n>(list));
+        return std::move(Matrix<T>(std::move(ptr)));
+      }
+
+      template <typename T>
+      Matrix<T>
+      make_matrix(std::initializer_list<std::initializer_list<T>> list) {
+        std::unique_ptr<MatrixBase<T>> ptr;
+        ptr.reset(new MatrixVector<T>(list));
         return std::move(Matrix<T>(std::move(ptr)));
       }
     }

@@ -31,9 +31,10 @@ go_bandit([] {
 
     Matrix<float> matrix =
         std::move(make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}}));
-    Matrix<float> matrix2 = matrix * 2;
+    Matrix<float> matrix2 =
+        std::move(make_matrix<float>({{2, 4}, {6, 8}, {10, 12}}));
     Matrix<float> matrix3 = matrix * 3;
-    Matrix<float> matrix4 = matrix * 4;
+    Matrix<float> matrix4 = matrix2 * 2;
 
     describe(".get_num_rows", [&matrix] {
       it("should return the correct number of rows",
