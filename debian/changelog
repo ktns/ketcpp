@@ -1,6 +1,6 @@
-ketcpp (0.0~9.gbpf8aad4) UNRELEASED; urgency=low
+ketcpp (0.0~10.gbp734b8c) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @f8aad4dbab9917839327a7494707c39f419177a1 **
+  ** SNAPSHOT build @734b8c5c9eafb9e56112f845a4faee930f524217 **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
@@ -19,15 +19,15 @@ ketcpp (0.0~9.gbpf8aad4) UNRELEASED; urgency=low
       - operator*=(scalar)
       - operator+=(MatrixBase)
     - Implement MatrixBase+=MatrixBase.
-  * Defined concrete wrapper class MatrixArray.
+  * Defined concrete wrapper class MatrixArray and MatrixVector.
     - Make MatrixArray initializeble with an initializer list.
     - Implement Arithmetic operators for MatrixArray
       - operator ==
       - operator +=
       - operator*= for scalars
       - operator* for scalars
-      - operator* for MatrixArray
+      - operator* for MatrixBase
   * Defined wrapper class Matrix<T>.
-  * Implemented make_matrix for fixed size matrices.
+  * Implemented make_matrix.
 
  -- Katsuhiko Nishimra <ktns.87@gmail.com>  Tue, 19 May 2015 18:06:37 +0900
