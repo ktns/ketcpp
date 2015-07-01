@@ -1,6 +1,6 @@
-ketcpp (0.0~10.gbp734b8c) UNRELEASED; urgency=low
+ketcpp (0.0~11.gbp321496) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @734b8c5c9eafb9e56112f845a4faee930f524217 **
+  ** SNAPSHOT build @3214969ad3be6e1d718a544613338b50e8838013 **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
