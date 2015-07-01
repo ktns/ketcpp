@@ -1,15 +1,15 @@
 Source: ketcpp
-Section: unknown
+Section: science
 Priority: optional
 Maintainer: Katsuhiko Nishimra <ktns.87@gmail.com>
 Build-Depends: debhelper (>= 9), cmake (>= 3.1), pkg-config, clang (>= 3.4) | g++ (>=4.8) | c++-compiler, libeigen3-dev
 Standards-Version: 3.9.6
-Homepage: <insert the upstream URL, if relevant>
+#Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://anonscm.debian.org/collab-maint/ketcpp.git
 #Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/ketcpp.git;a=summary
 
 Package: ketcpp
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: Ab initio quantum chemistry tool written in C++
+ |C++> (ketcpp) is an ab initio quantum chemistry tool written in C++
