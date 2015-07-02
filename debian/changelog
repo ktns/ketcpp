@@ -1,6 +1,6 @@
-ketcpp (0.0~11.gbp321496) UNRELEASED; urgency=low
+ketcpp (0.0~12.gbpac1d70) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @3214969ad3be6e1d718a544613338b50e8838013 **
+  ** SNAPSHOT build @ac1d70c9b7a074da50fb2912acaba500a0c4daf6 **
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
@@ -29,5 +29,6 @@ ketcpp (0.0~11.gbp321496) UNRELEASED; urgency=low
       - operator* for MatrixBase
   * Defined wrapper class Matrix<T>.
   * Implemented make_matrix.
+  * lintian workaround
 
  -- Katsuhiko Nishimra <ktns.87@gmail.com>  Tue, 19 May 2015 18:06:37 +0900
