@@ -1,0 +1,2 @@
+ketcpp: binary-without-manpage usr/bin/ket_cpp
+ketcpp: latest-debian-changelog-entry-without-new-version
