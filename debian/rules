@@ -20,7 +20,7 @@ export CTEST_OUTPUT_ON_FAILURE=1
 
 # main packaging script based on dh7 syntax
 %:
-	dh $@ 
+	dh $@ --parallel
 
 # debmake generated override targets
 # This is example for Cmake (See http://bugs.debian.org/641051 )
