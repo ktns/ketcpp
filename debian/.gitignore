@@ -2,3 +2,4 @@ files
 *.debhelper.log
 *.substvars
 ketcpp/
+ketcpp-doc/

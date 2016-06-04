@@ -28,6 +28,9 @@ export CTEST_OUTPUT_ON_FAILURE=1
 #	dh_auto_configure -- \
 #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
 
+override_dh_auto_build-indep:
+	dh_auto_build -- doc
 
-
-
+override_dh_installdocs-indep:
+	dh_installdocs
+	dh_doxygen
