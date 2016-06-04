@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <numeric>
 #include <vector>
 
 #include "wrapper/matrix/base.h"

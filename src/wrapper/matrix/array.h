@@ -24,6 +24,7 @@
 #include <iostream>
 #include <iterator>
 #include <memory>
+#include <numeric>
 #include <sstream>
 
 #include "wrapper/matrix/base.h"
