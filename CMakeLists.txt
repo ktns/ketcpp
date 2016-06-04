@@ -5,6 +5,21 @@ set(serial 0.0)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	message(STATUS "Generating a rule to build documentation by doxygen")
+	if(DOXYGEN_DOT_FOUND)
+		set(DOXYGEN_DOT_FOUND_YESNO YES)
+	else(DOXYGEN_DOT_FOUND)
+		set(DOXYGEN_DOT_FOUND_YESNO NO)
+	endif(DOXYGEN_DOT_FOUND)
+
+	set(KETCPP_DOC_DIR "${CMAKE_CURRENT_BINARY_DIR}/doc/")
+	configure_file(Doxyfile.in Doxyfile)
+
+	add_custom_target(doc ${DOXYGEN_EXECUTABLE})
+endif(DOXYGEN_FOUND)
+
 find_package(PkgConfig)
 pkg_check_modules(EIGEN3_PC eigen3)
 if(EIGEN3_PC_FOUND)
