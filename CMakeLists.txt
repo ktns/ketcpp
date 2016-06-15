@@ -15,6 +15,7 @@ if(DOXYGEN_FOUND)
 	endif(DOXYGEN_DOT_FOUND)
 
 	set(KETCPP_DOC_DIR "${CMAKE_CURRENT_BINARY_DIR}/doc/")
+	set(KETCPP_DOC_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/main.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/")
 	configure_file(Doxyfile.in Doxyfile)
 
 	add_custom_target(doc ${DOXYGEN_EXECUTABLE})
