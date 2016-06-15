@@ -17,4 +17,9 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*!
+ * \mainpage
+ * |C++> (ketcpp) is a program suite for ab-initio quantum chemistry written in C++14.
+ */
+
 int main(void) { return 0; }
