@@ -1,1 +1,5 @@
+/doc/
+/Doxyfile
 /Makefile
+cmake_install.cmake
+CTestTestfile.cmake
