@@ -50,6 +50,12 @@ enable_testing()
 add_executable (run_tests ${SRCS} ${TEST_SRCS})
 target_include_directories(run_tests PRIVATE extlib/bandit)
 add_test(NAME run_tests COMMAND $<TARGET_FILE:run_tests> --reporter=spec)
+set(KETCPP_TEST_FIXTURE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/fixture")
+target_include_directories(run_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/test/")
+target_include_directories(run_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/test/")
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/test/config/ketcpp_test_config.h.in
+	${CMAKE_CURRENT_BINARY_DIR}/test/config/ketcpp_test_config.h)
 
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 14)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
