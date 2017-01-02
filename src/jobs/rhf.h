@@ -20,6 +20,7 @@
 #pragma once
 
 #include <memory>
+#include <type_traits>
 
 #include "orbital/basisset/base.h"
 #include "wrapper/molecule/base.h"
@@ -38,6 +39,12 @@ namespace ketcpp {
                    std::unique_ptr<const orbital::basisset::Base> &&);
       void release(std::unique_ptr<wrapper::molecule::Base> &,
                    std::unique_ptr<orbital::basisset::Base> &);
+      auto release() {
+        std::unique_ptr<wrapper::molecule::Base> mol;
+        std::unique_ptr<orbital::basisset::Base> set;
+        release(mol, set);
+        return make_tuple(std::move(mol), std::move(set));
+      }
     };
   }
 }

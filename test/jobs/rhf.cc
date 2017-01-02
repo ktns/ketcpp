@@ -69,5 +69,21 @@ go_bandit([] {
         set.get() must equal(set_ptr);
       });
     });
+
+    describe(".release()", [] {
+      it("should release resources", [] {
+        bool mol_alive = true, set_alive = true;
+        std::unique_ptr<wrapper::molecule::Base> mol =
+            std::make_unique<TestMolecule>(mol_alive);
+        std::unique_ptr<orbital::basisset::Base> set =
+            std::make_unique<TestBasisSet>(set_alive);
+        void *mol_ptr = mol.get(), *set_ptr = set.get();
+        RHF job;
+        job.prepare(std::move(mol), std::move(set));
+        std::tie(mol, set) = job.release();
+        mol.get() must equal(mol_ptr);
+        set.get() must equal(set_ptr);
+      });
+    });
   });
 });
