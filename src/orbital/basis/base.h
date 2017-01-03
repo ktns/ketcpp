@@ -17,19 +17,12 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "orbital/basis/base.h"
-#include "wrapper/molecule/base.h"
-
 namespace ketcpp {
   namespace orbital {
-    namespace basisset {
+    namespace basis {
       class Base {
       public:
         virtual ~Base() {}
-        virtual std::unique_ptr<orbital::basis::Base>
-        get_basis(const wrapper::molecule::Base &) const = 0;
       };
     }
   }

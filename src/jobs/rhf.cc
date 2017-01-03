@@ -25,6 +25,7 @@ void RHF::prepare(std::unique_ptr<const wrapper::molecule::Base> &&mol,
                   std::unique_ptr<const orbital::basisset::Base> &&set) {
   molecule = std::move(mol);
   basisset = std::move(set);
+  basis = basisset->get_basis(*molecule.get());
   prepared = true;
 }
 

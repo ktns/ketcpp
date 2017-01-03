@@ -32,12 +32,18 @@ public:
   ~TestMolecule() { alive = false; }
 };
 
+class TestBasis : public orbital::basis::Base {};
+
 class TestBasisSet : public orbital::basisset::Base {
   bool &alive;
 
 public:
   TestBasisSet(bool &alive) : alive(alive) { alive = true; }
   ~TestBasisSet() { alive = false; }
+  std::unique_ptr<ketcpp::orbital::basis::Base>
+  get_basis(const wrapper::molecule::Base &) const {
+    return std::make_unique<TestBasis>();
+  }
 };
 
 struct TestSuite {
@@ -62,6 +68,16 @@ go_bandit([] {
       }();
       t.mol_alive must be_falsy;
       t.set_alive must be_falsy;
+    });
+
+    describe(".prepare(mol, set)", [] {
+      it("should prepare basis", [] {
+        TestSuite t;
+        RHF job;
+        job.get_basis().get() must be_null;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_basis().get() must_not be_null;
+      });
     });
 
     describe(".release(mol, set)", [] {

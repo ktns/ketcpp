@@ -31,6 +31,7 @@ namespace ketcpp {
       bool prepared;
       std::unique_ptr<const wrapper::molecule::Base> molecule;
       std::unique_ptr<const orbital::basisset::Base> basisset;
+      std::unique_ptr<orbital::basis::Base> basis;
 
     public:
       RHF() : prepared(false) {}
@@ -45,6 +46,7 @@ namespace ketcpp {
         release(mol, set);
         return make_tuple(std::move(mol), std::move(set));
       }
+      const auto &get_basis() { return basis; }
     };
   }
 }
