@@ -40,49 +40,55 @@ public:
   ~TestBasisSet() { alive = false; }
 };
 
+struct TestSuite {
+  bool mol_alive, set_alive;
+  std::unique_ptr<wrapper::molecule::Base> mol;
+  std::unique_ptr<orbital::basisset::Base> set;
+  TestSuite() {
+    mol_alive = set_alive = true;
+    mol = std::make_unique<TestMolecule>(mol_alive);
+    set = std::make_unique<TestBasisSet>(set_alive);
+  }
+  ~TestSuite() {}
+};
+
 go_bandit([] {
   describe("RHF", [] {
     it("should destruct its resources", [] {
-      bool mol_alive = true, set_alive = true;
-      auto mol = std::make_unique<TestMolecule>(mol_alive);
-      auto set = std::make_unique<TestBasisSet>(set_alive);
-      [&] {
+      TestSuite t;
+      [&t] {
         RHF job;
-        job.prepare(std::move(mol), std::move(set));
+        job.prepare(std::move(t.mol), std::move(t.set));
       }();
-      mol_alive must be_falsy;
-      set_alive must be_falsy;
+      t.mol_alive must be_falsy;
+      t.set_alive must be_falsy;
     });
 
     describe(".release(mol, set)", [] {
       it("should release resources", [] {
-        bool mol_alive = true, set_alive = true;
-        std::unique_ptr<wrapper::molecule::Base> mol =
-            std::make_unique<TestMolecule>(mol_alive);
-        std::unique_ptr<orbital::basisset::Base> set =
-            std::make_unique<TestBasisSet>(set_alive);
-        void *mol_ptr = mol.get(), *set_ptr = set.get();
+        TestSuite t;
+        void *mol_ptr = t.mol.get(), *set_ptr = t.set.get();
         RHF job;
-        job.prepare(std::move(mol), std::move(set));
-        job.release(mol, set);
-        mol.get() must equal(mol_ptr);
-        set.get() must equal(set_ptr);
+        job.prepare(std::move(t.mol), std::move(t.set));
+        t.mol.get() must be_null;
+        t.set.get() must be_null;
+        job.release(t.mol, t.set);
+        t.mol.get() must equal(mol_ptr);
+        t.set.get() must equal(set_ptr);
       });
     });
 
     describe(".release()", [] {
       it("should release resources", [] {
-        bool mol_alive = true, set_alive = true;
-        std::unique_ptr<wrapper::molecule::Base> mol =
-            std::make_unique<TestMolecule>(mol_alive);
-        std::unique_ptr<orbital::basisset::Base> set =
-            std::make_unique<TestBasisSet>(set_alive);
-        void *mol_ptr = mol.get(), *set_ptr = set.get();
+        TestSuite t;
+        void *mol_ptr = t.mol.get(), *set_ptr = t.set.get();
         RHF job;
-        job.prepare(std::move(mol), std::move(set));
-        std::tie(mol, set) = job.release();
-        mol.get() must equal(mol_ptr);
-        set.get() must equal(set_ptr);
+        job.prepare(std::move(t.mol), std::move(t.set));
+        t.mol.get() must be_null;
+        t.set.get() must be_null;
+        std::tie(t.mol, t.set) = job.release();
+        t.mol.get() must equal(mol_ptr);
+        t.set.get() must equal(set_ptr);
       });
     });
   });
