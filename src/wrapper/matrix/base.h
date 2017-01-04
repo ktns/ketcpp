@@ -19,8 +19,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <functional>
 #include <memory>
+#include <sstream>
 
 #include <infix_iterator.h>
 
@@ -252,7 +254,7 @@ namespace ketcpp {
         virtual MatrixBase &operator+=(const MatrixBase &rhs) {
           for (auto riters = std::make_pair(rows().begin(), rhs.rows().begin());
                riters.first != rows().end() &&
-                   riters.second != rhs.rows().end();
+               riters.second != rhs.rows().end();
                ++riters.first, ++riters.second) {
             auto &lr = riters.first;
             auto &rr = riters.second;

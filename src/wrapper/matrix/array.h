@@ -149,15 +149,14 @@ namespace ketcpp {
         }
 
       public:
-        MatrixArray(
-            const std::initializer_list<std::initializer_list<float>> &list)
+        MatrixArray(const std::initializer_list<std::initializer_list<T>> &list)
             : storage() {
           auto dest = storage.begin();
           for (auto i : list) {
             dest = std::copy(i.begin(), i.end(), dest);
           }
         }
-        MatrixArray(const std::initializer_list<float> &list) : storage() {
+        MatrixArray(const std::initializer_list<T> &list) : storage() {
           std::copy(list.begin(), list.end(), storage.begin());
         }
         MatrixArray() = default;
