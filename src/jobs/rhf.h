@@ -23,6 +23,7 @@
 #include <type_traits>
 
 #include "orbital/basisset/base.h"
+#include "wrapper/matrix/matrix.h"
 #include "wrapper/molecule/base.h"
 
 namespace ketcpp {
@@ -32,6 +33,7 @@ namespace ketcpp {
       std::unique_ptr<const wrapper::molecule::Base> molecule;
       std::unique_ptr<const orbital::basisset::Base> basisset;
       std::unique_ptr<orbital::basis::Base> basis;
+      std::unique_ptr<const wrapper::matrix::Matrix<double>> overlap;
 
     public:
       RHF() : prepared(false) {}
@@ -47,6 +49,7 @@ namespace ketcpp {
         return make_tuple(std::move(mol), std::move(set));
       }
       const auto &get_basis() { return basis; }
+      const auto &get_overlap() { return overlap; }
     };
   }
 }

@@ -18,6 +18,7 @@
  */
 
 #include "jobs/rhf.h"
+#include "wrapper/matrix/default.h"
 #include <bandit/bandit.h>
 using namespace bandit;
 using namespace bandit::Matchers;
@@ -32,7 +33,11 @@ public:
   ~TestMolecule() { alive = false; }
 };
 
-class TestBasis : public orbital::basis::Base {};
+class TestBasis : public orbital::basis::Base {
+  const wrapper::matrix::Matrix<double> get_overlap() {
+    return wrapper::matrix::make_matrix<double, 2>({{1, 0}, {0, 1}});
+  }
+};
 
 class TestBasisSet : public orbital::basisset::Base {
   bool &alive;
@@ -77,6 +82,14 @@ go_bandit([] {
         job.get_basis() must be_falsy;
         job.prepare(std::move(t.mol), std::move(t.set));
         job.get_basis() must be_truthy;
+      });
+
+      it("should prepare overlap matrix", [] {
+        TestSuite t;
+        RHF job;
+        job.get_overlap() must be_falsy;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_overlap() must be_truthy;
       });
     });
 

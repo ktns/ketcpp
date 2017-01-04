@@ -17,12 +17,18 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma
+
+#include "wrapper/matrix/matrix.h"
+#include <memory>
+
 namespace ketcpp {
   namespace orbital {
     namespace basis {
       class Base {
       public:
         virtual ~Base() {}
+        virtual const wrapper::matrix::Matrix<double> get_overlap() = 0;
       };
     }
   }

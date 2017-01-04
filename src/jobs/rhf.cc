@@ -19,6 +19,7 @@
 
 #include "jobs/rhf.h"
 
+using namespace ketcpp;
 using namespace ketcpp::jobs;
 
 void RHF::prepare(std::unique_ptr<const wrapper::molecule::Base> &&mol,
@@ -26,6 +27,8 @@ void RHF::prepare(std::unique_ptr<const wrapper::molecule::Base> &&mol,
   molecule = std::move(mol);
   basisset = std::move(set);
   basis = basisset->get_basis(*molecule.get());
+  overlap = std::make_unique<const wrapper::matrix::Matrix<double>>(
+      std::move(basis->get_overlap()));
   prepared = true;
 }
 
