@@ -74,9 +74,9 @@ go_bandit([] {
       it("should prepare basis", [] {
         TestSuite t;
         RHF job;
-        job.get_basis().get() must be_null;
+        job.get_basis() must be_falsy;
         job.prepare(std::move(t.mol), std::move(t.set));
-        job.get_basis().get() must_not be_null;
+        job.get_basis() must be_truthy;
       });
     });
 
@@ -86,9 +86,11 @@ go_bandit([] {
         void *mol_ptr = t.mol.get(), *set_ptr = t.set.get();
         RHF job;
         job.prepare(std::move(t.mol), std::move(t.set));
-        t.mol.get() must be_null;
-        t.set.get() must be_null;
+        t.mol must be_falsy;
+        t.set must be_falsy;
         job.release(t.mol, t.set);
+        t.mol must be_truthy;
+        t.set must be_truthy;
         t.mol.get() must equal(mol_ptr);
         t.set.get() must equal(set_ptr);
       });
@@ -100,9 +102,11 @@ go_bandit([] {
         void *mol_ptr = t.mol.get(), *set_ptr = t.set.get();
         RHF job;
         job.prepare(std::move(t.mol), std::move(t.set));
-        t.mol.get() must be_null;
-        t.set.get() must be_null;
+        t.mol must be_falsy;
+        t.set must be_falsy;
         std::tie(t.mol, t.set) = job.release();
+        t.mol must be_truthy;
+        t.set must be_truthy;
         t.mol.get() must equal(mol_ptr);
         t.set.get() must equal(set_ptr);
       });
