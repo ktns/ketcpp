@@ -33,10 +33,12 @@ public:
   ~TestMolecule() { alive = false; }
 };
 
+static const wrapper::matrix::Matrix<double> overlap_matrix =
+    wrapper::matrix::make_matrix<double, 2>(
+        {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+
 class TestBasis : public orbital::basis::Base {
-  const wrapper::matrix::Matrix<double> get_overlap() {
-    return wrapper::matrix::make_matrix<double, 2>({{1, 0}, {0, 1}});
-  }
+  decltype(overlap_matrix) get_overlap() { return overlap_matrix; }
 };
 
 class TestBasisSet : public orbital::basisset::Base {
@@ -90,6 +92,7 @@ go_bandit([] {
         job.get_overlap() must be_falsy;
         job.prepare(std::move(t.mol), std::move(t.set));
         job.get_overlap() must be_truthy;
+        *job.get_overlap() must equal(overlap_matrix);
       });
     });
 
