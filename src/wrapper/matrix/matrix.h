@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <memory>
 
 #include "wrapper/matrix/base.h"
