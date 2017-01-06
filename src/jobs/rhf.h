@@ -30,21 +30,25 @@ namespace ketcpp {
   namespace jobs {
     class RHF {
       bool prepared;
-      std::unique_ptr<const wrapper::molecule::Base> molecule;
-      std::unique_ptr<const orbital::basisset::Base> basisset;
-      std::unique_ptr<orbital::basis::Base> basis;
-      std::unique_ptr<const wrapper::matrix::Matrix<double>> overlap;
+      typedef wrapper::molecule::Base molecule_t;
+      typedef orbital::basisset::Base basisset_t;
+      typedef orbital::basis::Base basis_t;
+      typedef wrapper::matrix::Matrix<double> matrix_t;
+      std::unique_ptr<const molecule_t> molecule;
+      std::unique_ptr<const basisset_t> basisset;
+      std::unique_ptr<basis_t> basis;
+      std::unique_ptr<const matrix_t> overlap;
 
     public:
       RHF() : prepared(false) {}
       ~RHF() {}
-      void prepare(std::unique_ptr<const wrapper::molecule::Base> &&,
-                   std::unique_ptr<const orbital::basisset::Base> &&);
-      void release(std::unique_ptr<wrapper::molecule::Base> &,
-                   std::unique_ptr<orbital::basisset::Base> &);
+      void prepare(std::unique_ptr<const molecule_t> &&,
+                   std::unique_ptr<const basisset_t> &&);
+      void release(std::unique_ptr<molecule_t> &,
+                   std::unique_ptr<basisset_t> &);
       auto release() {
-        std::unique_ptr<wrapper::molecule::Base> mol;
-        std::unique_ptr<orbital::basisset::Base> set;
+        std::unique_ptr<molecule_t> mol;
+        std::unique_ptr<basisset_t> set;
         release(mol, set);
         return make_tuple(std::move(mol), std::move(set));
       }
