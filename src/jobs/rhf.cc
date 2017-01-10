@@ -29,6 +29,8 @@ void RHF::prepare(std::unique_ptr<const molecule_t> &&mol,
   basis = basisset->get_basis(*molecule.get());
   overlap = std::make_unique<const wrapper::matrix::Matrix<double>>(
       std::move(basis->get_overlap()));
+  core_hamiltonian = std::make_unique<wrapper::matrix::Matrix<double>>(
+      std::move(basis->get_kinetic()));
   prepared = true;
 }
 

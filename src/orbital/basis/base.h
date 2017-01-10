@@ -29,6 +29,7 @@ namespace ketcpp {
       public:
         virtual ~Base() {}
         virtual const wrapper::matrix::Matrix<double> get_overlap() = 0;
+        virtual const wrapper::matrix::Matrix<double> get_kinetic() = 0;
       };
     }
   }

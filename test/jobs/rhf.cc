@@ -37,8 +37,13 @@ static const wrapper::matrix::Matrix<double> overlap_matrix =
     wrapper::matrix::make_matrix<double, 2>(
         {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
 
+static const wrapper::matrix::Matrix<double> kinetic_matrix =
+    wrapper::matrix::make_matrix<double, 2>(
+        {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+
 class TestBasis : public orbital::basis::Base {
   decltype(overlap_matrix) get_overlap() { return overlap_matrix; }
+  decltype(kinetic_matrix) get_kinetic() { return kinetic_matrix; }
 };
 
 class TestBasisSet : public orbital::basisset::Base {
@@ -93,6 +98,15 @@ go_bandit([] {
         job.prepare(std::move(t.mol), std::move(t.set));
         job.get_overlap() must be_truthy;
         *job.get_overlap() must equal(overlap_matrix);
+      });
+
+      it("should prepare core_hamiltonian matrix", [] {
+        TestSuite t;
+        RHF job;
+        job.get_core_hamiltonian() must be_falsy;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_core_hamiltonian() must be_truthy;
+        //*job.get_overlap() must equal(overlap_matrix);
       });
     });
 

@@ -38,6 +38,7 @@ namespace ketcpp {
       std::unique_ptr<const basisset_t> basisset;
       std::unique_ptr<basis_t> basis;
       std::unique_ptr<const matrix_t> overlap;
+      std::unique_ptr<matrix_t> core_hamiltonian;
 
     public:
       RHF() : prepared(false) {}
@@ -54,6 +55,7 @@ namespace ketcpp {
       }
       const auto &get_basis() { return basis; }
       const auto &get_overlap() { return overlap; }
+      const auto &get_core_hamiltonian() { return core_hamiltonian; }
     };
   }
 }
