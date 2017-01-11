@@ -38,8 +38,7 @@ namespace ketcpp {
       }
 
       template <typename T, int m, int n = m>
-      Matrix<T>
-      make_matrix(std::initializer_list<T> list) {
+      Matrix<T> make_matrix(std::initializer_list<T> list) {
         std::unique_ptr<MatrixBase<T>> ptr;
         ptr.reset(new MatrixArray<T, m, n>(list));
         return std::move(Matrix<T>(std::move(ptr)));

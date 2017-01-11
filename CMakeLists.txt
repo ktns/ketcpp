@@ -21,13 +21,19 @@ if(DOXYGEN_FOUND)
 	add_custom_target(doc ${DOXYGEN_EXECUTABLE})
 endif(DOXYGEN_FOUND)
 
-find_package(PkgConfig)
+find_package(PkgConfig REQUIRED)
 pkg_check_modules(EIGEN3_PC eigen3)
 if(EIGEN3_PC_FOUND)
   set(EIGEN3_INCLUDE_DIR ${EIGEN3_PC_INCLUDE_DIRS})
 endif(EIGEN3_PC_FOUND)
 find_package(Eigen3)
 include_directories(${EIGEN3_INCLUDE_DIR})
+
+pkg_check_modules(LIBINT2 libint2)
+
+configure_file(
+	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h.in
+	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h)
 
 file(GLOB_RECURSE SRCS src/*.cc)
 

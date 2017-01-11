@@ -1,6 +1,6 @@
 /*
  * ketcpp: Quantum chemical toolset made of C++
- * Copyright (C) 2015 Katsuhiko Nishimra
+ * Copyright (C) 2017 Katsuhiko Nishimra
  *
  * This file is part of ketcpp.
  *
