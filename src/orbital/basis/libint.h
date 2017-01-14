@@ -23,9 +23,9 @@
 
 #ifdef LIBINT2_FOUND
 
+#include <memory>
 #include "orbital/basisset/gaussian.h"
 #include "wrapper/molecule/base.h"
-#include <memory>
 
 namespace ketcpp {
   namespace orbital {

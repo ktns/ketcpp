@@ -21,6 +21,7 @@
 
 #ifdef LIBINT2_FOUND
 
+#include <libint2.hpp>
 #include "orbital/basis/libint.h"
 
 using namespace std::string_literals;
