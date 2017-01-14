@@ -19,13 +19,26 @@
 
 #pragma once
 
+#include "config/ketcpp_config.h"
+
+#ifdef LIBINT2_FOUND
+
+#include <memory>
+
 namespace ketcpp {
   namespace orbital {
     namespace basisset {
-      class Gaussian {
+      class Libint2BasisSet {
+      private:
+        class Impl;
+        std::unique_ptr<Impl> impl;
+
       public:
-        virtual ~Gaussian() {}
+        Libint2BasisSet();
+        ~Libint2BasisSet();
       };
     }
   }
 }
+
+#endif
