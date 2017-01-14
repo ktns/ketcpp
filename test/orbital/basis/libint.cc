@@ -22,21 +22,31 @@
 #ifdef LIBINT2_FOUND
 
 #include "orbital/basis/libint.h"
+#include <bandit/bandit.h>
+#include <memory>
 
-using namespace std::string_literals;
+using namespace bandit;
+using namespace bandit::Matchers;
+using namespace ketcpp;
 using namespace ketcpp::orbital::basis;
 
-class Libint2Basis::Impl {
-public:
-  Impl(const mol_t &, const bset_t &) {
-    throw std::logic_error("not yet implemented");
-  }
-  ~Impl() {}
+struct TestMolecule : public wrapper::molecule::Base {
+  TestMolecule() {}
 };
 
-Libint2Basis::Libint2Basis(const mol_t &mol, const bset_t &bset)
-    : impl(std::make_unique<Impl>(mol, bset)) {}
+struct TestBasisSet : public orbital::basisset::Gaussian {
+  TestBasisSet() {}
+};
 
-Libint2Basis::~Libint2Basis() {}
+go_bandit([] {
+  describe("orbital::basis::Libint2Basis", [] {
+    it("Should be constructed by a molecule and a basisset", [] {
+      const TestMolecule mol;
+      const TestBasisSet bset;
+      auto basis = std::make_unique<Libint2Basis>(mol, bset);
+      basis must be_truthy;
+    });
+  });
+});
 
 #endif

@@ -17,26 +17,15 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config/ketcpp_config.h"
+#pragma once
 
-#ifdef LIBINT2_FOUND
-
-#include "orbital/basis/libint.h"
-
-using namespace std::string_literals;
-using namespace ketcpp::orbital::basis;
-
-class Libint2Basis::Impl {
-public:
-  Impl(const mol_t &, const bset_t &) {
-    throw std::logic_error("not yet implemented");
+namespace ketcpp {
+  namespace wrapper {
+    namespace molecule {
+      class Base {
+      public:
+        virtual ~Base(){};
+      };
+    }
   }
-  ~Impl() {}
-};
-
-Libint2Basis::Libint2Basis(const mol_t &mol, const bset_t &bset)
-    : impl(std::make_unique<Impl>(mol, bset)) {}
-
-Libint2Basis::~Libint2Basis() {}
-
-#endif
+}

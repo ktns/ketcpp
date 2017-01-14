@@ -23,7 +23,8 @@
 
 #ifdef LIBINT2_FOUND
 
-#include <string>
+#include "orbital/basisset/gaussian.h"
+#include "wrapper/molecule/base.h"
 #include <memory>
 
 namespace ketcpp {
@@ -33,9 +34,12 @@ namespace ketcpp {
       private:
         class Impl;
         std::unique_ptr<Impl> impl;
+        typedef wrapper::molecule::Base mol_t;
+        typedef basisset::Gaussian bset_t;
+        friend Impl;
 
       public:
-        Libint2Basis();
+        Libint2Basis(const mol_t &, const bset_t &);
         ~Libint2Basis();
       };
     }
