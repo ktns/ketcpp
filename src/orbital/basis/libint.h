@@ -34,7 +34,7 @@ namespace ketcpp {
         std::unique_ptr<Impl> impl;
 
       public:
-        Libint2Basis(const std::string &molecule_file,
+        Libint2Basis(const std::string &xyz_file,
                      const std::string &basisset_name);
         ~Libint2Basis();
       };

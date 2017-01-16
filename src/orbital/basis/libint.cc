@@ -60,12 +60,18 @@ class Libint2Basis::Impl {
 
 private:
   std::shared_ptr<const Libint2Resource> resource;
-  Impl() { resource = Libint2Resource::acquire_resource(); }
+  std::unique_ptr<libint2::BasisSet> basis;
+  Impl(const std::string &xyz_file_name, const std::string &basisset_name) {
+    resource = Libint2Resource::acquire_resource();
+    std::ifstream xyz_file(xyz_file_name);
+    std::vector<libint2::Atom> atoms = libint2::read_dotxyz(xyz_file);
+    basis = std::make_unique<libint2::BasisSet>(basisset_name, atoms);
+  }
 };
 
-Libint2Basis::Libint2Basis(const std::string &molecule_file,
+Libint2Basis::Libint2Basis(const std::string &xyz_file,
                            const std::string &basisset_name)
-    : impl(new Impl) {}
+    : impl(new Impl(xyz_file, basisset_name)) {}
 Libint2Basis::~Libint2Basis() {}
 
 #endif
