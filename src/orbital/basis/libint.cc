@@ -21,23 +21,51 @@
 
 #ifdef LIBINT2_FOUND
 
-#include <libint2.hpp>
+#include <memory>
+#include "libint2.hpp"
 #include "orbital/basis/libint.h"
 
-using namespace std::string_literals;
+using namespace ketcpp;
 using namespace ketcpp::orbital::basis;
 
+namespace {
+  class Libint2Resource {
+  private:
+    Libint2Resource() {
+      libint2::init();
+      assert(libint2::initialized());
+    }
+    static std::weak_ptr<const Libint2Resource> resource;
+
+  public:
+    ~Libint2Resource() {
+      libint2::finalize();
+      assert(!libint2::initialized());
+    }
+    static std::shared_ptr<const Libint2Resource> acquire_resource() {
+      auto ptr = resource.lock();
+      if (!ptr) {
+        ptr.reset(new Libint2Resource);
+        resource = ptr;
+      }
+      assert(ptr);
+      return ptr;
+    }
+  };
+  std::weak_ptr<const Libint2Resource> Libint2Resource::resource;
+}
+
 class Libint2Basis::Impl {
-public:
-  Impl(const mol_t &, const bset_t &) {
-    throw std::logic_error("not yet implemented");
-  }
-  ~Impl() {}
+  friend Libint2Basis;
+
+private:
+  std::shared_ptr<const Libint2Resource> resource;
+  Impl() { resource = Libint2Resource::acquire_resource(); }
 };
 
-Libint2Basis::Libint2Basis(const mol_t &mol, const bset_t &bset)
-    : impl(std::make_unique<Impl>(mol, bset)) {}
-
+Libint2Basis::Libint2Basis(const std::string &molecule_file,
+                           const std::string &basisset_name)
+    : impl(new Impl) {}
 Libint2Basis::~Libint2Basis() {}
 
 #endif

@@ -21,27 +21,32 @@
 
 #ifdef LIBINT2_FOUND
 
-#include "orbital/basis/libint.h"
-#include <bandit/bandit.h>
 #include <memory>
+#include <libint2.hpp>
+#include <bandit/bandit.h>
+#include "config/fixture.h"
+#include "orbital/basis/libint.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp;
 using namespace ketcpp::orbital::basis;
-using namespace ketcpp::orbital::basisset;
-
-struct TestMolecule : public wrapper::molecule::Base {
-  TestMolecule() {}
-};
 
 go_bandit([] {
-  describe("orbital::basis::Libint2Basis", [] {
-    it("Should be constructed by a molecule and a basisset", [] {
-      const TestMolecule mol;
-      const Libint2BasisSet bset;
-      auto basis = std::make_unique<Libint2Basis>(mol, bset);
+  describe("orbital::basisset::Libint2Basis", [] {
+    it("Should be constructed by a molecule file name and a basisset name", [] {
+      auto basis =
+          std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
       basis must be_truthy;
+    });
+
+    it("ctor/dtor should initialize/finalize libint2", [] {
+      libint2::initialized() must be_falsy;
+      auto basisset =
+          std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
+      libint2::initialized() must be_truthy;
+      basisset.reset();
+      libint2::initialized() must be_falsy;
     });
   });
 });
