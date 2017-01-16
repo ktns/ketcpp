@@ -22,48 +22,25 @@
 #ifdef LIBINT2_FOUND
 
 #include <memory>
-#include "libint2.hpp"
+#include <libint2.hpp>
+#include <bandit/bandit.h>
 #include "orbital/basisset/libint.h"
 
+using namespace bandit;
+using namespace bandit::Matchers;
 using namespace ketcpp;
 using namespace ketcpp::orbital::basisset;
 
-namespace {
-  class Libint2Resource {
-  private:
-    Libint2Resource() {
-      libint2::init();
-      assert(libint2::initialized());
-    }
-    static std::weak_ptr<const Libint2Resource> resource;
-
-  public:
-    ~Libint2Resource() {
-      libint2::finalize();
-      assert(!libint2::initialized());
-    }
-    static std::shared_ptr<const Libint2Resource> acquire_resource() {
-      auto ptr = resource.lock();
-      if (!ptr) {
-        ptr.reset(new Libint2Resource);
-        resource = ptr;
-      }
-      assert(ptr);
-      return ptr;
-    }
-  };
-  std::weak_ptr<const Libint2Resource> Libint2Resource::resource;
-}
-
-class Libint2BasisSet::Impl {
-  friend Libint2BasisSet;
-
-private:
-  std::shared_ptr<const Libint2Resource> resource;
-  Impl() { resource = Libint2Resource::acquire_resource(); }
-};
-
-Libint2BasisSet::Libint2BasisSet() : impl(new Impl) {}
-Libint2BasisSet::~Libint2BasisSet() {}
+go_bandit([] {
+  describe("orbital::basisset::Libint2BasisSet", [] {
+    it("ctor must initialize libint2", [] {
+      libint2::initialized() must be_falsy;
+      auto basisset = std::make_unique<Libint2BasisSet>();
+      libint2::initialized() must be_truthy;
+      basisset.reset();
+      libint2::initialized() must be_falsy;
+    });
+  });
+});
 
 #endif

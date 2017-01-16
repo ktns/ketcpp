@@ -31,6 +31,7 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 pkg_check_modules(LIBINT2 libint2)
 include_directories(SYSTEM ${LIBINT2_INCLUDE_DIRS})
+link_libraries(int2)
 
 configure_file(
 	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h.in
