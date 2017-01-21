@@ -26,6 +26,7 @@
 #include <bandit/bandit.h>
 #include "config/fixture.h"
 #include "orbital/basis/libint.h"
+#include "wrapper/matrix/default.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
@@ -34,19 +35,32 @@ using namespace ketcpp::orbital::basis;
 
 go_bandit([] {
   describe("orbital::basisset::Libint2Basis", [] {
-    it("Should be constructed by a molecule file name and a basisset name", [] {
-      auto basis =
-          std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
-      basis must be_truthy;
+    std::unique_ptr<Libint2Basis> basis;
+    before_each([&] {
+      basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
     });
 
-    it("ctor/dtor should initialize/finalize libint2", [] {
-      libint2::initialized() must be_falsy;
-      auto basisset =
-          std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
+    after_each([&] { basis.reset(); });
+
+    it("Should be constructed by a molecule file name and a basisset name",
+       [&] { basis must be_truthy; });
+
+    it("ctor/dtor should initialize/finalize libint2", [&] {
       libint2::initialized() must be_truthy;
-      basisset.reset();
+      basis.reset();
       libint2::initialized() must be_falsy;
+      basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
+      libint2::initialized() must be_truthy;
+    });
+
+    describe("::get_overlap", [&] {
+      it("Should return correct overlap matrix", [&] {
+        auto overlap = basis->get_overlap();
+        decltype(overlap) correct =
+            wrapper::matrix::make_matrix<double>({{0.0}});
+        overlap must equal(correct);
+      });
+
     });
   });
 });

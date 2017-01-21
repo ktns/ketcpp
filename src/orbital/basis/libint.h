@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include "wrapper/matrix/matrix.h"
+
 namespace ketcpp {
   namespace orbital {
     namespace basis {
@@ -37,6 +39,9 @@ namespace ketcpp {
         Libint2Basis(const std::string &xyz_file,
                      const std::string &basisset_name);
         ~Libint2Basis();
+
+        typedef wrapper::matrix::Matrix<double> matrix_t;
+        matrix_t get_overlap();
       };
     }
   }

@@ -24,6 +24,7 @@
 #include <memory>
 #include "libint2.hpp"
 #include "orbital/basis/libint.h"
+#include "wrapper/matrix/default.h"
 
 using namespace ketcpp;
 using namespace ketcpp::orbital::basis;
@@ -81,5 +82,9 @@ Libint2Basis::Libint2Basis(const std::string &xyz_file,
                            const std::string &basisset_name)
     : impl(new Impl(xyz_file, basisset_name)) {}
 Libint2Basis::~Libint2Basis() {}
+
+Libint2Basis::matrix_t Libint2Basis::get_overlap() {
+  return wrapper::matrix::make_matrix({{42.0}}); // FIXME
+}
 
 #endif
