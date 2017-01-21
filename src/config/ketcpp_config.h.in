@@ -18,3 +18,5 @@
  */
 
 #cmakedefine LIBINT2_FOUND
+#cmakedefine LIBINT2_INIT
+#cmakedefine LIBINT2_INITIALIZE

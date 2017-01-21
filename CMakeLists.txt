@@ -30,8 +30,17 @@ find_package(Eigen3)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 pkg_check_modules(LIBINT2 libint2)
-include_directories(SYSTEM ${LIBINT2_INCLUDE_DIRS})
-link_libraries(int2)
+if(LIBINT2_FOUND)
+	include_directories(SYSTEM ${LIBINT2_INCLUDE_DIRS})
+	link_libraries(int2)
+	if(LIBINT2_VERSION VERSION_LESS "2.2")
+		set(LIBINT2_INIT true)
+		set(LIBINT2_INITIALIZE false)
+	else()
+		set(LIBINT2_INIT false)
+		set(LIBINT2_INITIALIZE true)
+	endif()
+endif(LIBINT2_FOUND)
 
 configure_file(
 	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h.in

@@ -32,7 +32,15 @@ namespace {
   class Libint2Resource {
   private:
     Libint2Resource() {
+#ifdef LIBINT2_INITIALIZE
+      libint2::initialize();
+#elif defined(LIBINT2_INIT)
       libint2::init();
+#else
+#error                                                                         \
+    "Don't know whether libint2::init() or libint2::initialize() should be used!"
+#endif
+
       assert(libint2::initialized());
     }
     static std::weak_ptr<const Libint2Resource> resource;
