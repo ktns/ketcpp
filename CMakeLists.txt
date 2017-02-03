@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.7.20161201)
 project (ket_cpp CXX)
 
 set(serial 0.0)
@@ -43,7 +43,7 @@ add_executable (run_tests ${SRCS} ${TEST_SRCS})
 target_include_directories(run_tests PRIVATE extlib/bandit)
 add_test(NAME run_tests COMMAND $<TARGET_FILE:run_tests> --reporter=spec)
 
-set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 14)
+set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
 
 install(TARGETS ket_cpp DESTINATION bin COMPONENT runtime)
