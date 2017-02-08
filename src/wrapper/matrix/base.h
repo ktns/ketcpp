@@ -99,7 +99,11 @@ namespace ketcpp {
         MatrixBase &operator+=(const std::unique_ptr<MatrixBase> &rhs) {
           return *this += *rhs;
         }
-        virtual MatrixBase &operator*=(T rhs) = 0;
+
+        virtual MatrixBase &operator*=(T rhs) {
+          for_each([this, &rhs](size_t i, size_t j) { this->at(i, j) *= rhs; });
+          return *this;
+        }
 
         virtual bool operator!=(const MatrixBase &rhs) const {
           optional<bool> ret = for_each(

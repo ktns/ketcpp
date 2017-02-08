@@ -18,14 +18,45 @@
  */
 
 #include <bandit/bandit.h>
+
+#include "wrapper/matrix/array.h"
 #include "wrapper/matrix/base.h"
+
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
+
+namespace {
+  template <typename T, size_t m, size_t n = m>
+  class MatrixTestBase : public MatrixArray<T, m, n> {
+  public:
+    using MatrixArray<T, m, n>::MatrixArray;
+    MatrixBase<T> &operator*=(T rhs) { return MatrixBase<T>::operator*=(rhs); }
+  };
+};
 
 go_bandit([] {
   describe("MatrixBase", [] {
     it("Should be abstract class",
        [] { std::is_abstract<MatrixBase<float>>::value must be_truthy; });
+
+    describe("::operator*=(scalar)", [] {
+      it("should multiply all elements uniformly", [] {
+        MatrixTestBase<int, 2> matrix1{{1, 2}, {3, 4}};
+        MatrixTestBase<int, 2> const matrix2{{2, 4}, {6, 8}};
+        (matrix1 *= 2) must equal(matrix2);
+        matrix1 must equal(matrix2);
+      });
+    });
+
+    describe("::operator*(scalar)", [] {
+      it("should multiply all elements uniformly", [] {
+        MatrixTestBase<int, 2> matrix1{{1, 2}, {3, 4}};
+        MatrixTestBase<int, 2> const matrix2{{2, 4}, {6, 8}};
+				auto matrix3 = matrix1 * 2;
+        (*matrix3) must equal(matrix2);
+        matrix1 must_not equal(matrix2);
+      });
+    });
   });
 });
