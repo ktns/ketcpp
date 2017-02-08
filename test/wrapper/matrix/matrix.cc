@@ -29,10 +29,8 @@ go_bandit([] {
     it("Should not be abstract class",
        [] { std::is_abstract<Matrix<float>>::value must be_falsy; });
 
-    Matrix<float> matrix =
-        std::move(make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}}));
-    Matrix<float> matrix2 =
-        std::move(make_matrix<float>({{2, 4}, {6, 8}, {10, 12}}));
+    Matrix<float> matrix = make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}});
+    Matrix<float> matrix2 = make_matrix<float>({{2, 4}, {6, 8}, {10, 12}});
     Matrix<float> matrix3 = matrix * 3;
     Matrix<float> matrix4 = matrix2 * 2;
 
