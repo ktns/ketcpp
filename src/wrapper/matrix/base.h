@@ -22,7 +22,19 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#if __has_include(<optional>)
 #include <optional>
+template <typename T> namespace { using optional = std::optional<T>; };
+#else
+#include <experimental/optional>
+namespace {
+  template <typename T>
+  struct optional : public std::experimental::optional<T> {
+    using std::experimental::optional<T>::optional;
+    bool has_value() { return static_cast<bool>(*this); }
+  };
+};
+#endif
 #include <sstream>
 
 namespace ketcpp {
@@ -50,9 +62,8 @@ namespace ketcpp {
           }
         }
         template <typename R>
-        std::optional<R>
-        for_each(std::function<std::optional<R>(size_t, size_t)> lmd,
-                 size_t nr = 0, size_t nc = 0) const {
+        optional<R> for_each(std::function<optional<R>(size_t, size_t)> lmd,
+                             size_t nr = 0, size_t nc = 0) const {
           if (nr == 0)
             nr = this->get_num_rows();
           if (nc == 0)
@@ -91,17 +102,16 @@ namespace ketcpp {
         virtual MatrixBase &operator*=(T rhs) = 0;
 
         virtual bool operator!=(const MatrixBase &rhs) const {
-          std::optional<bool> ret = for_each(
-              static_cast<std::function<std::optional<bool>(size_t, size_t)>>(
-                  [this, &rhs](size_t i, size_t j) -> std::optional<bool> {
+          optional<bool> ret = for_each(
+              static_cast<std::function<optional<bool>(size_t, size_t)>>(
+                  [this, &rhs](size_t i, size_t j) -> optional<bool> {
                     if (this->at(i, j) != rhs.at(i, j))
-                      return true; // abort loop
+                      return true; // abort loop and return true
                     return {};     // resume loop
                   }));
 
-          return ret.has_value() // ret has value when the loop has been aborted
-                     ? ret.value()
-                     : false;
+          return ret.value_or(
+              false); // ret has value when the loop has finished
         }
         virtual bool operator==(const MatrixBase &rhs) const {
           return !((*this) != rhs);
