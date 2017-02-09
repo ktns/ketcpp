@@ -38,19 +38,19 @@ go_bandit([] {
 
     describe(".get_num_rows", [&matrix] {
       it("should return the correct number of rows",
-         [&matrix] { matrix.get_num_rows() must equal(3); });
+         [&matrix] { matrix->get_num_rows() must equal(3); });
     });
     describe(".get_num_columns", [&matrix] {
       it("should return the correct number of columns",
-         [&matrix] { matrix.get_num_columns() must equal(2); });
+         [&matrix] { matrix->get_num_columns() must equal(2); });
     });
     describe(".get_row_size", [&matrix] {
       it("should return the correct size of rows",
-         [&matrix] { matrix.get_row_size() must equal(2); });
+         [&matrix] { matrix->get_row_size() must equal(2); });
     });
     describe(".get_column_size", [&matrix] {
       it("should return the correct size of columns",
-         [&matrix] { matrix.get_column_size() must equal(3); });
+         [&matrix] { matrix->get_column_size() must equal(3); });
     });
 
     describe("::operator==", [&matrix, &matrix2] {
@@ -112,16 +112,6 @@ go_bandit([] {
           matrix3 must equal(matrix2);
         });
       });
-			/* FIXME:
-      describe("(MatrixArray)", [] {
-        it("should return a multiplied matrix", [] {
-          MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
-          MatrixArray<float, 2, 3> matrix2 = {6, 5, 4, 3, 2, 1};
-          MatrixArray<float, 3, 3> matrix3 = {12, 9, 6, 30, 23, 16, 48, 37, 26};
-          matrix1 *matrix2 must equal(matrix3);
-        });
-      });
-			*/
     });
   });
 });

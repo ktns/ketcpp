@@ -20,7 +20,6 @@
 #include <bandit/bandit.h>
 
 #include "wrapper/matrix/array.h"
-#include "wrapper/matrix/base.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
@@ -53,8 +52,8 @@ go_bandit([] {
       it("should multiply all elements uniformly", [] {
         MatrixTestBase<int, 2> matrix1{{1, 2}, {3, 4}};
         MatrixTestBase<int, 2> const matrix2{{2, 4}, {6, 8}};
-				auto matrix3 = matrix1 * 2;
-        (*matrix3) must equal(matrix2);
+        auto matrix3 = matrix1 * 2;
+        matrix3 must equal(matrix2);
         matrix1 must_not equal(matrix2);
       });
     });

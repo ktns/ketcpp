@@ -19,65 +19,158 @@
 
 #pragma once
 
-#include <iostream>
+#include <algorithm>
+#include <functional>
 #include <memory>
+#include <memory>
+#include <ostream>
+#if __has_include(<optional>)
+#include <optional>
+namespace {
+  template <typename T> using optional = std::optional<T>;
+};
+#else
+#include <experimental/optional>
+namespace {
+  template <typename T>
+  struct optional : public std::experimental::optional<T> {
+    using std::experimental::optional<T>::optional;
+    bool has_value() { return static_cast<bool>(*this); }
+  };
+};
+#endif
 
-#include "wrapper/matrix/base.h"
+namespace ketcpp::wrapper::matrix {
+  template <typename T> class MatrixBase;
+  template <typename T> class Matrix {
+  private:
+    using Base = MatrixBase<T>;
+    using unique_ptr = std::unique_ptr<Base>;
+    unique_ptr base;
 
-namespace ketcpp {
-  namespace wrapper {
-    namespace matrix {
-      template <typename T> class Matrix {
-      private:
-        using Base = MatrixBase<T>;
-        using unique_ptr = std::unique_ptr<Base>;
-        unique_ptr base;
+  public:
+    Matrix(const Matrix &src) : base(src.base->copy()) {}
+    Matrix(const Base &src) : base(src.copy()) {}
+    Matrix(Matrix &&src) : base(std::move(src.base)) {}
+    Matrix(unique_ptr &&src) : base(std::move(src)) {}
 
-      public:
-        Matrix(const Matrix &src) : base(std::move(src.base->copy())) {}
-        Matrix(const Base &src) : base(std::move(src.copy())) {}
-        Matrix(Matrix &&src) : base(std::move(src.base)) {}
-        Matrix(std::unique_ptr<Base> &&src) : base(std::move(src)) {}
+    MatrixBase<T> *operator->() { return base.get(); }
 
-        size_t get_num_rows() const { return base->get_num_rows(); }
-        size_t get_num_columns() const { return base->get_num_columns(); }
-        size_t get_row_size() const { return base->get_row_size(); }
-        size_t get_column_size() const { return base->get_column_size(); }
+    operator Base &() { return *base; }
+    operator const Base &() const { return *base; }
 
-        auto rows() { return base->rows(); }
-        auto rows() const { return base->rows(); }
-        auto columns() { return base->columns(); }
-        auto columns() const { return base->columns(); }
+    bool operator==(const Base &rhs) const { return *base == rhs; }
+    bool operator!=(const Base &rhs) const { return *base != rhs; }
 
-        bool operator==(const Matrix &rhs) const { return *base == *rhs.base; }
+    Matrix operator*(T rhs) const { return *base * rhs; }
 
-        Matrix operator+(const Matrix &rhs) const {
-          return *this; // FIXME
-        }
-
-        Matrix &operator+=(const Matrix &rhs) {
-          *this->base += rhs.base;
-          return *this;
-        }
-
-        Matrix operator*(T rhs) {
-          return std::move(Matrix(std::move(*this->base * rhs)));
-        }
-
-        Matrix operator*=(T rhs) {
-          *this->base *= rhs;
-          return *this;
-        }
-
-        Matrix operator*(const Matrix &rhs) const {
-          return std::move(Matrix(std::move(*this->base * (*rhs.base))));
-        }
-
-        friend std::ostream &operator<<(std::ostream &out,
-                                        const Matrix &matrix) {
-          return out << *matrix.base;
-        }
-      };
+    Matrix &operator+=(const Base &rhs) {
+      *base += rhs;
+      return *this;
     }
+    Matrix &operator*=(T rhs) {
+      *base *= rhs;
+      return *this;
+    }
+  };
+
+  template <typename T>
+  std::ostream &operator<<(std::ostream &ost, const Matrix<T> &matrix) {
+    return ost << static_cast<const MatrixBase<T> &>(matrix);
+  }
+
+  template <typename T> class MatrixBase {
+  public:
+    virtual size_t get_num_rows() const = 0;
+    virtual size_t get_num_columns() const = 0;
+    virtual size_t get_row_size() const = 0;
+    virtual size_t get_column_size() const = 0;
+    virtual T &at(size_t irow, size_t icol) = 0;
+    virtual T at(size_t irow, size_t icol) const = 0;
+
+    void for_each(std::function<void(size_t, size_t)> lmd, //
+                  size_t nr = 0, size_t nc = 0) const {
+      if (nr == 0)
+        nr = this->get_num_rows();
+      if (nc == 0)
+        nc = this->get_num_columns();
+      for (size_t i = 0; i < nr; i++) {
+        for (size_t j = 0; j < nc; j++) {
+          lmd(i, j);
+        }
+      }
+    }
+    template <typename R>
+    optional<R> for_each(std::function<optional<R>(size_t, size_t)> lmd,
+                         size_t nr = 0, size_t nc = 0) const {
+      if (nr == 0)
+        nr = this->get_num_rows();
+      if (nc == 0)
+        nc = this->get_num_columns();
+      for (size_t i = 0; i < nr; i++) {
+        for (size_t j = 0; j < nc; j++) {
+          auto ret = lmd(i, j);
+          if (ret.has_value())
+            return ret;
+        }
+      }
+      return {};
+    }
+
+    Matrix<T> operator+(const MatrixBase &rhs) {
+      Matrix<T> res(*this);
+      static_cast<MatrixBase<T> &>(res) += rhs;
+      return res;
+    }
+    Matrix<T> operator*(T rhs) {
+      Matrix<T> res(*this);
+      static_cast<MatrixBase<T> &>(res) *= rhs;
+      return res;
+    }
+    virtual MatrixBase &operator+=(const MatrixBase &rhs) {
+      for_each(
+          [this, &rhs](size_t i, size_t j) { this->at(i, j) += rhs.at(i, j); });
+      return *this;
+    }
+
+    virtual MatrixBase &operator*=(T rhs) {
+      for_each([this, &rhs](size_t i, size_t j) { this->at(i, j) *= rhs; });
+      return *this;
+    }
+
+    virtual bool operator!=(const MatrixBase &rhs) const {
+      optional<bool> ret =
+          for_each(static_cast<std::function<optional<bool>(size_t, size_t)>>(
+              [this, &rhs](size_t i, size_t j) -> optional<bool> {
+                if (this->at(i, j) != rhs.at(i, j))
+                  return true; // abort loop and return true
+                return {};     // resume loop
+              }));
+
+      return ret.value_or(false); // ret has value when the loop has finished
+    }
+    virtual bool operator==(const MatrixBase &rhs) const {
+      return !((*this) != rhs);
+    }
+
+    virtual std::unique_ptr<MatrixBase> copy() const = 0;
+
+    virtual ~MatrixBase(){};
+  };
+
+  template <typename T>
+  std::ostream &operator<<(std::ostream &out, const MatrixBase<T> &matrix) {
+    for (size_t i = 0; i < matrix.get_num_rows(); i++) {
+      out << '{';
+      for (size_t j = 0; j < matrix.get_num_columns(); j++) {
+        out << matrix.at(i, j);
+        if (j < matrix.get_num_columns() - 1)
+          out << ',';
+      }
+      out << '}';
+      if (i < matrix.get_num_rows() - 1)
+        out << std::endl;
+    }
+    return out;
   }
 }

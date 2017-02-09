@@ -78,26 +78,15 @@ go_bandit([] {
       describe("(float)", [&vector, &vector2] {
         it("should return a multiplied matrix", [&vector, &vector2] {
           auto vector3 = vector * 2.f;
-          *vector3 must equal(vector2);
+          vector3 must equal(vector2);
         });
       });
       describe("(unsinged int)", [&vector, &vector2] {
         it("should return a multiplied matrix", [&vector, &vector2] {
           auto vector3 = vector * 2u;
-          *vector3 must equal(vector2);
+          vector3 must equal(vector2);
         });
       });
-			/* FIXME:
-      describe("(MatrixVector)", [] {
-        it("should return a multiplied matrix", [] {
-          MatrixVector<float> vector1 = {{1, 2}, {3, 4}, {5, 6}};
-          MatrixVector<float> vector2 = {{6, 5, 4}, {3, 2, 1}};
-          MatrixVector<float> vector3 = {
-              {12, 9, 6}, {30, 23, 16}, {48, 37, 26}};
-          (vector1 * vector2) must equal(vector3);
-        });
-      });
-			*/
     });
   });
 });

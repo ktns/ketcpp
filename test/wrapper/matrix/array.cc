@@ -107,25 +107,15 @@ go_bandit([] {
       describe("(float)", [&array, &array2] {
         it("should return a multiplied matrix", [&array, &array2] {
           auto array3 = array * 2.f;
-          *array3 must equal(array2);
+          array3 must equal(array2);
         });
       });
       describe("(unsinged int)", [&array, &array2] {
         it("should return a multiplied matrix", [&array, &array2] {
           auto array3 = array * 2u;
-          *array3 must equal(array2);
+          array3 must equal(array2);
         });
       });
-			/* FIXME
-      describe("(MatrixArray)", [] {
-        it("should return a multiplied matrix", [] {
-          MatrixArray<float, 3, 2> array1 = {1, 2, 3, 4, 5, 6};
-          MatrixArray<float, 2, 3> array2 = {6, 5, 4, 3, 2, 1};
-          MatrixArray<float, 3, 3> array3 = {12, 9, 6, 30, 23, 16, 48, 37, 26};
-          (array1 * array2) must equal(array3);
-        });
-      });
-			*/
     });
   });
 });

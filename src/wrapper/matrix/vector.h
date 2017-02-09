@@ -25,7 +25,7 @@
 #include <numeric>
 #include <vector>
 
-#include "wrapper/matrix/base.h"
+#include "wrapper/matrix/matrix.h"
 
 namespace ketcpp {
   namespace wrapper {
@@ -72,30 +72,22 @@ namespace ketcpp {
         MatrixVector(size_t m, size_t n) : num_rows(m), num_columns(n) {}
         MatrixVector() = delete;
 
-				T& at(size_t i, size_t j){
-					return storage[i*num_columns+j];
-				}
+        T &at(size_t i, size_t j) { return storage[i * num_columns + j]; }
 
-				T at(size_t i, size_t j) const{
-					return storage[i*num_columns+j];
-				}
+        T at(size_t i, size_t j) const { return storage[i * num_columns + j]; }
 
-				/* FIXME
         bool operator==(const MatrixVector &rhs) const {
           return std::equal(this->storage.cbegin(), this->storage.cend(),
                             rhs.storage.cbegin());
         }
-				*/
         Base &operator+=(const Base &rhsbase) {
-          try {
-            auto &rhs = dynamic_cast<const MatrixVector &>(rhsbase);
-            std::transform(this->storage.cbegin(), this->storage.cend(),
-                           rhs.storage.cbegin(), this->storage.begin(),
-                           [](T l, T r) -> T { return l + r; });
-            return *this;
-          } catch (std::bad_cast &ex) {
+          auto *prhs = dynamic_cast<const MatrixVector *>(&rhsbase);
+          if (prhs == nullptr)
             return Base::operator+=(rhsbase);
-          }
+          std::transform(this->storage.cbegin(), this->storage.cend(),
+                         prhs->storage.cbegin(), this->storage.begin(),
+                         [](T l, T r) -> T { return l + r; });
+          return *this;
         }
 
         Base &operator*=(T rhs) {
@@ -104,26 +96,6 @@ namespace ketcpp {
                          [rhs](T l) -> T { return l * rhs; });
           return *this;
         }
-        std::unique_ptr<MatrixBase<T>> operator*(T rhs) {
-          auto new_ptr = std::move(this->copy());
-          auto &new_matrix = dynamic_cast<decltype(*this) &>(*new_ptr);
-          new_matrix *= rhs;
-          return std::move(new_ptr);
-        }
-				/* FIXME
-        MatrixVector<T> operator*(const MatrixVector<T> &rhs) const {
-          MatrixVector<T> buf(this->num_rows, rhs.num_columns);
-          auto lr = this->rows().begin();
-          for (auto br = buf.rows().begin(); br != buf.rows().end();
-               ++br, ++lr) {
-            auto rc = rhs.columns().begin();
-            for (auto b = br.begin(); b != br.end(); ++b, ++rc) {
-              *b = std::inner_product(lr.begin(), lr.end(), rc.begin(), 0);
-            }
-          }
-          return std::move(buf);
-        }
-				*/
 
         std::unique_ptr<MatrixBase<T>> copy() const {
           std::unique_ptr<MatrixBase<T>> copy;
