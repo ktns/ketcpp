@@ -69,6 +69,7 @@ namespace ketcpp {
             dest += num_columns;
           }
         }
+        MatrixVector(size_t m) : num_rows(m), num_columns(m), storage(m * m) {}
         MatrixVector(size_t m, size_t n)
             : num_rows(m), num_columns(n), storage(m * n) {}
         MatrixVector() = delete;

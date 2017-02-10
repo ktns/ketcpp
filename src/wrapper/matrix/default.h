@@ -60,6 +60,23 @@ namespace ketcpp {
             [&ptr](size_t i, size_t j) { assert(ptr->at(i, j) == 0); });
         return Matrix<T>(std::move(ptr));
       }
+
+      template <typename T>
+      Matrix<T> make_symmetric_matrix(
+          std::initializer_list<std::initializer_list<T>> list) {
+        size_t i = 0;
+        auto ptr = std::make_unique<MatrixVector<T>>(list.size());
+        for (auto l : list) {
+          assert(l.size() == i + 1);
+          size_t j = 0;
+          for (T v : l) {
+            ptr->at(i, j) = ptr->at(j, i) = v;
+            j++;
+          }
+          i++;
+        }
+        return Matrix<T>(std::move(ptr));
+      }
     }
   }
 }

@@ -32,4 +32,13 @@ go_bandit([] {
           [&mat](size_t i, size_t j) { mat->at(i, j) must equal(0); });
     });
   });
+
+  describe("make_symmetric_matrix", [] {
+    it("should return a symmetric matrix", [] {
+      auto mat = make_symmetric_matrix<double>({{0}, {1, 2}, {3, 4, 5}});
+      mat->for_each([&mat](size_t i, size_t j) {
+        mat->at(i, j) must equal(mat->at(j, i));
+      });
+    });
+  });
 });
