@@ -22,8 +22,11 @@
 #ifdef LIBINT2_FOUND
 
 #include <memory>
+
 #include <libint2.hpp>
+
 #include <bandit/bandit.h>
+
 #include "config/fixture.h"
 #include "orbital/basis/libint.h"
 #include "wrapper/matrix/default.h"
@@ -56,11 +59,22 @@ go_bandit([] {
     describe("::get_overlap", [&] {
       it("Should return correct overlap matrix", [&] {
         auto overlap = basis->get_overlap();
-        decltype(overlap) correct =
-            wrapper::matrix::make_matrix<double>({{0.0}});
-        overlap must equal(correct);
+        auto correct = wrapper::matrix::make_symmetric_matrix<double>(
+            {{0.10000000e+01},
+             {0.23670392e+00, 0.10000000e+01},
+             {0.00000000e+00, 0.00000000e+00, 0.10000000e+01},
+             {0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.10000000e+01},
+             {0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
+              0.10000000e+01},
+             {0.52485534e-01, 0.46709281e+00, 0.38887100e+00, 0.14311115e-01,
+              -0.11964767e-01, 0.10000000e+01},
+             {0.52485684e-01, 0.46709359e+00, -0.11203435e+00, 0.28606226e+00,
+              -0.23913519e+00, 0.24703413e+00, 0.10000000e+01}});
+        auto within_delta = [](double a, double b) -> bool {
+          return std::abs(a - b) < 1e-7;
+        };
+        AssertThat(overlap, EqualsContainer(correct, within_delta));
       });
-
     });
   });
 });
