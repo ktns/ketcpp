@@ -57,5 +57,25 @@ go_bandit([] {
         matrix1 must_not equal(matrix2);
       });
     });
+
+    describe("::begin/end()", [] {
+      it("should enumerate all elements of a matrix", [] {
+        const MatrixTestBase<int, 2> matrix{{1, 2}, {3, 4}};
+        const std::array<int, 4> array{{1, 2, 3, 4}};
+        std::equal(matrix.begin(), matrix.end(), array.begin()) must be_truthy;
+      });
+      it("should return assignable iterators", [] {
+        MatrixTestBase<int, 2> matrix;
+        const std::array<int, 4> array{{42, 42, 42, 42}};
+        std::fill(matrix.begin(), matrix.end(), 42);
+        std::equal(matrix.begin(), matrix.end(), array.begin()) must be_truthy;
+      });
+    });
+
+    it("should be able to be compared as a container", [] {
+      const MatrixTestBase<int, 2> matrix{{1, 2}, {3, 4}};
+      const std::array<int, 4> array{{1, 2, 3, 4}};
+      AssertThat(matrix, EqualsContainer(array));
+    });
   });
 });

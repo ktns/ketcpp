@@ -111,5 +111,9 @@ go_bandit([] {
         });
       });
     });
+    it("should be able to be compared as matrix", [&matrix, &matrix2] {
+      AssertThat(matrix, Is().EqualToContainer(matrix));
+      AssertThat(matrix, Is().Not().EqualToContainer(matrix2));
+    });
   });
 });

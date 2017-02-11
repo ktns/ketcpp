@@ -21,7 +21,7 @@
 
 #include <algorithm>
 #include <functional>
-#include <memory>
+#include <list>
 #include <memory>
 #include <ostream>
 #if __has_include(<optional>)
@@ -72,6 +72,18 @@ namespace ketcpp::wrapper::matrix {
       *base *= rhs;
       return *this;
     }
+
+    typedef T value_type;
+    typedef typename MatrixBase<T>::iterator iterator;
+    typedef typename MatrixBase<T>::const_iterator const_iterator;
+
+    size_t size() const { return base->size(); }
+    iterator begin() { return base->begin(); }
+    iterator end() { return base->end(); }
+    const_iterator begin() const { return base->begin(); }
+    const_iterator end() const { return base->end(); }
+    const_iterator cbegin() const { return base->cbegin(); }
+    const_iterator cend() const { return base->cend(); }
   };
 
   template <typename T>
@@ -87,6 +99,7 @@ namespace ketcpp::wrapper::matrix {
     virtual size_t get_column_size() const = 0;
     virtual T &at(size_t irow, size_t icol) = 0;
     virtual T at(size_t irow, size_t icol) const = 0;
+    size_t size() const { return get_num_rows() * get_num_columns(); }
 
     void for_each(std::function<void(size_t, size_t)> lmd, //
                   size_t nr = 0, size_t nc = 0) const {
@@ -154,6 +167,49 @@ namespace ketcpp::wrapper::matrix {
     }
 
     virtual std::unique_ptr<MatrixBase> copy() const = 0;
+
+  private:
+    struct refwrapper : public std::reference_wrapper<T> {
+      using std::reference_wrapper<T>::reference_wrapper;
+      T &operator=(T v) { return static_cast<T &>(*this) = v; }
+    };
+    std::unique_ptr<std::list<refwrapper>> reflist = nullptr;
+    void prepare_reflist() {
+      if (reflist != nullptr)
+        return;
+      reflist.reset(new std::list<refwrapper>);
+      for_each([this](size_t i, size_t j) { reflist->push_back(at(i, j)); });
+    }
+    void prepare_reflist_const() const {
+      const_cast<MatrixBase<T> *>(this)->prepare_reflist();
+    }
+
+  public:
+    auto begin() {
+      prepare_reflist();
+      return reflist->begin();
+    }
+    auto end() {
+      prepare_reflist();
+      return reflist->end();
+    }
+    auto cbegin() const {
+      prepare_reflist_const();
+      return reflist->cbegin();
+    }
+    auto cend() const {
+      prepare_reflist_const();
+      return reflist->cend();
+    }
+    auto begin() const { return cbegin(); }
+    auto end() const { return cend(); }
+
+    MatrixBase() : reflist(nullptr) {}
+    MatrixBase(const MatrixBase<T> &) : reflist(nullptr) {}
+
+    typedef T value_type;
+    typedef decltype(reflist->begin()) iterator;
+    typedef decltype(reflist->cbegin()) const_iterator;
 
     virtual ~MatrixBase(){};
   };
