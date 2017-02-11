@@ -1,9 +1,14 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.7.20161201)
 project (ket_cpp CXX)
 
 set(serial 0.0)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+set(COTIRE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/extlib/bandit/cmake/cotire/CMake/cotire.cmake)
+if(EXISTS ${COTIRE_PATH})
+	include(${COTIRE_PATH})
+endif(EXISTS ${COTIRE_PATH})
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -63,7 +68,7 @@ configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/test/config/ketcpp_test_config.h.in
 	${CMAKE_CURRENT_BINARY_DIR}/test/config/ketcpp_test_config.h)
 
-set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 14)
+set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
 
 install(TARGETS ket_cpp DESTINATION bin COMPONENT runtime)
