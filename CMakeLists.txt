@@ -3,7 +3,12 @@ project (ket_cpp CXX)
 
 set(serial 0.0)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+set(COTIRE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/extlib/bandit/cmake/cotire/CMake/cotire.cmake)
+if(EXISTS ${COTIRE_PATH})
+	include(${COTIRE_PATH})
+endif(EXISTS ${COTIRE_PATH})
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
