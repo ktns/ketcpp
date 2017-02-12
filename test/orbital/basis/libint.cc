@@ -30,17 +30,46 @@
 #include "config/fixture.h"
 #include "orbital/basis/libint.h"
 #include "wrapper/matrix/default.h"
+#include "wrapper/matrix/dummy.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp;
+using namespace ketcpp::wrapper::matrix;
 using namespace ketcpp::orbital::basis;
+
+typedef typename Libint2Basis::matrix_t matrix_t;
 
 go_bandit([] {
   describe("orbital::basisset::Libint2Basis", [] {
     std::unique_ptr<Libint2Basis> basis;
+    matrix_t correct_overlap = make_dummy_matrix<double>(),
+             correct_kinetic = correct_overlap;
+
     before_each([&] {
       basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
+      correct_overlap = wrapper::matrix::make_symmetric_matrix<double>(
+          {{+0.10000000e+01},
+           {+0.23670392e+00, +0.10000000e+01},
+           {+0.00000000e+00, +0.00000000e+00, +0.10000000e+01},
+           {+0.00000000e+00, +0.00000000e+00, +0.00000000e+00, +0.10000000e+01},
+           {+0.00000000e+00, +0.00000000e+00, +0.00000000e+00, +0.00000000e+00,
+            +0.10000000e+01},
+           {+0.52485534e-01, +0.46709281e+00, +0.38887100e+00, +0.14311115e-01,
+            -0.11964767e-01, +0.10000000e+01},
+           {+0.52485684e-01, +0.46709359e+00, -0.11203435e+00, +0.28606226e+00,
+            -0.23913519e+00, +0.24703413e+00, +0.10000000e+01}});
+      correct_kinetic = wrapper::matrix::make_symmetric_matrix<double>(
+          {{+2.9003204e+01},
+           {-1.6801096e-01, +8.0812790e-01},
+           {+0.0000000e+00, +0.0000000e+00, +2.5287312e+00},
+           {+0.0000000e+00, +0.0000000e+00, +0.0000000e+00, +2.5287312e+00},
+           {+0.0000000e+00, +0.0000000e+00, +0.0000000e+00, +0.0000000e+00,
+            +2.5287312e+00},
+           {-3.3098365e-03, +1.2301215e-01, +2.7495169e-01, +1.0118690e-02,
+            -8.4597024e-03, +7.6003188e-01},
+           {-3.3097585e-03, +1.2301271e-01, -7.9214194e-02, +2.0226109e-01,
+            -1.6908118e-01, +7.4497840e-03, +7.6003188e-01}});
     });
 
     after_each([&] { basis.reset(); });
@@ -59,42 +88,20 @@ go_bandit([] {
     describe("::get_overlap", [&] {
       it("Should return correct overlap matrix", [&] {
         auto overlap = basis->get_overlap();
-        auto correct = wrapper::matrix::make_symmetric_matrix<double>(
-            {{0.10000000e+01},
-             {0.23670392e+00, 0.10000000e+01},
-             {0.00000000e+00, 0.00000000e+00, 0.10000000e+01},
-             {0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.10000000e+01},
-             {0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
-              0.10000000e+01},
-             {0.52485534e-01, 0.46709281e+00, 0.38887100e+00, 0.14311115e-01,
-              -0.11964767e-01, 0.10000000e+01},
-             {0.52485684e-01, 0.46709359e+00, -0.11203435e+00, 0.28606226e+00,
-              -0.23913519e+00, 0.24703413e+00, 0.10000000e+01}});
         auto within_delta = [](double a, double b) -> bool {
           return std::abs(a - b) < 1e-7;
         };
-        AssertThat(overlap, EqualsContainer(correct, within_delta));
+        AssertThat(overlap, EqualsContainer(correct_overlap, within_delta));
       });
     });
 
     describe("::get_kinetic", [&] {
       it("Should return correct kinetic matrix", [&] {
         auto kinetic = basis->get_kinetic();
-        auto correct = wrapper::matrix::make_symmetric_matrix<double>(
-            {{+2.9003204e+01},
-             {-1.6801096e-01, +8.0812790e-01},
-             {+0.0000000e+00, +0.0000000e+00, +2.5287312e+00},
-             {+0.0000000e+00, +0.0000000e+00, +0.0000000e+00, +2.5287312e+00},
-             {+0.0000000e+00, +0.0000000e+00, +0.0000000e+00, +0.0000000e+00,
-              +2.5287312e+00},
-             {-3.3098365e-03, +1.2301215e-01, +2.7495169e-01, +1.0118690e-02,
-              -8.4597024e-03, +7.6003188e-01},
-             {-3.3097585e-03, +1.2301271e-01, -7.9214194e-02, +2.0226109e-01,
-              -1.6908118e-01, +7.4497840e-03, +7.6003188e-01}});
         auto within_delta = [](double a, double b) -> bool {
           return std::abs(a - b) < 1e-5;
         };
-        AssertThat(kinetic, EqualsContainer(correct, within_delta));
+        AssertThat(kinetic, EqualsContainer(correct_kinetic, within_delta));
       });
     });
   });
