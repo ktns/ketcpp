@@ -39,6 +39,25 @@ go_bandit([] {
     it("Should be abstract class",
        [] { std::is_abstract<MatrixBase<float>>::value must be_truthy; });
 
+    describe("::operator+=(matrix)", [] {
+      it("should subtract matrix from matrix", [] {
+        MatrixTestBase<int, 2> matrix1{{1, 2}, {3, 4}};
+        MatrixTestBase<int, 2> const matrix2{{2, 4}, {6, 8}};
+        MatrixTestBase<int, 2> const matrix3{{3, 6}, {9, 12}};
+        (matrix1 += matrix2) must equal(matrix3);
+        matrix1 must equal(matrix3);
+      });
+    });
+    describe("::operator-=(matrix)", [] {
+      it("should subtract matrix from matrix", [] {
+        MatrixTestBase<int, 2> matrix1{{1, 2}, {3, 4}};
+        MatrixTestBase<int, 2> const matrix2{{2, 4}, {6, 8}};
+        MatrixTestBase<int, 2> const matrix3{{-1, -2}, {-3, -4}};
+        (matrix1 -= matrix2) must equal(matrix3);
+        matrix1 must equal(matrix3);
+      });
+    });
+
     describe("::operator*=(scalar)", [] {
       it("should multiply all elements uniformly", [] {
         MatrixTestBase<int, 2> matrix1{{1, 2}, {3, 4}};

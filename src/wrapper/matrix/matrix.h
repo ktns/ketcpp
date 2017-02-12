@@ -66,10 +66,16 @@ namespace ketcpp::wrapper::matrix {
     bool operator==(const Base &rhs) const { return *base == rhs; }
     bool operator!=(const Base &rhs) const { return *base != rhs; }
 
+    Matrix operator+(const Base &rhs) { return *base + rhs; }
+    Matrix operator-(const Base &rhs) { return *base - rhs; }
     Matrix operator*(T rhs) const { return *base * rhs; }
 
     Matrix &operator+=(const Base &rhs) {
       *base += rhs;
+      return *this;
+    }
+    Matrix &operator-=(const Base &rhs) {
+      *base -= rhs;
       return *this;
     }
     Matrix &operator*=(T rhs) {
@@ -139,17 +145,27 @@ namespace ketcpp::wrapper::matrix {
       static_cast<MatrixBase<T> &>(res) += rhs;
       return res;
     }
+    Matrix<T> operator-(const MatrixBase &rhs) {
+      Matrix<T> res(*this);
+      static_cast<MatrixBase<T> &>(res) -= rhs;
+      return res;
+    }
     Matrix<T> operator*(T rhs) {
       Matrix<T> res(*this);
       static_cast<MatrixBase<T> &>(res) *= rhs;
       return res;
     }
+
     virtual MatrixBase &operator+=(const MatrixBase &rhs) {
       for_each(
           [this, &rhs](size_t i, size_t j) { this->at(i, j) += rhs.at(i, j); });
       return *this;
     }
-
+    virtual MatrixBase &operator-=(const MatrixBase &rhs) {
+      for_each(
+          [this, &rhs](size_t i, size_t j) { this->at(i, j) -= rhs.at(i, j); });
+      return *this;
+    }
     virtual MatrixBase &operator*=(T rhs) {
       for_each([this, &rhs](size_t i, size_t j) { this->at(i, j) *= rhs; });
       return *this;
