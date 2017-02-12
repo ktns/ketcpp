@@ -53,6 +53,10 @@ namespace ketcpp::wrapper::matrix {
     Matrix(const Base &src) : base(src.copy()) {}
     Matrix(Matrix &&src) : base(std::move(src.base)) {}
     Matrix(unique_ptr &&src) : base(std::move(src)) {}
+    Matrix &operator=(const Matrix &src) {
+      base = src.base->copy();
+      return *this;
+    }
 
     MatrixBase<T> *operator->() { return base.get(); }
 
