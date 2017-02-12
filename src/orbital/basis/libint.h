@@ -24,6 +24,8 @@
 #ifdef LIBINT2_FOUND
 
 #include <memory>
+#include <vector>
+#include <tuple>
 
 #include "wrapper/matrix/matrix.h"
 
@@ -40,9 +42,21 @@ namespace ketcpp {
                      const std::string &basisset_name);
         ~Libint2Basis();
 
+        struct pointcharge_t {
+          double x, y, z, charge;
+          pointcharge_t(
+              const std::tuple<double, double, double, double> &tuple) {
+            std::tie(x, y, z, charge) = tuple;
+          }
+          operator std::tuple<double, double, double, double>() {
+            return std::make_tuple(x, y, z, charge);
+          }
+        };
         typedef wrapper::matrix::Matrix<double> matrix_t;
         matrix_t get_overlap();
         matrix_t get_kinetic();
+        matrix_t get_nuclear();
+        matrix_t get_nuclear(const std::vector<pointcharge_t> &charges);
       };
     }
   }

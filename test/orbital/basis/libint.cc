@@ -44,7 +44,8 @@ go_bandit([] {
   describe("orbital::basisset::Libint2Basis", [] {
     std::unique_ptr<Libint2Basis> basis;
     matrix_t correct_overlap = make_dummy_matrix<double>(),
-             correct_kinetic = correct_overlap;
+             correct_kinetic = correct_overlap,
+             correct_nuclear = correct_overlap;
 
     before_each([&] {
       basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
@@ -70,6 +71,18 @@ go_bandit([] {
             -8.4597024e-03, +7.6003188e-01},
            {-3.3097585e-03, +1.2301271e-01, -7.9214194e-02, +2.0226109e-01,
             -1.6908118e-01, +7.4497840e-03, +7.6003188e-01}});
+      auto correct_coreh = wrapper::matrix::make_symmetric_matrix<double>(
+          {{-3.2707466e+01},
+           {-7.6096206e+00, -9.3225767e+00},
+           {-1.0771234e-02, -1.2723748e-01, -7.5790415e+00},
+           {-1.1687029e-02, -1.3805543e-01, +2.1247898e-02, -7.5134646e+00},
+           {+9.7698825e-03, +1.1540874e-01, -1.7761876e-02, +5.5020976e-02,
+            -7.4936416e+00},
+           {-1.7005997e+00, -3.6664246e+00, -2.5689634e+00, -1.3765816e-01,
+            +1.1508480e-01, -5.0290866e+00},
+           {-1.7006045e+00, -3.6664318e+00, +6.8713967e-01, -1.9041595e+00,
+            +1.5917920e+00, -1.5659711e+00, -5.0290911e+00}});
+      correct_nuclear = correct_coreh - correct_kinetic;
     });
 
     after_each([&] { basis.reset(); });
@@ -102,6 +115,16 @@ go_bandit([] {
           return std::abs(a - b) < 1e-5;
         };
         AssertThat(kinetic, EqualsContainer(correct_kinetic, within_delta));
+      });
+    });
+
+    describe("::get_nuclear", [&] {
+      it("Should return correct nuclear matrix", [&] {
+        auto kinetic = basis->get_nuclear();
+        auto within_delta = [](double a, double b) -> bool {
+          return std::abs(a - b) < 1e-5;
+        };
+        AssertThat(kinetic, EqualsContainer(correct_nuclear, within_delta));
       });
     });
   });
