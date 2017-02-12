@@ -32,7 +32,7 @@ if(EIGEN3_PC_FOUND)
   set(EIGEN3_INCLUDE_DIR ${EIGEN3_PC_INCLUDE_DIRS})
 endif(EIGEN3_PC_FOUND)
 find_package(Eigen3)
-include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 
 file(GLOB_RECURSE SRCS src/*.cc)
 
