@@ -42,6 +42,7 @@ namespace ketcpp {
 
         typedef wrapper::matrix::Matrix<double> matrix_t;
         matrix_t get_overlap();
+        matrix_t get_kinetic();
       };
     }
   }

@@ -107,5 +107,8 @@ Libint2Basis::Impl::get_1el_matrix(libint2::Operator opr) {
 Libint2Basis::matrix_t Libint2Basis::get_overlap() {
   return impl->get_1el_matrix(libint2::Operator::overlap);
 }
+Libint2Basis::matrix_t Libint2Basis::get_kinetic() {
+  return impl->get_1el_matrix(libint2::Operator::kinetic);
+}
 
 #endif

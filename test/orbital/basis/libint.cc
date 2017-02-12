@@ -76,6 +76,27 @@ go_bandit([] {
         AssertThat(overlap, EqualsContainer(correct, within_delta));
       });
     });
+
+    describe("::get_kinetic", [&] {
+      it("Should return correct kinetic matrix", [&] {
+        auto kinetic = basis->get_kinetic();
+        auto correct = wrapper::matrix::make_symmetric_matrix<double>(
+            {{+2.9003204e+01},
+             {-1.6801096e-01, +8.0812790e-01},
+             {+0.0000000e+00, +0.0000000e+00, +2.5287312e+00},
+             {+0.0000000e+00, +0.0000000e+00, +0.0000000e+00, +2.5287312e+00},
+             {+0.0000000e+00, +0.0000000e+00, +0.0000000e+00, +0.0000000e+00,
+              +2.5287312e+00},
+             {-3.3098365e-03, +1.2301215e-01, +2.7495169e-01, +1.0118690e-02,
+              -8.4597024e-03, +7.6003188e-01},
+             {-3.3097585e-03, +1.2301271e-01, -7.9214194e-02, +2.0226109e-01,
+              -1.6908118e-01, +7.4497840e-03, +7.6003188e-01}});
+        auto within_delta = [](double a, double b) -> bool {
+          return std::abs(a - b) < 1e-5;
+        };
+        AssertThat(kinetic, EqualsContainer(correct, within_delta));
+      });
+    });
   });
 });
 
