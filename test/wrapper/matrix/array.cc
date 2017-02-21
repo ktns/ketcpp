@@ -50,19 +50,19 @@ go_bandit([] {
 
     describe(".get_num_rows", [&array] {
       it("should return the correct number of rows",
-         [&array] { array.get_num_rows() must equal(3); });
+         [&array] { array.get_num_rows() must equal(3u); });
     });
     describe(".get_num_columns", [&array] {
       it("should return the correct number of columns",
-         [&array] { array.get_num_columns() must equal(2); });
+         [&array] { array.get_num_columns() must equal(2u); });
     });
     describe(".get_row_size", [&array] {
       it("should return the correct size of rows",
-         [&array] { array.get_row_size() must equal(2); });
+         [&array] { array.get_row_size() must equal(2u); });
     });
     describe(".get_column_size", [&array] {
       it("should return the correct size of columns",
-         [&array] { array.get_column_size() must equal(3); });
+         [&array] { array.get_column_size() must equal(3u); });
     });
 
     describe("::operator==", [&array, &array2] {

@@ -32,7 +32,7 @@ namespace {
     using MatrixArray<T, m, n>::MatrixArray;
     MatrixBase<T> &operator*=(T rhs) { return MatrixBase<T>::operator*=(rhs); }
   };
-};
+}
 
 go_bandit([] {
   describe("MatrixBase", [] {

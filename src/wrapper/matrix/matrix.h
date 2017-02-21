@@ -38,7 +38,7 @@ namespace {
     using std::experimental::optional<T>::optional;
     bool has_value() { return static_cast<bool>(*this); }
   };
-};
+}
 #endif
 
 namespace ketcpp::wrapper::matrix {
