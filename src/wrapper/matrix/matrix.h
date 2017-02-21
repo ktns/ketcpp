@@ -24,6 +24,7 @@
 #include <list>
 #include <memory>
 #include <ostream>
+#include <type_traits>
 #if __has_include(<optional>)
 #include <optional>
 namespace {
@@ -111,8 +112,29 @@ namespace ketcpp::wrapper::matrix {
     virtual T at(size_t irow, size_t icol) const = 0;
     size_t size() const { return get_num_rows() * get_num_columns(); }
 
-    void for_each(std::function<void(size_t, size_t)> lmd, //
-                  size_t nr = 0, size_t nc = 0) const {
+    template <typename F, typename R = typename std::result_of_t<
+                              F(size_t, size_t)>::value_type>
+    std::enable_if_t<
+        std::is_same<std::result_of_t<F(size_t, size_t)>, optional<R>>::value,
+        optional<R>>
+    for_each(F lmd, size_t nr = 0, size_t nc = 0) const {
+      if (nr == 0)
+        nr = this->get_num_rows();
+      if (nc == 0)
+        nc = this->get_num_columns();
+      for (size_t i = 0; i < nr; i++) {
+        for (size_t j = 0; j < nc; j++) {
+          auto ret = lmd(i, j);
+          if (ret.has_value())
+            [[unlikely]] return ret;
+        }
+      }
+      return {};
+    }
+    template <typename F>
+    std::enable_if_t<
+        std::is_same<std::result_of_t<F(size_t, size_t)>, void>::value, void>
+    for_each(F lmd, size_t nr = 0, size_t nc = 0) const {
       if (nr == 0)
         nr = this->get_num_rows();
       if (nc == 0)
@@ -122,22 +144,6 @@ namespace ketcpp::wrapper::matrix {
           lmd(i, j);
         }
       }
-    }
-    template <typename R>
-    optional<R> for_each(std::function<optional<R>(size_t, size_t)> lmd,
-                         size_t nr = 0, size_t nc = 0) const {
-      if (nr == 0)
-        nr = this->get_num_rows();
-      if (nc == 0)
-        nc = this->get_num_columns();
-      for (size_t i = 0; i < nr; i++) {
-        for (size_t j = 0; j < nc; j++) {
-          auto ret = lmd(i, j);
-          if (ret.has_value())
-            return ret;
-        }
-      }
-      return {};
     }
 
     Matrix<T> operator+(const MatrixBase &rhs) {
@@ -172,13 +178,11 @@ namespace ketcpp::wrapper::matrix {
     }
 
     virtual bool operator!=(const MatrixBase &rhs) const {
-      optional<bool> ret =
-          for_each(static_cast<std::function<optional<bool>(size_t, size_t)>>(
-              [this, &rhs](size_t i, size_t j) -> optional<bool> {
-                if (this->at(i, j) != rhs.at(i, j))
-                  return true; // abort loop and return true
-                return {};     // resume loop
-              }));
+      auto ret = for_each([this, &rhs](size_t i, size_t j) -> optional<bool> {
+        if (this->at(i, j) != rhs.at(i, j))
+          return true; // abort loop and return true
+        return {};     // resume loop
+      });
 
       return ret.value_or(false); // ret has value when the loop has finished
     }
