@@ -59,7 +59,7 @@ file(GLOB_RECURSE TEST_SRCS test/*.cc)
 
 enable_testing()
 add_executable (run_tests ${SRCS} ${TEST_SRCS})
-target_include_directories(run_tests PRIVATE ${PROJECT_SOURCE_DIR}/test/ ${PROJECT_SOURCE_DIR}/extlib/bandit)
+target_include_directories(run_tests PRIVATE ${PROJECT_SOURCE_DIR}/test/ PRIVATE SYSTEM ${PROJECT_SOURCE_DIR}/extlib/bandit)
 add_test(NAME run_tests COMMAND $<TARGET_FILE:run_tests> --reporter=spec)
 set(KETCPP_TEST_FIXTURE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/fixture")
 target_include_directories(run_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/test/")

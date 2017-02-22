@@ -41,19 +41,19 @@ go_bandit([] {
 
     describe(".get_num_rows", [&matrix1] {
       it("should return the correct number of rows",
-         [&matrix1] { matrix1->get_num_rows() must equal(3); });
+         [&matrix1] { matrix1->get_num_rows() must equal(3u); });
     });
     describe(".get_num_columns", [&matrix1] {
       it("should return the correct number of columns",
-         [&matrix1] { matrix1->get_num_columns() must equal(2); });
+         [&matrix1] { matrix1->get_num_columns() must equal(2u); });
     });
     describe(".get_row_size", [&matrix1] {
       it("should return the correct size of rows",
-         [&matrix1] { matrix1->get_row_size() must equal(2); });
+         [&matrix1] { matrix1->get_row_size() must equal(2u); });
     });
     describe(".get_column_size", [&matrix1] {
       it("should return the correct size of columns",
-         [&matrix1] { matrix1->get_column_size() must equal(3); });
+         [&matrix1] { matrix1->get_column_size() must equal(3u); });
     });
 
     describe("::operator==", [&matrix1, &matrix2] {
