@@ -31,6 +31,8 @@
 using namespace ketcpp;
 using namespace ketcpp::orbital::basis;
 
+using matrix_t = Libint2Basis::matrix_t;
+
 namespace {
   class Libint2Resource {
   private:
@@ -81,8 +83,7 @@ private:
     shell2bf = basis->shell2bf();
   }
   template <typename T = std::nullptr_t>
-  Libint2Basis::matrix_t get_1el_matrix(libint2::Operator opr,
-                                        T param = nullptr) {
+  matrix_t get_1el_matrix(libint2::Operator opr, T param = nullptr) {
     matrix_t mat = wrapper::matrix::make_zero_matrix<double>(basis_size);
     const auto &shells = *basis.get();
     const auto &shell2bf = this->shell2bf;
@@ -111,18 +112,17 @@ Libint2Basis::Libint2Basis(const std::string &xyz_file,
     : impl(new Impl(xyz_file, basisset_name)) {}
 Libint2Basis::~Libint2Basis() {}
 
-Libint2Basis::matrix_t Libint2Basis::get_overlap() {
+matrix_t Libint2Basis::get_overlap() {
   return impl->get_1el_matrix(libint2::Operator::overlap);
 }
-Libint2Basis::matrix_t Libint2Basis::get_kinetic() {
+matrix_t Libint2Basis::get_kinetic() {
   return impl->get_1el_matrix(libint2::Operator::kinetic);
 }
-Libint2Basis::matrix_t Libint2Basis::get_nuclear() {
+matrix_t Libint2Basis::get_nuclear() {
   return impl->get_1el_matrix(libint2::Operator::nuclear,
                               make_point_charges(impl->atoms));
 }
-Libint2Basis::matrix_t
-Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
+matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
   return impl->get_1el_matrix(libint2::Operator::nuclear, charges);
 }
 
