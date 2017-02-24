@@ -36,9 +36,6 @@ go_bandit([] {
       matrix3 = make_matrix<float, 3, 2>({{3, 6}, {9, 12}, {15, 18}});
     });
 
-    it("Should not be abstract class",
-       [] { std::is_abstract<Matrix<float>>::value must be_falsy; });
-
     describe(".get_num_rows", [&matrix1] {
       it("should return the correct number of rows",
          [&matrix1] { matrix1->get_num_rows() must equal(3u); });
@@ -54,6 +51,42 @@ go_bandit([] {
     describe(".get_column_size", [&matrix1] {
       it("should return the correct size of columns",
          [&matrix1] { matrix1->get_column_size() must equal(3u); });
+    });
+
+    describe("->at", [&matrix1] {
+      it("should return correct element", [&matrix1] {
+        matrix1->at(0, 0) must equal(1);
+        matrix1->at(0, 1) must equal(2);
+        matrix1->at(1, 0) must equal(3);
+        matrix1->at(1, 1) must equal(4);
+        matrix1->at(2, 0) must equal(5);
+        matrix1->at(2, 1) must equal(6);
+      });
+
+      it("should return assignable reference", [&matrix1] {
+        matrix1->at(0, 0) = 0;
+        matrix1->at(0, 1) = 0;
+        matrix1->at(1, 0) = 0;
+        matrix1->at(1, 1) = 0;
+        matrix1->at(2, 0) = 0;
+        matrix1->at(2, 1) = 0;
+        matrix1->at(0, 0) must equal(0);
+        matrix1->at(0, 1) must equal(0);
+        matrix1->at(1, 0) must equal(0);
+        matrix1->at(1, 1) must equal(0);
+        matrix1->at(2, 0) must equal(0);
+        matrix1->at(2, 1) must equal(0);
+      });
+
+      it("should be invoked from const reference", [&matrix1] {
+        const auto &matrix2 = matrix1;
+        matrix2->at(0, 0) must equal(1);
+        matrix2->at(0, 1) must equal(2);
+        matrix2->at(1, 0) must equal(3);
+        matrix2->at(1, 1) must equal(4);
+        matrix2->at(2, 0) must equal(5);
+        matrix2->at(2, 1) must equal(6);
+      });
     });
 
     describe("::operator==", [&matrix1, &matrix2] {

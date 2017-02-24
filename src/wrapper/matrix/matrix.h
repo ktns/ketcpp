@@ -60,6 +60,7 @@ namespace ketcpp::wrapper::matrix {
     }
 
     MatrixBase<T> *operator->() { return base.get(); }
+    const MatrixBase<T> *operator->() const { return base.get(); }
 
     operator Base &() { return *base; }
     operator const Base &() const { return *base; }
