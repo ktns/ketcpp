@@ -252,6 +252,12 @@ namespace ketcpp::wrapper::matrix {
     virtual ~MatrixBase(){};
   };
 
+  template <typename T, typename U>
+  std::enable_if_t<std::is_convertible<U, T>::value, Matrix<T>>
+  operator*(U scalar, const Matrix<T> &mat) {
+    return mat * static_cast<T>(scalar);
+  }
+
   template <typename T>
   std::ostream &operator<<(std::ostream &out, const MatrixBase<T> &matrix) {
     for (size_t i = 0; i < matrix.get_num_rows(); i++) {

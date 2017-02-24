@@ -131,18 +131,35 @@ go_bandit([] {
       });
     });
 
+    describe("operator*(float, Matrix<float>)", [&matrix1, &matrix2] {
+      it("should return a matrix multiplied by the scalar",
+         [&matrix1, &matrix2] {
+           auto matrix3 = 2.f * matrix1;
+           matrix3 must equal(matrix2);
+         });
+    });
+    describe("operator*(unsinged int, Matrix<float>)", [&matrix1, &matrix2] {
+      it("should return a matrix multiplied by the scalar",
+         [&matrix1, &matrix2] {
+           auto matrix3 = 2u * matrix1;
+           matrix3 must equal(matrix2);
+         });
+    });
+
     describe("::operator*", [&matrix1, &matrix2] {
       describe("(float)", [&matrix1, &matrix2] {
-        it("should return a multiplied matrix", [&matrix1, &matrix2] {
-          auto matrix3 = matrix1 * 2.f;
-          matrix3 must equal(matrix2);
-        });
+        it("should return a matrix multiplied by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix1 * 2.f;
+             matrix3 must equal(matrix2);
+           });
       });
       describe("(unsinged int)", [&matrix1, &matrix2] {
-        it("should return a multiplied matrix", [&matrix1, &matrix2] {
-          auto matrix3 = matrix1 * 2u;
-          matrix3 must equal(matrix2);
-        });
+        it("should return a matrix multiplied by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix1 * 2u;
+             matrix3 must equal(matrix2);
+           });
       });
     });
 
