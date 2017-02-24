@@ -1,6 +1,6 @@
 /*
  * ketcpp: Quantum chemical toolset made of C++
- * Copyright (C) 2015 Katsuhiko Nishimra
+ * Copyright (C) 2015-2017 Katsuhiko Nishimra
  *
  * This file is part of ketcpp.
  *
@@ -70,6 +70,7 @@ namespace ketcpp::wrapper::matrix {
     Matrix operator+(const Base &rhs) { return *base + rhs; }
     Matrix operator-(const Base &rhs) { return *base - rhs; }
     Matrix operator*(T rhs) const { return *base * rhs; }
+    Matrix operator/(T rhs) const { return *base / rhs; }
 
     Matrix &operator+=(const Base &rhs) {
       *base += rhs;
@@ -81,6 +82,10 @@ namespace ketcpp::wrapper::matrix {
     }
     Matrix &operator*=(T rhs) {
       *base *= rhs;
+      return *this;
+    }
+    Matrix &operator/=(T rhs) {
+      *base /= rhs;
       return *this;
     }
 
@@ -156,9 +161,14 @@ namespace ketcpp::wrapper::matrix {
       static_cast<MatrixBase<T> &>(res) -= rhs;
       return res;
     }
-    Matrix<T> operator*(T rhs) {
+    Matrix<T> operator*(T rhs) const {
       Matrix<T> res(*this);
       static_cast<MatrixBase<T> &>(res) *= rhs;
+      return res;
+    }
+    Matrix<T> operator/(T rhs) const {
+      Matrix<T> res(*this);
+      static_cast<MatrixBase<T> &>(res) /= rhs;
       return res;
     }
 
@@ -174,6 +184,10 @@ namespace ketcpp::wrapper::matrix {
     }
     virtual MatrixBase &operator*=(T rhs) {
       for_each([this, &rhs](size_t i, size_t j) { this->at(i, j) *= rhs; });
+      return *this;
+    }
+    virtual MatrixBase &operator/=(T rhs) {
+      for_each([this, &rhs](size_t i, size_t j) { this->at(i, j) /= rhs; });
       return *this;
     }
 

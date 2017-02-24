@@ -33,7 +33,7 @@ go_bandit([] {
     before_each([&matrix1, &matrix2, &matrix3] {
       matrix1 = make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}});
       matrix2 = make_matrix<float>({{2, 4}, {6, 8}, {10, 12}});
-      matrix3 = matrix1 * 3;
+      matrix3 = make_matrix<float, 3, 2>({{3, 6}, {9, 12}, {15, 18}});
     });
 
     it("Should not be abstract class",
@@ -145,6 +145,24 @@ go_bandit([] {
         });
       });
     });
+
+    describe("::operator/", [&matrix1, &matrix2] {
+      describe("(float)", [&matrix1, &matrix2] {
+        it("should return a matrix divided by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix2 / 2.f;
+             matrix3 must equal(matrix1);
+           });
+      });
+      describe("(unsinged int)", [&matrix1, &matrix2] {
+        it("should return a matrix divided by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix2 / 2u;
+             matrix3 must equal(matrix1);
+           });
+      });
+    });
+
     it("should be able to be compared as matrix", [&matrix1, &matrix2] {
       AssertThat(matrix1, Is().EqualToContainer(matrix1));
       AssertThat(matrix1, Is().Not().EqualToContainer(matrix2));
