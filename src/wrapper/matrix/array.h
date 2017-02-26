@@ -33,7 +33,7 @@ namespace ketcpp {
   namespace wrapper {
     namespace matrix {
       template <typename T, size_t m, size_t n = m>
-      class MatrixArray : public MatrixBase<T> {
+      class MatrixArrayCore : public MatrixBase<T> {
       public:
         constexpr static size_t num_rows = m;
         constexpr static size_t num_columns = n;
@@ -44,7 +44,7 @@ namespace ketcpp {
         size_t get_row_size() const { return row_size; }
         size_t get_column_size() const { return column_size; }
 
-      private:
+      protected:
         using array = std::array<T, m * n>;
         array storage;
         using Base = MatrixBase<T>;
@@ -54,23 +54,41 @@ namespace ketcpp {
 
         T at(size_t i, size_t j) const { return storage[i * num_columns + j]; }
 
-        MatrixArray(const std::initializer_list<std::initializer_list<T>> &list)
+        MatrixArrayCore(
+            const std::initializer_list<std::initializer_list<T>> &list)
             : storage() {
           auto dest = storage.begin();
           for (auto i : list) {
             dest = std::copy(i.begin(), i.end(), dest);
           }
         }
-        MatrixArray(const std::initializer_list<T> &list) : storage() {
+        MatrixArrayCore(const std::initializer_list<T> &list) : storage() {
           std::copy(list.begin(), list.end(), storage.begin());
         }
-        MatrixArray() = default;
+        MatrixArrayCore() = default;
+
+        virtual std::unique_ptr<MatrixBase<T>> copy() const {
+          std::unique_ptr<MatrixBase<T>> copy;
+          copy.reset(new MatrixArrayCore(*this));
+          return std::move(copy);
+        }
+
+        virtual ~MatrixArrayCore() {}
+      };
+
+      template <typename T, size_t m, size_t n = m>
+      class MatrixArray : public MatrixArrayCore<T, m, n> {
+      private:
+        using Base = typename MatrixArrayCore<T, m, n>::Base;
+
+      public:
+        using MatrixArrayCore<T, m, n>::MatrixArrayCore;
 
         bool operator==(const MatrixArray &rhs) const {
           return std::equal(this->storage.cbegin(), this->storage.cend(),
                             rhs.storage.cbegin());
         }
-        Base &operator+=(const Base &rhsbase) {
+        virtual Base &operator+=(const Base &rhsbase) {
           try {
             auto &rhs = dynamic_cast<const MatrixArray &>(rhsbase);
             std::transform(this->storage.cbegin(), this->storage.cend(),
@@ -82,20 +100,20 @@ namespace ketcpp {
           }
         }
 
-        Base &operator*=(T rhs) {
+        virtual Base &operator*=(T rhs) {
           std::transform(this->storage.cbegin(), this->storage.cend(),
                          this->storage.begin(),
                          [rhs](T l) -> T { return l * rhs; });
           return *this;
         }
 
-        std::unique_ptr<MatrixBase<T>> copy() const {
+        virtual std::unique_ptr<MatrixBase<T>> copy() const {
           std::unique_ptr<MatrixBase<T>> copy;
           copy.reset(new MatrixArray(*this));
           return std::move(copy);
         }
 
-        ~MatrixArray() {}
+        virtual ~MatrixArray() {}
       };
     }
   }
