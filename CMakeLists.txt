@@ -37,7 +37,6 @@ include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 file(GLOB_RECURSE SRCS src/*.cc)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(${PROJECT_SOURCE_DIR}/extlib/infix_iterator/)
 
 add_executable (ket_cpp main.cc ${SRCS})
 
