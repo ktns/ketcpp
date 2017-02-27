@@ -26,25 +26,25 @@ namespace ketcpp::wrapper::matrix {
   public:
     MatrixDummy() {}
 
-    size_t get_num_rows() const {
+    size_t get_num_rows() const override {
       throw std::logic_error("Dummy matrix is in use!");
     }
-    size_t get_num_columns() const {
+    size_t get_num_columns() const override {
       throw std::logic_error("Dummy matrix is in use!");
     };
-    size_t get_row_size() const {
+    size_t get_row_size() const override {
       throw std::logic_error("Dummy matrix is in use!");
     };
-    size_t get_column_size() const {
+    size_t get_column_size() const override {
       throw std::logic_error("Dummy matrix is in use!");
     };
-    T &at(size_t, size_t) {
+    T &at(size_t, size_t) override {
       throw std::logic_error("Dummy matrix is in use!");
     };
-    T at(size_t, size_t) const {
+    T at(size_t, size_t) const override {
       throw std::logic_error("Dummy matrix is in use!");
     };
-    std::unique_ptr<MatrixBase<T>> copy() const {
+    std::unique_ptr<MatrixBase<T>> copy() const override {
       return std::make_unique<MatrixDummy>();
     };
   };

@@ -38,10 +38,10 @@ namespace ketcpp {
         const size_t &column_size = num_rows;
 
       public:
-        size_t get_num_rows() const { return num_rows; }
-        size_t get_num_columns() const { return num_columns; }
-        size_t get_row_size() const { return row_size; }
-        size_t get_column_size() const { return column_size; }
+        size_t get_num_rows() const override { return num_rows; }
+        size_t get_num_columns() const override { return num_columns; }
+        size_t get_row_size() const override { return row_size; }
+        size_t get_column_size() const override { return column_size; }
 
       private:
         using vector = std::vector<T>;
@@ -74,15 +74,20 @@ namespace ketcpp {
             : num_rows(m), num_columns(n), storage(m * n) {}
         MatrixVector() = delete;
 
-        T &at(size_t i, size_t j) { return storage[i * num_columns + j]; }
+        T &at(size_t i, size_t j) override {
+          return storage[i * num_columns + j];
+        }
 
-        T at(size_t i, size_t j) const { return storage[i * num_columns + j]; }
+        T at(size_t i, size_t j) const override {
+          return storage[i * num_columns + j];
+        }
 
         bool operator==(const MatrixVector &rhs) const {
           return std::equal(this->storage.cbegin(), this->storage.cend(),
                             rhs.storage.cbegin());
         }
-        Base &operator+=(const Base &rhsbase) {
+
+        Base &operator+=(const Base &rhsbase) override {
           auto *prhs = dynamic_cast<const MatrixVector *>(&rhsbase);
           if (prhs == nullptr)
             return Base::operator+=(rhsbase);
@@ -92,14 +97,14 @@ namespace ketcpp {
           return *this;
         }
 
-        Base &operator*=(T rhs) {
+        Base &operator*=(T rhs) override {
           std::transform(this->storage.cbegin(), this->storage.cend(),
                          this->storage.begin(),
                          [rhs](T l) -> T { return l * rhs; });
           return *this;
         }
 
-        std::unique_ptr<MatrixBase<T>> copy() const {
+        std::unique_ptr<MatrixBase<T>> copy() const override {
           std::unique_ptr<MatrixBase<T>> copy;
           copy.reset(new MatrixVector(*this));
           return std::move(copy);
