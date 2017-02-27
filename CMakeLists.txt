@@ -44,7 +44,8 @@ file(GLOB_RECURSE TEST_SRCS test/*.cc)
 
 enable_testing()
 add_executable (run_tests ${SRCS} ${TEST_SRCS})
-target_include_directories(run_tests PRIVATE ${PROJECT_SOURCE_DIR}/test/ PRIVATE SYSTEM ${PROJECT_SOURCE_DIR}/extlib/bandit)
+target_include_directories(run_tests PRIVATE ${PROJECT_SOURCE_DIR}/test/)
+target_include_directories(run_tests SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/extlib/bandit)
 add_test(NAME run_tests COMMAND $<TARGET_FILE:run_tests> --reporter=spec)
 
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
