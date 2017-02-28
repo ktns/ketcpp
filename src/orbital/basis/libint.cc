@@ -80,7 +80,7 @@ private:
     atoms = libint2::read_dotxyz(xyz_file);
     auto coutbuf = std::cout.rdbuf();
     struct nullbuf_t : public std::streambuf {
-      int overflow(int c) { return c; }
+      int overflow(int c) override { return c; }
     } nullbuf;
     std::cout.rdbuf(&nullbuf);
     basis = std::make_unique<libint2::BasisSet>(basisset_name, atoms);
