@@ -45,7 +45,8 @@ go_bandit([] {
     std::unique_ptr<Libint2Basis> basis;
     matrix_t correct_overlap = make_dummy_matrix<double>(),
              correct_kinetic = correct_overlap,
-             correct_nuclear = correct_overlap;
+             correct_nuclear = correct_overlap, correct_fock = correct_overlap,
+             correct_repulsion = correct_overlap, density = correct_overlap;
 
     before_each([&] {
       basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
@@ -83,6 +84,31 @@ go_bandit([] {
            {-1.7006045e+00, -3.6664318e+00, +6.8713967e-01, -1.9041595e+00,
             +1.5917920e+00, -1.5659711e+00, -5.0290911e+00}});
       correct_nuclear = correct_coreh - correct_kinetic;
+      density =
+          wrapper::matrix::make_symmetric_matrix<double>(
+              {{+2.1066504e+00},
+               {-4.4842475e-01, +1.9764733e+00},
+               {+6.2699979e-02, -3.5473274e-01, +8.9938392e-01},
+               {+6.8030674e-02, -3.8489207e-01, +1.7678412e-01, +1.4480347e+00},
+               {-5.6870884e-02, +3.2175416e-01, -1.4778013e-01, +4.6141830e-01,
+                +1.6142749e+00},
+               {-2.6944853e-02, -3.8620675e-02, +7.1749737e-01, +5.9084858e-02,
+                -4.9394761e-02, +6.0813286e-01},
+               {-2.6944918e-02, -3.8620935e-02, -1.6655332e-01, +5.3869946e-01,
+                -4.5032869e-01, -1.8779198e-01, +6.0813231e-01}}) /
+          2;
+      correct_fock = wrapper::matrix::make_symmetric_matrix<double>(
+          {{-2.0235145e+01},
+           {-5.1631145e+00, -2.4426736e+00},
+           {-1.6805364e-02, -7.0696673e-02, -3.2179111e-01},
+           {-1.8234171e-02, -7.6707645e-02, -1.2598994e-02, -3.5705840e-01},
+           {+1.5243027e-02, +6.4124480e-02, +1.0531978e-02, -2.8297299e-02,
+            -3.6725339e-01},
+           {-1.1626680e+00, -1.0043084e+00, -5.3130902e-01, -5.5699306e-02,
+            +4.6563965e-02, -5.6350596e-01},
+           {-1.1626713e+00, -1.0043104e+00, +1.0865265e-01, -4.0289126e-01,
+            +3.3679915e-01, -3.8176459e-01, -5.6350754e-01}});
+      correct_repulsion = correct_fock - correct_coreh;
     });
 
     after_each([&] { basis.reset(); });
@@ -125,6 +151,27 @@ go_bandit([] {
           return std::abs(a - b) < 1e-5;
         };
         AssertThat(kinetic, EqualsContainer(correct_nuclear, within_delta));
+      });
+    });
+
+    describe("::add_rhf_electron_repulsion", [&] {
+      it("Should add correct electron repulsion to a matrix", [&] {
+        auto repulsion = make_zero_matrix<double>(7);
+        basis->add_rhf_electron_repulsion(repulsion, density);
+        auto within_delta = [](double a, double b) -> bool {
+          return std::abs(a - b) < 1e-5;
+        };
+        AssertThat(repulsion, EqualsContainer(correct_repulsion, within_delta));
+      });
+    });
+
+    describe("::get_rhf_fock", [&] {
+      it("Should return correct fock matrix", [&] {
+        auto fock = basis->get_rhf_fock(density);
+        auto within_delta = [](double a, double b) -> bool {
+          return std::abs(a - b) < 1e-5;
+        };
+        AssertThat(fock, EqualsContainer(correct_fock, within_delta));
       });
     });
   });

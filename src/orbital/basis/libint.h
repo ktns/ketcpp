@@ -24,8 +24,8 @@
 #ifdef LIBINT2_FOUND
 
 #include <memory>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 #include "wrapper/matrix/matrix.h"
 
@@ -57,6 +57,13 @@ namespace ketcpp {
         matrix_t get_kinetic();
         matrix_t get_nuclear();
         matrix_t get_nuclear(const std::vector<pointcharge_t> &charges);
+        matrix_t &add_rhf_electron_repulsion(matrix_t &fock,
+                                             const matrix_t &density);
+        template <typename... Args>
+        matrix_t get_rhf_fock(const matrix_t &density, Args... args) {
+          auto fock = get_kinetic(args...) + get_nuclear();
+          return add_rhf_electron_repulsion(fock, density);
+        }
       };
     }
   }

@@ -111,6 +111,57 @@ private:
     }
     return mat;
   }
+  matrix_t &add_rhf_electron_repulsion(matrix_t &fock,
+                                       const matrix_t &density) {
+    const auto &shells = *basis.get();
+    const auto &shell2bf = this->shell2bf;
+    libint2::Engine engine(libint2::Operator::coulomb, shells.max_nprim(),
+                           shells.max_l(), 0);
+    const auto n = shells.size();
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < n; j++) {
+        for (size_t k = 0; k < n; k++) {
+          for (size_t l = 0; l < n; l++) {
+            const auto &si = shells[i], &sj = shells[j], &sk = shells[k],
+                       &sl = shells[l];
+            const size_t offset_i = shell2bf[i], offset_j = shell2bf[j],
+                         offset_k = shell2bf[k], offset_l = shell2bf[l],
+                         ni = si.size(), nj = sj.size(), nk = sk.size(),
+                         nl = sl.size();
+            engine.compute(si, sj, sk, sl);
+            const auto &results = engine.results()[0];
+            if (results == nullptr)
+              continue;
+            for (size_t bi = 0; bi < ni; bi++) {
+              for (size_t bj = 0; bj < nj; bj++) {
+                for (size_t bk = 0; bk < nk; bk++) {
+                  for (size_t bl = 0; bl < nl; bl++) {
+                    size_t br = nl * nk * nj * bi + nl * nk * bj + nl * bk + bl,
+                           boi = bi + offset_i, boj = bj + offset_j,
+                           bok = bk + offset_k, bol = bl + offset_l;
+                    const auto r = results[br];
+                    fock->at(boi, boj) += density->at(bok, bol) * r / 2.0;
+                    fock->at(boj, boi) += density->at(bol, bok) * r / 2.0;
+                    fock->at(bok, bol) += density->at(boi, boj) * r / 2.0;
+                    fock->at(bol, bok) += density->at(boj, boi) * r / 2.0;
+                    fock->at(boi, bok) -= density->at(boj, bol) * r / 8.0;
+                    fock->at(boj, bol) -= density->at(boi, bok) * r / 8.0;
+                    fock->at(boi, bol) -= density->at(boj, bok) * r / 8.0;
+                    fock->at(boj, bok) -= density->at(boi, bol) * r / 8.0;
+                    fock->at(bok, boi) -= density->at(bol, boj) * r / 8.0;
+                    fock->at(bol, boj) -= density->at(bok, boi) * r / 8.0;
+                    fock->at(bol, boi) -= density->at(bok, boj) * r / 8.0;
+                    fock->at(bok, boj) -= density->at(bol, boi) * r / 8.0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return fock;
+  }
 };
 
 Libint2Basis::Libint2Basis(const std::string &xyz_file,
@@ -132,4 +183,8 @@ matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
   return impl->get_1el_matrix(libint2::Operator::nuclear, charges);
 }
 
+matrix_t &Libint2Basis::add_rhf_electron_repulsion(matrix_t &fock,
+                                                   const matrix_t &density) {
+  return impl->add_rhf_electron_repulsion(fock, density);
+}
 #endif
