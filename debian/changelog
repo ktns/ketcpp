@@ -4,8 +4,6 @@ ketcpp (0.0~12.gbpac1d70) UNRELEASED; urgency=low
 
   * Initial Release.
   * Add bandit as submodule (https://github.com/joakimkarlsson/bandit).
-  * Import infix_iterator.h
-    (http://codereview.stackexchange.com/questions/13176/infix-iterator-code)
   * Include submodules into source tarball.
   * Configure install target.
   * Build-Depends on eigen3, cmake

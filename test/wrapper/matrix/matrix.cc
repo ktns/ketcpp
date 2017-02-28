@@ -33,11 +33,8 @@ go_bandit([] {
     before_each([&matrix1, &matrix2, &matrix3] {
       matrix1 = make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}});
       matrix2 = make_matrix<float>({{2, 4}, {6, 8}, {10, 12}});
-      matrix3 = matrix1 * 3;
+      matrix3 = make_matrix<float, 3, 2>({{3, 6}, {9, 12}, {15, 18}});
     });
-
-    it("Should not be abstract class",
-       [] { std::is_abstract<Matrix<float>>::value must be_falsy; });
 
     describe(".get_num_rows", [&matrix1] {
       it("should return the correct number of rows",
@@ -54,6 +51,42 @@ go_bandit([] {
     describe(".get_column_size", [&matrix1] {
       it("should return the correct size of columns",
          [&matrix1] { matrix1->get_column_size() must equal(3u); });
+    });
+
+    describe("->at", [&matrix1] {
+      it("should return correct element", [&matrix1] {
+        matrix1->at(0, 0) must equal(1);
+        matrix1->at(0, 1) must equal(2);
+        matrix1->at(1, 0) must equal(3);
+        matrix1->at(1, 1) must equal(4);
+        matrix1->at(2, 0) must equal(5);
+        matrix1->at(2, 1) must equal(6);
+      });
+
+      it("should return assignable reference", [&matrix1] {
+        matrix1->at(0, 0) = 0;
+        matrix1->at(0, 1) = 0;
+        matrix1->at(1, 0) = 0;
+        matrix1->at(1, 1) = 0;
+        matrix1->at(2, 0) = 0;
+        matrix1->at(2, 1) = 0;
+        matrix1->at(0, 0) must equal(0);
+        matrix1->at(0, 1) must equal(0);
+        matrix1->at(1, 0) must equal(0);
+        matrix1->at(1, 1) must equal(0);
+        matrix1->at(2, 0) must equal(0);
+        matrix1->at(2, 1) must equal(0);
+      });
+
+      it("should be invoked from const reference", [&matrix1] {
+        const auto &matrix2 = matrix1;
+        matrix2->at(0, 0) must equal(1);
+        matrix2->at(0, 1) must equal(2);
+        matrix2->at(1, 0) must equal(3);
+        matrix2->at(1, 1) must equal(4);
+        matrix2->at(2, 0) must equal(5);
+        matrix2->at(2, 1) must equal(6);
+      });
     });
 
     describe("::operator==", [&matrix1, &matrix2] {
@@ -131,20 +164,55 @@ go_bandit([] {
       });
     });
 
+    describe("operator*(float, Matrix<float>)", [&matrix1, &matrix2] {
+      it("should return a matrix multiplied by the scalar",
+         [&matrix1, &matrix2] {
+           auto matrix3 = 2.f * matrix1;
+           matrix3 must equal(matrix2);
+         });
+    });
+    describe("operator*(unsinged int, Matrix<float>)", [&matrix1, &matrix2] {
+      it("should return a matrix multiplied by the scalar",
+         [&matrix1, &matrix2] {
+           auto matrix3 = 2u * matrix1;
+           matrix3 must equal(matrix2);
+         });
+    });
+
     describe("::operator*", [&matrix1, &matrix2] {
       describe("(float)", [&matrix1, &matrix2] {
-        it("should return a multiplied matrix", [&matrix1, &matrix2] {
-          auto matrix3 = matrix1 * 2.f;
-          matrix3 must equal(matrix2);
-        });
+        it("should return a matrix multiplied by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix1 * 2.f;
+             matrix3 must equal(matrix2);
+           });
       });
       describe("(unsinged int)", [&matrix1, &matrix2] {
-        it("should return a multiplied matrix", [&matrix1, &matrix2] {
-          auto matrix3 = matrix1 * 2u;
-          matrix3 must equal(matrix2);
-        });
+        it("should return a matrix multiplied by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix1 * 2u;
+             matrix3 must equal(matrix2);
+           });
       });
     });
+
+    describe("::operator/", [&matrix1, &matrix2] {
+      describe("(float)", [&matrix1, &matrix2] {
+        it("should return a matrix divided by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix2 / 2.f;
+             matrix3 must equal(matrix1);
+           });
+      });
+      describe("(unsinged int)", [&matrix1, &matrix2] {
+        it("should return a matrix divided by the scalar",
+           [&matrix1, &matrix2] {
+             auto matrix3 = matrix2 / 2u;
+             matrix3 must equal(matrix1);
+           });
+      });
+    });
+
     it("should be able to be compared as matrix", [&matrix1, &matrix2] {
       AssertThat(matrix1, Is().EqualToContainer(matrix1));
       AssertThat(matrix1, Is().Not().EqualToContainer(matrix2));
