@@ -119,9 +119,9 @@ private:
                            shells.max_l(), 0);
     const auto n = shells.size();
     for (size_t i = 0; i < n; i++) {
-      for (size_t j = 0; j < n; j++) {
+      for (size_t j = i; j < n; j++) {
         for (size_t k = 0; k < n; k++) {
-          for (size_t l = 0; l < n; l++) {
+          for (size_t l = k; l < n; l++) {
             const auto &si = shells[i], &sj = shells[j], &sk = shells[k],
                        &sl = shells[l];
             const size_t offset_i = shell2bf[i], offset_j = shell2bf[j],
@@ -139,7 +139,11 @@ private:
                     size_t br = nl * nk * nj * bi + nl * nk * bj + nl * bk + bl,
                            boi = bi + offset_i, boj = bj + offset_j,
                            bok = bk + offset_k, bol = bl + offset_l;
-                    const auto r = results[br];
+                    auto r = results[br];
+                    if (i != j)
+                      r *= 2;
+                    if (k != l)
+                      r *= 2;
                     fock->at(boi, boj) += density->at(bok, bol) * r / 2.0;
                     fock->at(boj, boi) += density->at(bol, bok) * r / 2.0;
                     fock->at(bok, bol) += density->at(boi, boj) * r / 2.0;
