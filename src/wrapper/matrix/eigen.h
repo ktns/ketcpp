@@ -83,6 +83,73 @@ namespace ketcpp::wrapper::matrix {
       return copy;
     }
 
+    // bool operator==(const MatrixEigen &rhs) const {
+    //  return matrix == rhs.matrix;
+    //}
+
+    Base &operator+=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const MatrixEigen *>(&rhsbase);
+      if (prhs == nullptr)
+        return Base::operator+=(rhsbase);
+
+      matrix += prhs->matrix;
+      return *this;
+    }
+
+    Base &operator*=(T rhs) override {
+      matrix *= rhs;
+      return *this;
+    }
+  };
+
+  template <typename T> class MatrixEigen<T, 0, 0> : public MatrixBase<T> {
+    // This difinition is for variable sized matrix.
+
+  private:
+    typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
+                          Eigen::StorageOptions::RowMajor>
+        matrix_t;
+    matrix_t matrix;
+    using Base = MatrixBase<T>;
+
+  public:
+    size_t get_num_rows() const override { return matrix.rows(); }
+    size_t get_num_columns() const override { return matrix.cols(); }
+    size_t get_row_size() const override { return matrix.cols(); }
+    size_t get_column_size() const override { return matrix.rows(); }
+
+    T &at(size_t i, size_t j) override { return matrix(i, j); }
+    T at(size_t i, size_t j) const override { return matrix(i, j); }
+
+  private:
+    static size_t
+    max_size(const std::initializer_list<std::initializer_list<T>> &list) {
+      const auto max_size_element = std::max_element(
+          list.begin(), list.end(), [](const std::initializer_list<T> &a,
+                                       const std::initializer_list<T> &b) {
+            return a.size() < b.size();
+          });
+      return max_size_element->size();
+    }
+
+  public:
+    MatrixEigen(const std::initializer_list<std::initializer_list<T>> &list) {
+      size_t m = list.size(), n = max_size(list);
+      matrix.resize(m, n);
+      size_t i = 0;
+      for (auto l : list) {
+        typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_t;
+        matrix.row(i++) = Eigen::Map<const row_t>(l.begin(), 1, l.size());
+      }
+    }
+
+    MatrixEigen(const MatrixEigen &from) : matrix(from.matrix){};
+    std::unique_ptr<MatrixBase<T>> copy() const override {
+      std::unique_ptr<MatrixBase<T>> copy;
+      copy.reset(new MatrixEigen(*this));
+      return copy;
+    }
+
     bool operator==(const MatrixEigen &rhs) const {
       return matrix == rhs.matrix;
     }
