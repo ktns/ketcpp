@@ -91,6 +91,9 @@ go_bandit([] {
         MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}};
         (matrix1 == vector) must be_truthy;
         (vector == matrix1) must be_truthy;
+        MatrixEigen<float> eigen_v = {{1, 2}, {3, 4}, {5, 6}};
+        (matrix1 == eigen_v) must be_truthy;
+        (eigen_v == matrix1) must be_truthy;
       });
     });
 
@@ -98,9 +101,21 @@ go_bandit([] {
       it("should change elements", [&matrix1, &matrix2, &matrix3] {
         auto matrix4 = matrix1;
 
-        matrix1 must equal(matrix4);
+        matrix4 must equal(matrix1);
         matrix4 += matrix2;
         matrix4 must equal(matrix3);
+        matrix4 must_not equal(matrix1);
+      });
+    });
+
+    describe("::operator-=", [&matrix1, &matrix2, &matrix3] {
+      it("should change elements", [&matrix1, &matrix2, &matrix3] {
+        auto matrix4 = matrix3;
+
+        matrix4 must equal(matrix3);
+        matrix4 -= matrix2;
+        matrix4 must equal(matrix1);
+        matrix4 must_not equal(matrix3);
       });
     });
 
@@ -197,6 +212,9 @@ go_bandit([] {
         MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}};
         (matrix1 == vector) must be_truthy;
         (vector == matrix1) must be_truthy;
+        MatrixEigen<float, 3, 2> eigen_c = {{1, 2}, {3, 4}, {5, 6}};
+        (matrix1 == eigen_c) must be_truthy;
+        (eigen_c == matrix1) must be_truthy;
       });
     });
 
@@ -207,6 +225,17 @@ go_bandit([] {
         matrix1 must equal(matrix4);
         matrix4 += matrix2;
         matrix4 must equal(matrix3);
+      });
+    });
+
+    describe("::operator-=", [&matrix1, &matrix2, &matrix3] {
+      it("should change elements", [&matrix1, &matrix2, &matrix3] {
+        auto matrix4 = matrix3;
+
+        matrix4 must equal(matrix3);
+        matrix4 -= matrix2;
+        matrix4 must equal(matrix1);
+        matrix4 must_not equal(matrix3);
       });
     });
 

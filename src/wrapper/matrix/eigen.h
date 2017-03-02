@@ -28,8 +28,62 @@
 #include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
+  template <typename T> class MatrixEigenCommon : public MatrixBase<T> {
+  public:
+    typedef Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
+                                     Eigen::StorageOptions::RowMajor>>
+        common_matrix_ref;
+    typedef Eigen::Ref<const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
+                                           Eigen::StorageOptions::RowMajor>>
+        const_common_matrix_ref;
+    virtual common_matrix_ref matrix_instance() = 0;
+    virtual const_common_matrix_ref matrix_instance() const = 0;
+
+    using Base = MatrixBase<T>;
+    using Common = MatrixEigenCommon<T>;
+
+    bool operator==(const Base &rhs) const override {
+      auto *prhs = dynamic_cast<const Common *>(&rhs);
+      if (prhs == nullptr)
+        return Base::operator==(rhs);
+
+      return matrix_instance() == prhs->matrix_instance();
+    }
+    bool operator!=(const Base &rhs) const override {
+      auto *prhs = dynamic_cast<const Common *>(&rhs);
+      if (prhs == nullptr)
+        return Base::operator!=(rhs);
+
+      return matrix_instance() != prhs->matrix_instance();
+    }
+
+    Base &operator+=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const Common *>(&rhsbase);
+      if (prhs != nullptr) {
+        matrix_instance() += prhs->matrix_instance();
+        return *this;
+      } else {
+        return Base::operator+=(rhsbase);
+      }
+    }
+    Base &operator-=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const Common *>(&rhsbase);
+      if (prhs != nullptr) {
+        matrix_instance() -= prhs->matrix_instance();
+        return *this;
+      } else {
+        return Base::operator-=(rhsbase);
+      }
+    }
+
+    Base &operator*=(T rhs) override {
+      matrix_instance() *= rhs;
+      return *this;
+    }
+  };
+
   template <typename T, size_t Rows = 0, size_t Cols = Rows>
-  class MatrixEigen : public MatrixBase<T> {
+  class MatrixEigen : public MatrixEigenCommon<T> {
     // This difinition is for constant sized matrix.
     static_assert(Rows > 0 && Cols > 0);
 
@@ -37,7 +91,11 @@ namespace ketcpp::wrapper::matrix {
     typedef Eigen::Matrix<T, Rows, Cols, Eigen::StorageOptions::RowMajor>
         matrix_t;
     matrix_t matrix;
-    using Base = MatrixBase<T>;
+    using Common = MatrixEigenCommon<T>;
+    using common_matrix_ref = typename Common::common_matrix_ref;
+    using const_common_matrix_ref = typename Common::const_common_matrix_ref;
+    common_matrix_ref matrix_instance() override { return matrix; }
+    const_common_matrix_ref matrix_instance() const override { return matrix; }
 
   public:
     constexpr static size_t num_rows = Rows;
@@ -82,27 +140,10 @@ namespace ketcpp::wrapper::matrix {
       copy.reset(new MatrixEigen(*this));
       return copy;
     }
-
-    // bool operator==(const MatrixEigen &rhs) const {
-    //  return matrix == rhs.matrix;
-    //}
-
-    Base &operator+=(const Base &rhsbase) override {
-      auto *prhs = dynamic_cast<const MatrixEigen *>(&rhsbase);
-      if (prhs == nullptr)
-        return Base::operator+=(rhsbase);
-
-      matrix += prhs->matrix;
-      return *this;
-    }
-
-    Base &operator*=(T rhs) override {
-      matrix *= rhs;
-      return *this;
-    }
   };
 
-  template <typename T> class MatrixEigen<T, 0, 0> : public MatrixBase<T> {
+  template <typename T>
+  class MatrixEigen<T, 0, 0> : public MatrixEigenCommon<T> {
     // This difinition is for variable sized matrix.
 
   private:
@@ -110,7 +151,12 @@ namespace ketcpp::wrapper::matrix {
                           Eigen::StorageOptions::RowMajor>
         matrix_t;
     matrix_t matrix;
-    using Base = MatrixBase<T>;
+    using Common = MatrixEigenCommon<T>;
+    using common_matrix_ref = typename Common::common_matrix_ref;
+    using const_common_matrix_ref = typename Common::const_common_matrix_ref;
+
+    common_matrix_ref matrix_instance() override { return matrix; }
+    const_common_matrix_ref matrix_instance() const override { return matrix; }
 
   public:
     size_t get_num_rows() const override { return matrix.rows(); }
@@ -148,24 +194,6 @@ namespace ketcpp::wrapper::matrix {
       std::unique_ptr<MatrixBase<T>> copy;
       copy.reset(new MatrixEigen(*this));
       return copy;
-    }
-
-    bool operator==(const MatrixEigen &rhs) const {
-      return matrix == rhs.matrix;
-    }
-
-    Base &operator+=(const Base &rhsbase) override {
-      auto *prhs = dynamic_cast<const MatrixEigen *>(&rhsbase);
-      if (prhs == nullptr)
-        return Base::operator+=(rhsbase);
-
-      matrix += prhs->matrix;
-      return *this;
-    }
-
-    Base &operator*=(T rhs) override {
-      matrix *= rhs;
-      return *this;
     }
   };
 }
