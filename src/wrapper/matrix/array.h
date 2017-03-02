@@ -29,94 +29,112 @@
 
 #include "wrapper/matrix/matrix.h"
 
-namespace ketcpp {
-  namespace wrapper {
-    namespace matrix {
-      template <typename T, size_t m, size_t n = m>
-      class MatrixArrayCore : public MatrixBase<T> {
-      protected:
-        using array = std::array<T, m * n>;
-        array storage;
-        using Base = MatrixBase<T>;
+namespace ketcpp::wrapper::matrix {
+  template <typename T, size_t m, size_t n = m>
+  class MatrixArrayCore : public MatrixBase<T> {
+  protected:
+    using array = std::array<T, m * n>;
+    array storage;
+    using Base = MatrixBase<T>;
 
-      public:
-        constexpr static size_t num_rows = m;
-        constexpr static size_t num_columns = n;
-        constexpr static size_t row_size = n;
-        constexpr static size_t column_size = m;
-        size_t get_num_rows() const override { return num_rows; }
-        size_t get_num_columns() const override { return num_columns; }
-        size_t get_row_size() const override { return row_size; }
-        size_t get_column_size() const override { return column_size; }
+  public:
+    constexpr static size_t num_rows = m;
+    constexpr static size_t num_columns = n;
+    constexpr static size_t row_size = n;
+    constexpr static size_t column_size = m;
+    size_t get_num_rows() const override { return num_rows; }
+    size_t get_num_columns() const override { return num_columns; }
+    size_t get_row_size() const override { return row_size; }
+    size_t get_column_size() const override { return column_size; }
 
-        T &at(size_t i, size_t j) override {
-          return storage[i * num_columns + j];
-        }
-        T at(size_t i, size_t j) const override {
-          return storage[i * num_columns + j];
-        }
-
-        MatrixArrayCore(
-            const std::initializer_list<std::initializer_list<T>> &list)
-            : storage() {
-          auto dest = storage.begin();
-          for (auto i : list) {
-            dest = std::copy(i.begin(), i.end(), dest);
-          }
-        }
-        MatrixArrayCore(const std::initializer_list<T> &list) : storage() {
-          std::copy(list.begin(), list.end(), storage.begin());
-        }
-        MatrixArrayCore() = default;
-
-        virtual std::unique_ptr<MatrixBase<T>> copy() const override {
-          std::unique_ptr<MatrixBase<T>> copy;
-          copy.reset(new MatrixArrayCore(*this));
-          return std::move(copy);
-        }
-
-        virtual ~MatrixArrayCore() override {}
-      };
-
-      template <typename T, size_t m, size_t n = m>
-      class MatrixArray : public MatrixArrayCore<T, m, n> {
-      private:
-        using Base = typename MatrixArrayCore<T, m, n>::Base;
-
-      public:
-        using MatrixArrayCore<T, m, n>::MatrixArrayCore;
-
-        bool operator==(const MatrixArray &rhs) const {
-          return std::equal(this->storage.cbegin(), this->storage.cend(),
-                            rhs.storage.cbegin());
-        }
-        virtual Base &operator+=(const Base &rhsbase) override {
-          try {
-            auto &rhs = dynamic_cast<const MatrixArray &>(rhsbase);
-            std::transform(this->storage.cbegin(), this->storage.cend(),
-                           rhs.storage.cbegin(), this->storage.begin(),
-                           [](T l, T r) -> T { return l + r; });
-            return *this;
-          } catch (std::bad_cast &ex) {
-            return Base::operator+=(rhsbase);
-          }
-        }
-
-        virtual Base &operator*=(T rhs) override {
-          std::transform(this->storage.cbegin(), this->storage.cend(),
-                         this->storage.begin(),
-                         [rhs](T l) -> T { return l * rhs; });
-          return *this;
-        }
-
-        virtual std::unique_ptr<MatrixBase<T>> copy() const override {
-          std::unique_ptr<MatrixBase<T>> copy;
-          copy.reset(new MatrixArray(*this));
-          return std::move(copy);
-        }
-
-        virtual ~MatrixArray() override {}
-      };
+    T &at(size_t i, size_t j) override { return storage[i * num_columns + j]; }
+    T at(size_t i, size_t j) const override {
+      return storage[i * num_columns + j];
     }
-  }
+
+    MatrixArrayCore(const std::initializer_list<std::initializer_list<T>> &list)
+        : storage() {
+      auto dest = storage.begin();
+      for (auto i : list) {
+        dest = std::copy(i.begin(), i.end(), dest);
+      }
+    }
+    MatrixArrayCore(const std::initializer_list<T> &list) : storage() {
+      std::copy(list.begin(), list.end(), storage.begin());
+    }
+    MatrixArrayCore() = default;
+    MatrixArrayCore(const MatrixArrayCore &other) = default;
+    MatrixArrayCore &operator=(const MatrixArrayCore &other) {
+      storage = other.storage;
+      return *this;
+    }
+
+    virtual std::unique_ptr<MatrixBase<T>> copy() const override {
+      std::unique_ptr<MatrixBase<T>> copy;
+      copy.reset(new MatrixArrayCore(*this));
+      return std::move(copy);
+    }
+
+    virtual ~MatrixArrayCore() override {}
+  };
+
+  template <typename T, size_t m, size_t n = m>
+  class MatrixArray : public MatrixArrayCore<T, m, n> {
+  private:
+    using Base = typename MatrixArrayCore<T, m, n>::Base;
+
+  public:
+    using MatrixArrayCore<T, m, n>::MatrixArrayCore;
+
+    bool operator==(const Base &rhs) const override {
+      auto *prhs = dynamic_cast<const MatrixArray *>(&rhs);
+      if (prhs == nullptr)
+        return Base::operator==(rhs);
+      else
+        return
+
+            std::equal(this->storage.cbegin(), this->storage.cend(),
+                       prhs->storage.cbegin());
+    }
+
+    Base &operator+=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const MatrixArray *>(&rhsbase);
+      if (prhs == nullptr)
+        return Base::operator+=(rhsbase);
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     prhs->storage.cbegin(), this->storage.begin(),
+                     [](T l, T r) -> T { return l + r; });
+      return *this;
+    }
+
+    Base &operator-=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const MatrixArray *>(&rhsbase);
+      if (prhs == nullptr)
+        return Base::operator-=(rhsbase);
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     prhs->storage.cbegin(), this->storage.begin(),
+                     [](T l, T r) -> T { return l - r; });
+      return *this;
+    }
+
+    Base &operator*=(T rhs) override {
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     this->storage.begin(),
+                     [rhs](T l) -> T { return l * rhs; });
+      return *this;
+    }
+
+    Base &operator/=(T rhs) override {
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     this->storage.begin(),
+                     [rhs](T l) -> T { return l / rhs; });
+      return *this;
+    }
+
+    std::unique_ptr<MatrixBase<T>> copy() const override {
+      std::unique_ptr<MatrixBase<T>> copy;
+      copy.reset(new MatrixArray(*this));
+      return std::move(copy);
+    }
+  };
 }

@@ -19,8 +19,8 @@
 
 #include <bandit/bandit.h>
 
-#include "wrapper/matrix/dummy.h"
 #include "wrapper/matrix/default.h"
+#include "wrapper/matrix/dummy.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
@@ -105,8 +105,9 @@ go_bandit([] {
     });
     it("should return an assignable matrix", [] {
       auto dummy = make_dummy_matrix<float>();
-      dummy = make_matrix<float, 1>({42});
-      dummy->at(0, 0) must equal(42);
+      dummy = make_matrix<float, 3, 2>({1, 2, 3, 4, 5, 6});
+      std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+      AssertThat(dummy, Is().EqualToContainer(array));
     });
   });
 });

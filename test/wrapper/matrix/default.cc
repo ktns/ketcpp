@@ -26,16 +26,25 @@ using namespace ketcpp::wrapper::matrix;
 
 go_bandit([] {
   describe("make_zero_matrix", [] {
-    it("should return a matrix whose elements are all zero", [] {
-      auto mat = make_zero_matrix<double>(2, 3);
-      mat->for_each(
-          [&mat](size_t i, size_t j) { mat->at(i, j) must equal(0); });
+    describe("(2, 3)", [] {
+      it("should return a matrix whose elements are all zero", [] {
+        auto mat = make_zero_matrix<float>(2, 3);
+        mat->for_each(
+            [&mat](size_t i, size_t j) { mat->at(i, j) must equal(0); });
+      });
+    });
+    describe("(2)", [] {
+      it("should return a matrix whose elements are all zero", [] {
+        auto mat = make_zero_matrix<float>(2);
+        mat->for_each(
+            [&mat](size_t i, size_t j) { mat->at(i, j) must equal(0); });
+      });
     });
   });
 
   describe("make_symmetric_matrix", [] {
     it("should return a symmetric matrix", [] {
-      auto mat = make_symmetric_matrix<double>({{0}, {1, 2}, {3, 4, 5}});
+      auto mat = make_symmetric_matrix<float>({{0}, {1, 2}, {3, 4, 5}});
       mat->for_each([&mat](size_t i, size_t j) {
         mat->at(i, j) must equal(mat->at(j, i));
       });

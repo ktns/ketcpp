@@ -27,91 +27,108 @@
 
 #include "wrapper/matrix/matrix.h"
 
-namespace ketcpp {
-  namespace wrapper {
-    namespace matrix {
-      template <typename T> class MatrixVector : public MatrixBase<T> {
-      private:
-        const size_t num_rows;
-        const size_t num_columns;
-        const size_t &row_size = num_columns;
-        const size_t &column_size = num_rows;
+namespace ketcpp::wrapper::matrix {
+  template <typename T> class MatrixVector : public MatrixBase<T> {
+  private:
+    const size_t num_rows;
+    const size_t num_columns;
+    const size_t &row_size = num_columns;
+    const size_t &column_size = num_rows;
 
-      public:
-        size_t get_num_rows() const override { return num_rows; }
-        size_t get_num_columns() const override { return num_columns; }
-        size_t get_row_size() const override { return row_size; }
-        size_t get_column_size() const override { return column_size; }
+  public:
+    size_t get_num_rows() const override { return num_rows; }
+    size_t get_num_columns() const override { return num_columns; }
+    size_t get_row_size() const override { return row_size; }
+    size_t get_column_size() const override { return column_size; }
 
-      private:
-        using vector = std::vector<T>;
-        vector storage;
-        using Base = MatrixBase<T>;
+  private:
+    using vector = std::vector<T>;
+    vector storage;
+    using Base = MatrixBase<T>;
 
-      private:
-        static size_t
-        max_size(const std::initializer_list<std::initializer_list<T>> &list) {
-          const auto max_size_element = std::max_element(
-              list.begin(), list.end(), [](const std::initializer_list<T> &a,
-                                           const std::initializer_list<T> &b) {
-                return a.size() < b.size();
-              });
-          return max_size_element->size();
-        }
-
-      public:
-        MatrixVector(const std::initializer_list<std::initializer_list<T>> list)
-            : num_rows(list.size()), num_columns(max_size(list)),
-              storage(num_rows * num_columns) {
-          auto dest = storage.begin();
-          for (auto i : list) {
-            std::copy(i.begin(), i.end(), dest);
-            dest += num_columns;
-          }
-        }
-        MatrixVector(size_t m) : num_rows(m), num_columns(m), storage(m * m) {}
-        MatrixVector(size_t m, size_t n)
-            : num_rows(m), num_columns(n), storage(m * n) {}
-        MatrixVector() = delete;
-
-        T &at(size_t i, size_t j) override {
-          return storage[i * num_columns + j];
-        }
-
-        T at(size_t i, size_t j) const override {
-          return storage[i * num_columns + j];
-        }
-
-        bool operator==(const MatrixVector &rhs) const {
-          return std::equal(this->storage.cbegin(), this->storage.cend(),
-                            rhs.storage.cbegin());
-        }
-
-        Base &operator+=(const Base &rhsbase) override {
-          auto *prhs = dynamic_cast<const MatrixVector *>(&rhsbase);
-          if (prhs == nullptr)
-            return Base::operator+=(rhsbase);
-          std::transform(this->storage.cbegin(), this->storage.cend(),
-                         prhs->storage.cbegin(), this->storage.begin(),
-                         [](T l, T r) -> T { return l + r; });
-          return *this;
-        }
-
-        Base &operator*=(T rhs) override {
-          std::transform(this->storage.cbegin(), this->storage.cend(),
-                         this->storage.begin(),
-                         [rhs](T l) -> T { return l * rhs; });
-          return *this;
-        }
-
-        std::unique_ptr<MatrixBase<T>> copy() const override {
-          std::unique_ptr<MatrixBase<T>> copy;
-          copy.reset(new MatrixVector(*this));
-          return std::move(copy);
-        }
-
-        ~MatrixVector() {}
-      };
+  private:
+    static size_t
+    max_size(const std::initializer_list<std::initializer_list<T>> &list) {
+      const auto max_size_element = std::max_element(
+          list.begin(), list.end(),
+          [](const auto &a, const auto &b) { return a.size() < b.size(); });
+      return max_size_element->size();
     }
-  }
+
+  public:
+    MatrixVector(const std::initializer_list<std::initializer_list<T>> list)
+        : num_rows(list.size()), num_columns(max_size(list)),
+          storage(num_rows * num_columns) {
+      auto dest = storage.begin();
+      for (auto i : list) {
+        std::copy(i.begin(), i.end(), dest);
+        dest += row_size;
+      }
+    }
+    MatrixVector(size_t m) : num_rows(m), num_columns(m), storage(m * m) {}
+    MatrixVector(size_t m, size_t n)
+        : num_rows(m), num_columns(n), storage(m * n) {}
+    MatrixVector() = delete;
+    MatrixVector &operator=(const MatrixVector &other) {
+      storage = other.storage;
+      return *this;
+    }
+
+    T &at(size_t i, size_t j) override { return storage[i * num_columns + j]; }
+
+    T at(size_t i, size_t j) const override {
+      return storage[i * num_columns + j];
+    }
+
+    bool operator==(const Base &rhs) const override {
+      auto *prhs = dynamic_cast<const MatrixVector *>(&rhs);
+      if (prhs == nullptr)
+        return Base::operator==(rhs);
+      else
+        return this->get_row_size() == prhs->get_row_size() &&
+               this->get_column_size() == prhs->get_column_size() &&
+               std::equal(this->storage.cbegin(), this->storage.cend(),
+                          prhs->storage.cbegin());
+    }
+
+    Base &operator+=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const MatrixVector *>(&rhsbase);
+      if (prhs == nullptr)
+        return Base::operator+=(rhsbase);
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     prhs->storage.cbegin(), this->storage.begin(),
+                     [](T l, T r) -> T { return l + r; });
+      return *this;
+    }
+
+    Base &operator-=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const MatrixVector *>(&rhsbase);
+      if (prhs == nullptr)
+        return Base::operator-=(rhsbase);
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     prhs->storage.cbegin(), this->storage.begin(),
+                     [](T l, T r) -> T { return l - r; });
+      return *this;
+    }
+
+    Base &operator*=(T rhs) override {
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     this->storage.begin(),
+                     [rhs](T l) -> T { return l * rhs; });
+      return *this;
+    }
+
+    Base &operator/=(T rhs) override {
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     this->storage.begin(),
+                     [rhs](T l) -> T { return l / rhs; });
+      return *this;
+    }
+
+    std::unique_ptr<MatrixBase<T>> copy() const override {
+      std::unique_ptr<MatrixBase<T>> copy;
+      copy.reset(new MatrixVector(*this));
+      return std::move(copy);
+    }
+  };
 }
