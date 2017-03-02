@@ -1,4 +1,5 @@
 /doc/
+/coverage/
 /Doxyfile
 /Makefile
 cmake_install.cmake
