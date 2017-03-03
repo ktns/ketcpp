@@ -1,6 +1,6 @@
 /*
  * ketcpp: Quantum chemical toolset made of C++
- * Copyright (C) 2015 Katsuhiko Nishimra
+ * Copyright (C) 2017 Katsuhiko Nishimra
  *
  * This file is part of ketcpp.
  *
@@ -17,48 +17,53 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <array>
+#if __has_include("Eigen/Dense")
 
 #include <bandit/bandit.h>
 
 #include "wrapper/matrix/array.h"
+#include "wrapper/matrix/dummy.h"
+#include "wrapper/matrix/eigen.h"
 #include "wrapper/matrix/vector.h"
-
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
 
 go_bandit([] {
-  describe("MatrixArray", [] {
-    MatrixArray<float, 3, 2> matrix1, matrix2, matrix3;
+  describe("MatrixEigen(fixed sized)", [] {
+    MatrixEigen<float, 3, 2> matrix1, matrix2, matrix3;
 
     before_each([&] {
-      matrix1 = matrix2 = matrix3 =
-          MatrixArray<float, 3, 2>({1.f, 2.f, 3.f, 4.f, 5.f, 6.f});
+      MatrixEigen<float, 3, 2> eigen = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+      matrix1 = matrix2 = matrix3 = eigen;
       matrix2 *= 2;
       matrix3 *= 3;
     });
 
     it("should not be abstract class", [] {
-      std::is_abstract<MatrixArray<float, 3>>::value must_not be_truthy;
+      std::is_abstract<MatrixEigen<float, 3, 2>>::value must_not be_truthy;
     });
 
-    it("should be initialized with list", [] {
-      [] {
-        MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
-        MatrixArray<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
-      } must_not throw_exception;
-    });
-
-    it("should be correctly initialized with nested list", [] {
-      MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
-      MatrixArray<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
+    it("should be correctly initialized with initializer_list", [] {
+      MatrixEigen<float, 3, 2> matrix1 = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+      MatrixEigen<float, 3, 2> matrix2 = {{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}};
       matrix1 must equal(matrix2);
+    });
+
+    it("should throw an exception when initalized with short list", [] {
+      auto lmd1 = [] {
+        MatrixEigen<float, 3, 2> matrix1 = {1.f, 2.f, 3.f, 4.f, 5.f};
+      };
+      auto lmd2 = [] {
+        MatrixEigen<float, 3, 2> matrix2 = {{1.f}, {3.f, 4.f}, {5.f, 6.f}};
+      };
+      AssertThrows(std::logic_error, lmd1());
+      AssertThrows(std::logic_error, lmd2());
     });
 
     describe("copy ctor", [&matrix1] {
       it("should copy a matrix", [&matrix1] {
-        MatrixArray<float, 3, 2> matrix2(matrix1);
+        MatrixEigen<float, 3, 2> matrix2(matrix1);
         matrix2 must equal(matrix1);
       });
     });
@@ -164,10 +169,15 @@ go_bandit([] {
         (matrix1 == matrix2) must be_falsy;
       });
       it("should comparable with other matrices", [&matrix1] {
-        MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}},
-                            vector2 = {{6, 5}, {4, 3}, {2, 1}};
+        MatrixArrayCore<float, 3, 2> array = {1, 2, 3, 4, 5, 6};
+        (matrix1 == array) must be_truthy;
+        (array == matrix1) must be_truthy;
+        MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}};
         (matrix1 == vector) must be_truthy;
-        (matrix1 == vector2) must be_falsy;
+        (vector == matrix1) must be_truthy;
+        MatrixEigen<float> eigen_v = {{1, 2}, {3, 4}, {5, 6}};
+        (matrix1 == eigen_v) must be_truthy;
+        (eigen_v == matrix1) must be_truthy;
       });
       describe("(Matrix<float>)", [&matrix1, matrix2] {
         it("should work", [&matrix1, matrix2] {
@@ -188,20 +198,25 @@ go_bandit([] {
         matrix1 must_not equal(matrix2);
         (matrix1 != matrix2) must be_truthy;
       });
-      it("should be comparable with other matrices", [&matrix1] {
-        MatrixVector<float> vector1 = {{1, 2}, {3, 4}, {5, 6}},
-                            vector2 = {{6, 5}, {4, 3}, {2, 1}};
-        (matrix1 != vector1) must be_falsy;
-        (matrix1 != vector2) must be_truthy;
+      it("should be comparable between other types of matrices", [&matrix1] {
+        MatrixArrayCore<float, 3, 2> array = {1, 2, 3, 4, 5, 6};
+        (matrix1 == array) must be_truthy;
+        (array == matrix1) must be_truthy;
+        MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}};
+        (matrix1 == vector) must be_truthy;
+        (vector == matrix1) must be_truthy;
+        MatrixEigen<float> eigen_v = {{1, 2}, {3, 4}, {5, 6}};
+        (matrix1 == eigen_v) must be_truthy;
+        (eigen_v == matrix1) must be_truthy;
       });
-
-      describe("(Matrix<float>)", [&matrix1, matrix2] {
-        it("should work", [&matrix1, matrix2] {
-          Matrix<float> matrix3 = matrix1;
-          (matrix1 != matrix3) must be_falsy;
-          (matrix2 != matrix3) must be_truthy;
-        });
-      });
+      //
+      //      describe("(Matrix<float>)", [&matrix1, matrix2] {
+      //        it("should work", [&matrix1, matrix2] {
+      //          Matrix<float> matrix3 = matrix1;
+      //          (matrix1 != matrix3) must be_falsy;
+      //          (matrix2 != matrix3) must be_truthy;
+      //        });
+      //      });
     });
 
     describe("::operator+=", [&matrix1, &matrix2, &matrix3] {
@@ -330,6 +345,7 @@ go_bandit([] {
         });
       });
     });
+
     describe("::operator/", [&matrix1, &matrix2] {
       describe("(float)", [&matrix1, &matrix2] {
         it("should return a divided matrix", [&matrix1, &matrix2] {
@@ -366,3 +382,4 @@ go_bandit([] {
     });
   });
 });
+#endif

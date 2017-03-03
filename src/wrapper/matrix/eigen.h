@@ -113,32 +113,41 @@ namespace ketcpp::wrapper::matrix {
   private:
     static size_t
     max_size(const std::initializer_list<std::initializer_list<T>> &list) {
-      const auto max_size_element = std::max_element(
-          list.begin(), list.end(), [](const std::initializer_list<T> &a,
-                                       const std::initializer_list<T> &b) {
-            return a.size() < b.size();
-          });
+      const auto max_size_element =
+          std::max_element(list.begin(), list.end(),
+                           [](auto a, auto b) { return a.size() < b.size(); });
       return max_size_element->size();
     }
 
   public:
     MatrixEigen() : matrix(matrix_t::Zero()){};
     MatrixEigen(const std::initializer_list<T> &list) {
+      if (list.size() < this->size()) {
+        throw std::logic_error("Too short initialization list!");
+      }
       matrix = Eigen::Map<const matrix_t>(list.begin());
     }
     MatrixEigen(const std::initializer_list<std::initializer_list<T>> &list) {
       size_t i = 0;
       for (auto l : list) {
+        if (l.size() < this->get_row_size()) {
+          throw std::logic_error("Too short initialization list!");
+        }
         typedef Eigen::Matrix<T, 1, num_columns> row_t;
         matrix.row(i++) = Eigen::Map<const row_t>(l.begin(), 1, l.size());
       }
     }
 
     MatrixEigen(const MatrixEigen &from) : matrix(from.matrix){};
+
     std::unique_ptr<MatrixBase<T>> copy() const override {
       std::unique_ptr<MatrixBase<T>> copy;
       copy.reset(new MatrixEigen(*this));
       return copy;
+    }
+    MatrixEigen &operator=(const MatrixEigen &other) {
+      matrix = other.matrix_instance();
+      return *this;
     }
   };
 
@@ -170,9 +179,8 @@ namespace ketcpp::wrapper::matrix {
   private:
     static size_t
     max_size(const std::initializer_list<std::initializer_list<T>> &list) {
-      const auto max_size_element = std::max_element(
-          list.begin(), list.end(), [](const std::initializer_list<T> &a,
-                                       const std::initializer_list<T> &b) {
+      const auto max_size_element =
+          std::max_element(list.begin(), list.end(), [](auto &a, auto &b) {
             return a.size() < b.size();
           });
       return max_size_element->size();
