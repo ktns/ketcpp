@@ -206,7 +206,7 @@ namespace ketcpp::wrapper::matrix {
       return !((*this) != rhs);
     }
     bool operator!=(const Matrix<T> &rhs) const {
-      return (*this) != (*rhs->base.get());
+      return (*this) != (*rhs.base.get());
     }
     bool operator==(const Matrix<T> &rhs) const {
       return (*this) == (*rhs.base.get());
