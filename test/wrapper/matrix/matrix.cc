@@ -17,8 +17,14 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <sstream>
+#include <type_traits>
+
 #include <bandit/bandit.h>
+
 #include "wrapper/matrix/matrix.h"
+
 #include "wrapper/matrix/default.h"
 #include "wrapper/matrix/dummy.h"
 
@@ -31,9 +37,10 @@ go_bandit([] {
     Matrix<float> matrix1 = make_dummy_matrix<float>(), matrix2 = matrix1,
                   matrix3 = matrix1;
     before_each([&matrix1, &matrix2, &matrix3] {
-      matrix1 = make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}});
-      matrix2 = make_matrix<float>({{2, 4}, {6, 8}, {10, 12}});
-      matrix3 = make_matrix<float, 3, 2>({{3, 6}, {9, 12}, {15, 18}});
+      matrix1 = matrix2 = matrix3 =
+          make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}});
+      matrix2 *= 2;
+      matrix3 *= 3;
     });
 
     describe(".get_num_rows", [&matrix1] {
@@ -89,13 +96,54 @@ go_bandit([] {
       });
     });
 
+    describe(".cbegin()/.cend()", [&matrix1] {
+      it("should iterate correct times", [&matrix1] {
+        std::count_if(matrix1.cbegin(), matrix1.cend(), [](auto iter) {
+          return true;
+        }) must equal(matrix1.size());
+      });
+      it("should return not assignable iterator", [&matrix1] {
+        std::is_assignable<decltype(*matrix1.cbegin()), float>::value must
+            be_falsy;
+      });
+    });
+
+    describe(".begin()/.end() const", [&matrix1] {
+      it("should iterate correct times", [&matrix1] {
+        const Matrix<float> matrix2 = matrix1;
+        std::count_if(matrix2.begin(), matrix2.end(), [](auto iter) {
+          return true;
+        }) must equal(matrix2.size());
+      });
+      it("should return not assignable iterator", [&matrix1] {
+        const Matrix<float> matrix2 = matrix1;
+        std::is_assignable<decltype(*matrix2.begin()), float>::value must
+            be_falsy;
+      });
+    });
+
+    describe(".begin()/.end()", [&matrix1] {
+      it("should iterate correct times", [&matrix1] {
+        std::count_if(matrix1.begin(), matrix1.end(), [](auto iter) {
+          return true;
+        }) must equal(matrix1.size());
+      });
+      it("should return assignable iterator", [&matrix1] {
+        std::is_assignable<decltype(*matrix1.begin()), float>::value must
+            be_truthy;
+        std::fill(matrix1.begin(), matrix1.end(), 0);
+        std::count(matrix1.cbegin(), matrix1.cend(), 0)
+            must equal(matrix1.size());
+      });
+    });
+
     describe("::operator==", [&matrix1, &matrix2] {
       it("should return true for same matrix", [&matrix1] {
         auto matrix2 = matrix1;
         (matrix1 == matrix2) must be_truthy;
       });
 
-      it("should false true for different matrix", [&matrix1, &matrix2] {
+      it("should return false for different matrix", [&matrix1, &matrix2] {
         matrix1 must_not equal(matrix2);
         (matrix1 == matrix2) must be_falsy;
       });
@@ -144,6 +192,29 @@ go_bandit([] {
           matrix3 *= 2u;
           matrix3 must_not equal(matrix1);
           matrix3 must equal(matrix2);
+        });
+      });
+    });
+
+    describe("::operator/=", [&matrix1, &matrix2] {
+      describe("(float)", [&matrix1, &matrix2] {
+        it("should change elements", [&matrix1, &matrix2] {
+          auto matrix3 = matrix2;
+          matrix3 must equal(matrix2);
+          matrix3 must_not equal(matrix1);
+          matrix3 /= 2.0f;
+          matrix3 must_not equal(matrix2);
+          matrix3 must equal(matrix1);
+        });
+      });
+      describe("(unsinged int)", [&matrix1, &matrix2] {
+        it("should change elements", [&matrix1, &matrix2] {
+          auto matrix3 = matrix2;
+          matrix3 must equal(matrix2);
+          matrix3 must_not equal(matrix1);
+          matrix3 /= 2u;
+          matrix3 must_not equal(matrix2);
+          matrix3 must equal(matrix1);
         });
       });
     });
@@ -210,6 +281,14 @@ go_bandit([] {
              auto matrix3 = matrix2 / 2u;
              matrix3 must equal(matrix1);
            });
+      });
+    });
+
+    describe("::operator<<", [&matrix1] {
+      it("should properly output matrix contents", [&matrix1] {
+        std::stringstream ss;
+        ss << matrix1;
+        ss.str() must equal("{1,2}\n{3,4}\n{5,6}");
       });
     });
 

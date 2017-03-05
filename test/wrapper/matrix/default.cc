@@ -25,17 +25,74 @@ using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
 
 go_bandit([] {
+  describe("make_matrix", [] {
+    describe("<float, m,n>", [] {
+      describe("(initializer_list)", [] {
+        it("should return a matrix with correct size", [] {
+          auto matrix = make_matrix<float, 3, 2>({1, 2, 3, 4, 5, 6});
+          matrix->get_num_rows() must equal(3);
+          matrix->get_num_columns() must equal(2);
+        });
+
+        it("should return a matrix with correct contents", [] {
+          auto matrix = make_matrix<float, 3, 2>({1, 2, 3, 4, 5, 6});
+          std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+          AssertThat(matrix, Is().EqualToContainer(array));
+        });
+        it("should accept too long initializer_list", [] {
+          auto matrix = make_matrix<float, 3, 2>({1, 2, 3, 4, 5, 6, 7});
+          matrix->get_num_rows() must equal(3);
+          matrix->get_num_columns() must equal(2);
+          std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+          AssertThat(matrix, Is().EqualToContainer(array));
+        });
+      });
+
+      describe("(nested initializer_list)", [] {
+        it("should return a matrix with correct size", [] {
+          auto matrix = make_matrix<float, 3, 2>({{1, 2}, {3, 4}, {5, 6}});
+          matrix->get_num_rows() must equal(3);
+          matrix->get_num_columns() must equal(2);
+        });
+      });
+    });
+
+    describe("<float>", [] {
+      describe("(nested initializer_list)", [] {
+        it("should return a matrix with correct size", [] {
+          auto matrix = make_matrix<float>({{1, 2}, {3, 4}, {5, 6}});
+          matrix->get_num_rows() must equal(3);
+          matrix->get_num_columns() must equal(2);
+        });
+        it("should return a matrix with correct contents", [] {
+          auto matrix = make_matrix<float>({{1, 2}, {3, 4}, {5, 6}});
+          std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+          AssertThat(matrix, Is().EqualToContainer(array));
+        });
+      });
+    });
+  });
+
   describe("make_zero_matrix", [] {
-    it("should return a matrix whose elements are all zero", [] {
-      auto mat = make_zero_matrix<double>(2, 3);
-      mat->for_each(
-          [&mat](size_t i, size_t j) { mat->at(i, j) must equal(0); });
+    describe("(2, 3)", [] {
+      it("should return a matrix whose elements are all zero", [] {
+        auto mat = make_zero_matrix<float>(2, 3);
+        mat->for_each(
+            [&mat](size_t i, size_t j) { mat->at(i, j) must equal(0); });
+      });
+    });
+    describe("(2)", [] {
+      it("should return a matrix whose elements are all zero", [] {
+        auto mat = make_zero_matrix<float>(2);
+        mat->for_each(
+            [&mat](size_t i, size_t j) { mat->at(i, j) must equal(0); });
+      });
     });
   });
 
   describe("make_symmetric_matrix", [] {
     it("should return a symmetric matrix", [] {
-      auto mat = make_symmetric_matrix<double>({{0}, {1, 2}, {3, 4, 5}});
+      auto mat = make_symmetric_matrix<float>({{0}, {1, 2}, {3, 4, 5}});
       mat->for_each([&mat](size_t i, size_t j) {
         mat->at(i, j) must equal(mat->at(j, i));
       });
