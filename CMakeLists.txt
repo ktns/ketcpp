@@ -55,11 +55,3 @@ set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
 
 install(TARGETS ket_cpp DESTINATION bin COMPONENT runtime)
-
-if(COVERAGE)
-	set(CMAKE_BUILD_TYPE Debug)
-	list(APPEND LCOV_REMOVE_EXTRA '${PROJECT_SOURCE_DIR}/test/*' '${PROJECT_SOURCE_DIR}/extlib/*')
-	include(CodeCoverage)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
-	SETUP_TARGET_FOR_COVERAGE(test_coverage ./run_tests coverage)
-endif(COVERAGE)
