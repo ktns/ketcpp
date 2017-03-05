@@ -10,6 +10,10 @@ if(EXISTS ${COTIRE_PATH})
 	include(${COTIRE_PATH})
 endif(EXISTS ${COTIRE_PATH})
 
+set(CODECOV_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/extlib/codecov/cmake/)
+list(APPEND CMAKE_MODULE_PATH ${CODECOV_MODULE_PATH})
+find_package(codecov)
+
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 	message(STATUS "Generating a rule to build documentation by doxygen")
@@ -53,5 +57,9 @@ add_test(NAME run_tests COMMAND $<TARGET_FILE:run_tests> --reporter=spec)
 
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
+
+list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/extlib/*'" "'${PROJECT_SOURCE_DIR}/test/*'")
+add_coverage(run_tests)
+coverage_evaluate()
 
 install(TARGETS ket_cpp DESTINATION bin COMPONENT runtime)

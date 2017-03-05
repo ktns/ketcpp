@@ -3,6 +3,7 @@
 /Testing/
 /doc/
 /ket_cpp
+/lcov/
 /run_tests
 CMakeCache.txt
 CMakeFiles/
