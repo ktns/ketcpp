@@ -56,11 +56,13 @@ namespace ketcpp::wrapper::matrix {
         : storage() {
       auto dest = storage.begin();
       for (auto i : list) {
-        dest = std::copy(i.begin(), i.end(), dest);
+        auto end = std::min(i.begin() + this->size(), i.end());
+        dest = std::copy(i.begin(), end, dest);
       }
     }
     MatrixArrayCore(const std::initializer_list<T> &list) : storage() {
-      std::copy(list.begin(), list.end(), storage.begin());
+      auto end = std::min(list.begin() + this->size(), list.end());
+      std::copy(list.begin(), end, storage.begin());
     }
     MatrixArrayCore() = default;
     MatrixArrayCore(const MatrixArrayCore &other) = default;
