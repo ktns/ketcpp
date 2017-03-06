@@ -106,7 +106,7 @@ go_bandit([] {
     it("should return an assignable matrix", [] {
       auto dummy = make_dummy_matrix<float>();
       dummy = make_matrix<float, 3, 2>({1, 2, 3, 4, 5, 6});
-      std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+      std::array<float, 6> array = {{1, 2, 3, 4, 5, 6}};
       AssertThat(dummy, Is().EqualToContainer(array));
     });
   });

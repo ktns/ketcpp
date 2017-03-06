@@ -36,14 +36,14 @@ go_bandit([] {
 
         it("should return a matrix with correct contents", [] {
           auto matrix = make_matrix<float, 3, 2>({1, 2, 3, 4, 5, 6});
-          std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+          std::array<float, 6> array = {{1, 2, 3, 4, 5, 6}};
           AssertThat(matrix, Is().EqualToContainer(array));
         });
         it("should accept too long initializer_list", [] {
-          auto matrix = make_matrix<float, 3, 2>({1, 2, 3, 4, 5, 6, 7});
+          auto matrix = make_matrix<float, 3, 2>({{1, 2, 3, 4, 5, 6, 7}});
           matrix->get_num_rows() must equal(3);
           matrix->get_num_columns() must equal(2);
-          std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+          std::array<float, 6> array = {{1, 2, 3, 4, 5, 6}};
           AssertThat(matrix, Is().EqualToContainer(array));
         });
       });
@@ -66,7 +66,7 @@ go_bandit([] {
         });
         it("should return a matrix with correct contents", [] {
           auto matrix = make_matrix<float>({{1, 2}, {3, 4}, {5, 6}});
-          std::array<float, 6> array = {1, 2, 3, 4, 5, 6};
+          std::array<float, 6> array = {{1, 2, 3, 4, 5, 6}};
           AssertThat(matrix, Is().EqualToContainer(array));
         });
       });

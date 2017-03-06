@@ -118,7 +118,7 @@ go_bandit([] {
         std::distance(matrix1.cbegin(), matrix1.cend())
             must equal(matrix1.size());
       });
-      it("should return not assignable iterator", [&matrix1] {
+      it("should return not assignable iterator", [] {
         std::is_assignable<decltype(*matrix1.cbegin()), float>::value must
             be_falsy;
       });
@@ -162,9 +162,9 @@ go_bandit([] {
         (matrix1 == matrix2) must be_falsy;
       });
       it("should comparable with other matrices", [&matrix1] {
-        MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6},
-                                 array2 = {6, 5, 4, 3, 2, 1};
-        (matrix1 == matrix1) must be_truthy;
+        MatrixArray<float, 3, 2> array1 = {{1, 2, 3, 4, 5, 6}},
+                                 array2 = {{6, 5, 4, 3, 2, 1}};
+        (matrix1 == array1) must be_truthy;
         (matrix1 == array2) must be_falsy;
       });
       describe("(Matrix<float>)", [&matrix1, matrix2] {
@@ -338,11 +338,11 @@ go_bandit([] {
 
     it("should comparable as a container", [&] {
       AssertThat(matrix1, Is().EqualToContainer(
-                              std::array<float, 6>({1, 2, 3, 4, 5, 6})));
+                              std::array<float, 6>({{1, 2, 3, 4, 5, 6}})));
       AssertThat(matrix2, Is().EqualToContainer(
-                              std::array<float, 6>({2, 4, 6, 8, 10, 12})));
+                              std::array<float, 6>({{2, 4, 6, 8, 10, 12}})));
       AssertThat(matrix3, Is().EqualToContainer(
-                              std::array<float, 6>({3, 6, 9, 12, 15, 18})));
+                              std::array<float, 6>({{3, 6, 9, 12, 15, 18}})));
     });
   });
 });

@@ -1,6 +1,11 @@
-/doc/
-/coverage/
 /Doxyfile
 /Makefile
-cmake_install.cmake
+/Testing/
+/doc/
+/ket_cpp
+/lcov/
+/run_tests
+CMakeCache.txt
+CMakeFiles/
 CTestTestfile.cmake
+cmake_install.cmake
