@@ -21,9 +21,9 @@
 
 #include <bandit/bandit.h>
 
+#include "wrapper/matrix/array.h"
 #include "wrapper/matrix/dummy.h"
 #include "wrapper/matrix/eigen.h"
-#include "wrapper/matrix/array.h"
 #include "wrapper/matrix/vector.h"
 using namespace bandit;
 using namespace bandit::Matchers;
@@ -118,7 +118,7 @@ go_bandit([] {
           return true;
         }) must equal(matrix1.size());
       });
-      it("should return not assignable iterator", [&matrix1] {
+      it("should return not assignable iterator", [] {
         std::is_assignable<decltype(*matrix1.cbegin()), float>::value must
             be_falsy;
       });
