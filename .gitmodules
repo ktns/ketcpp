@@ -1,3 +1,6 @@
 [submodule "extlib/bandit"]
 	path = extlib/bandit
 	url = https://github.com/joakimkarlsson/bandit.git
+[submodule "extlib/codecov"]
+	path = extlib/codecov
+	url = https://github.com/RWTH-HPC/CMake-codecov.git

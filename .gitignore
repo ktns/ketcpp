@@ -1,11 +1,9 @@
 /Doxyfile
 /Makefile
 /Testing/
-/coverage.info
-/coverage.info.cleaned
-/coverage/
 /doc/
 /ket_cpp
+/lcov/
 /run_tests
 CMakeCache.txt
 CMakeFiles/
