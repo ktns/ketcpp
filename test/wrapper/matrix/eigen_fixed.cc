@@ -1,6 +1,6 @@
 /*
  * ketcpp: Quantum chemical toolset made of C++
- * Copyright (C) 2015 Katsuhiko Nishimra
+ * Copyright (C) 2017 Katsuhiko Nishimra
  *
  * This file is part of ketcpp.
  *
@@ -17,45 +17,53 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <array>
+#if __has_include("Eigen/Dense")
 
 #include <bandit/bandit.h>
 
 #include "wrapper/matrix/array.h"
+#include "wrapper/matrix/dummy.h"
+#include "wrapper/matrix/eigen.h"
 #include "wrapper/matrix/vector.h"
-
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
 
 go_bandit([] {
-  describe("MatrixVector", [] {
-    MatrixVector<float> matrix1(3, 2), matrix2(3, 2), matrix3(3, 2);
+  describe("MatrixEigen<fixed size>", [] {
+    MatrixEigen<float, 3, 2> matrix1, matrix2, matrix3;
+
     before_each([&] {
-      matrix1 = matrix2 = matrix3 =
-          MatrixVector<float>({{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}});
+      MatrixEigen<float, 3, 2> eigen = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+      matrix1 = matrix2 = matrix3 = eigen;
       matrix2 *= 2;
       matrix3 *= 3;
     });
 
-    it("should not be abstract class",
-       [] { std::is_abstract<MatrixVector<float>>::value must_not be_truthy; });
-
-    it("should be initialized with list", [] {
-      [] {
-        MatrixVector<float> matrix1 = {{1.f, 2.f}, {3.f, 4.f}};
-      } must_not throw_exception;
+    it("should not be abstract class", [] {
+      std::is_abstract<MatrixEigen<float, 3, 2>>::value must_not be_truthy;
     });
 
-    it("should be correctly initialized with nested list", [] {
-      MatrixVector<float> matrix1 = {{1.f}, {3.f, 4.f}};
-      MatrixVector<float> matrix2 = {{1.f, 0.f}, {3.f, 4.f}};
+    it("should be correctly initialized with initializer_list", [] {
+      MatrixEigen<float, 3, 2> matrix1 = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+      MatrixEigen<float, 3, 2> matrix2 = {{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}};
       matrix1 must equal(matrix2);
+    });
+
+    it("should throw an exception when initalized with short list", [] {
+      auto lmd1 = [] {
+        MatrixEigen<float, 3, 2> matrix1 = {1.f, 2.f, 3.f, 4.f, 5.f};
+      };
+      auto lmd2 = [] {
+        MatrixEigen<float, 3, 2> matrix2 = {{1.f}, {3.f, 4.f}, {5.f, 6.f}};
+      };
+      AssertThrows(std::logic_error, lmd1());
+      AssertThrows(std::logic_error, lmd2());
     });
 
     describe("copy ctor", [&matrix1] {
       it("should copy a matrix", [&matrix1] {
-        MatrixVector<float> matrix2(matrix1);
+        MatrixEigen<float, 3, 2> matrix2(matrix1);
         matrix2 must equal(matrix1);
       });
     });
@@ -167,13 +175,21 @@ go_bandit([] {
         (matrix2 == array) must be_falsy;
         (array == matrix2) must be_falsy;
       });
-      it("should be comparable with MatrixArray", [&matrix1, &matrix2] {
-        MatrixArray<float, 3, 2> array = {1, 2, 3, 4, 5, 6};
-        (matrix1 == array) must be_truthy;
-        (array == matrix1) must be_truthy;
-        (matrix2 == array) must be_falsy;
-        (array == matrix2) must be_falsy;
+      it("should be comparable with MatrixVector", [&matrix1, &matrix2] {
+        MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}};
+        (matrix1 == vector) must be_truthy;
+        (vector == matrix1) must be_truthy;
+        (matrix2 == vector) must be_falsy;
+        (vector == matrix2) must be_falsy;
       });
+      it("should be comparable with MatrixEigen<dynamically sized>",
+         [&matrix1, &matrix2] {
+           MatrixEigen<float> eigen_v = {{1, 2}, {3, 4}, {5, 6}};
+           (matrix1 == eigen_v) must be_truthy;
+           (eigen_v == matrix1) must be_truthy;
+           (matrix2 == eigen_v) must be_falsy;
+           (eigen_v == matrix2) must be_falsy;
+         });
 
       describe("(Matrix<float>)", [&matrix1, matrix2] {
         it("should work", [&matrix1, matrix2] {
@@ -201,19 +217,27 @@ go_bandit([] {
         (matrix2 != array) must be_truthy;
         (array != matrix2) must be_truthy;
       });
-      it("should be comparable with MatrixArray", [&matrix1, &matrix2] {
-        MatrixArray<float, 3, 2> array = {{1, 2, 3, 4, 5, 6}};
-        (matrix1 != array) must be_falsy;
-        (array != matrix1) must be_falsy;
-        (matrix2 != array) must be_truthy;
-        (array != matrix2) must be_truthy;
+      it("should be comparable with MatrixVector", [&matrix1, &matrix2] {
+        MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}};
+        (matrix1 != vector) must be_falsy;
+        (vector != matrix1) must be_falsy;
+        (matrix2 != vector) must be_truthy;
+        (vector != matrix2) must be_truthy;
       });
+      it("should be comparable with MatrixEigen<dynamically sized>",
+         [&matrix1, &matrix2] {
+           MatrixEigen<float> eigen_v = {{1, 2}, {3, 4}, {5, 6}};
+           (matrix1 != eigen_v) must be_falsy;
+           (eigen_v != matrix1) must be_falsy;
+           (matrix2 != eigen_v) must be_truthy;
+           (eigen_v != matrix2) must be_truthy;
+         });
 
       describe("(Matrix<float>)", [&matrix1, matrix2] {
         it("should work", [&matrix1, matrix2] {
-          Matrix<float> matrix = matrix1;
-          (matrix1 != matrix) must be_falsy;
-          (matrix2 != matrix) must be_truthy;
+          Matrix<float> matrix3 = matrix1;
+          (matrix1 != matrix3) must be_falsy;
+          (matrix2 != matrix3) must be_truthy;
         });
       });
     });
@@ -241,6 +265,20 @@ go_bandit([] {
         matrix1 += array;
         matrix1 must equal(array2);
       });
+      it("should work with MatrixVector", [&matrix1] {
+        MatrixVector<float> vector1 = {{6, 5}, {4, 3}, {2, 1}},
+                            vector2 = {{7, 7}, {7, 7}, {7, 7}};
+        matrix1 must_not equal(vector2);
+        matrix1 += vector1;
+        matrix1 must equal(vector2);
+      });
+      it("should work with MatrixEigen<dynamically sized>", [&matrix1] {
+        MatrixEigen<float> eigen_v1 = {{6, 5}, {4, 3}, {2, 1}},
+                           eigen_v2 = {{7, 7}, {7, 7}, {7, 7}};
+        matrix1 must_not equal(eigen_v2);
+        matrix1 += eigen_v1;
+        matrix1 must equal(eigen_v2);
+      });
     });
 
     describe("::operator-=", [&matrix1, &matrix2, &matrix3] {
@@ -253,19 +291,26 @@ go_bandit([] {
         matrix4 must_not equal(matrix3);
         matrix4 must equal(matrix2);
       });
-      it("should work with MatrixArrayCore", [&matrix1] {
-        MatrixArrayCore<float, 3, 2> array1 = {{6, 5}, {4, 3}, {2, 1}},
-                                     array2 = {{-5, -3}, {-1, 1}, {3, 5}};
-        matrix1 must_not equal(array2);
-        matrix1 -= array1;
-        matrix1 must equal(array2);
-      });
       it("should work with MatrixArray", [&matrix1] {
-        MatrixArray<float, 3, 2> array1 = {6, 5, 4, 3, 2, 1},
+        MatrixArray<float, 3, 2> array = {6, 5, 4, 3, 2, 1},
                                  array2 = {-5, -3, -1, 1, 3, 5};
         matrix1 must_not equal(array2);
-        matrix1 -= array1;
+        matrix1 -= array;
         matrix1 must equal(array2);
+      });
+      it("should work with MatrixVector", [&matrix1] {
+        MatrixVector<float> vector1 = {{6, 5}, {4, 3}, {2, 1}},
+                            vector2 = {{-5, -3}, {-1, 1}, {3, 5}};
+        matrix1 must_not equal(vector2);
+        matrix1 -= vector1;
+        matrix1 must equal(vector2);
+      });
+      it("should work with MatrixEigen<dynamically sized>", [&matrix1] {
+        MatrixEigen<float> eigen_v = {{6, 5}, {4, 3}, {2, 1}},
+                           eigen_v2 = {{-5, -3}, {-1, 1}, {3, 5}};
+        matrix1 must_not equal(eigen_v2);
+        matrix1 -= eigen_v;
+        matrix1 must equal(eigen_v2);
       });
     });
 
@@ -280,7 +325,7 @@ go_bandit([] {
           matrix3 must equal(matrix2);
         });
       });
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should change elements", [&matrix1, &matrix2] {
           auto matrix3 = matrix1;
           matrix3 must equal(matrix1);
@@ -303,7 +348,7 @@ go_bandit([] {
           matrix3 must_not equal(matrix2);
         });
       });
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should change elements", [&matrix1, &matrix2] {
           auto matrix3 = matrix2;
           matrix3 must_not equal(matrix1);
@@ -316,7 +361,7 @@ go_bandit([] {
     });
 
     describe("::operator+", [&matrix1, &matrix2, &matrix3] {
-      it("should not change elements", [&matrix1, &matrix2, &matrix3] {
+      it("should change elements", [&matrix1, &matrix2, &matrix3] {
         auto matrix4 = matrix1 + matrix2;
         matrix4 must equal(matrix3);
         matrix1 must_not equal(matrix3);
@@ -324,7 +369,7 @@ go_bandit([] {
     });
 
     describe("::operator-", [&matrix1, &matrix2, &matrix3] {
-      it("should not change elements", [&matrix1, &matrix2, &matrix3] {
+      it("should change elements", [&matrix1, &matrix2, &matrix3] {
         auto matrix4 = matrix3 - matrix1;
         matrix4 must equal(matrix2);
         matrix3 must_not equal(matrix2);
@@ -338,19 +383,19 @@ go_bandit([] {
              auto matrix3 = matrix1 * 2.f;
              matrix3 must equal(matrix2);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 * 2.f;
           matrix1 must equal(matrix2);
         });
       });
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should return a matrix multiplied by the scalar",
            [&matrix1, &matrix2] {
              auto matrix3 = matrix1 * 2u;
              matrix3 must equal(matrix2);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 * 2u;
           matrix1 must equal(matrix2);
@@ -365,20 +410,20 @@ go_bandit([] {
              auto matrix3 = matrix2 / 2.f;
              matrix3 must equal(matrix1);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 / 2.f;
           matrix1 must equal(matrix2);
         });
       });
 
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should return a matrix divided by the scalar",
            [&matrix1, &matrix2] {
              auto matrix3 = matrix2 / 2u;
              matrix3 must equal(matrix1);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 / 2.f;
           matrix1 must equal(matrix2);
@@ -402,3 +447,4 @@ go_bandit([] {
     });
   });
 });
+#endif
