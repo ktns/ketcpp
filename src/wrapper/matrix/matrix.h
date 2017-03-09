@@ -29,7 +29,7 @@
 #include <optional>
 namespace {
   template <typename T> using optional = std::optional<T>;
-};
+}
 #else
 #include <experimental/optional>
 namespace {
