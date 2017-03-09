@@ -111,6 +111,7 @@ namespace ketcpp::wrapper::matrix {
 
   template <typename T> class MatrixBase {
   public:
+    typedef T scalar_t;
     virtual size_t get_num_rows() const = 0;
     virtual size_t get_num_columns() const = 0;
     virtual size_t get_row_size() const = 0;
