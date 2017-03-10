@@ -51,6 +51,7 @@ namespace ketcpp::wrapper::matrix {
     unique_ptr base;
 
   public:
+    typedef T scalar_t;
     Matrix(const Matrix &src) : base(src.base->copy()) {}
     Matrix(const Base &src) : base(src.copy()) {}
     Matrix(Matrix &&src) : base(std::move(src.base)) {}

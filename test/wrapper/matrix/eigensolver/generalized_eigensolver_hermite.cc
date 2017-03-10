@@ -29,6 +29,7 @@ using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
 using namespace ketcpp::wrapper::matrix::eigensolver;
 
+typedef GeneralizedEigensolverHermite<float> GEH;
 go_bandit([] {
   describe("GeneralizedEigensolverHermite<float>", [] {
     describe("ctor", [] {
@@ -36,15 +37,11 @@ go_bandit([] {
       it("should deduce type properly", [] {
         auto a = make_symmetric_matrix<float>({{1}, {2, 3}}),
              b = make_symmetric_matrix<float>({{1}, {2, 1}});
-        GeneralizedEigensolverHermite solver(
-            static_cast<MatrixBase<float> &>(a),
-            static_cast<MatrixBase<float> &>(b));
-        std::is_same<decltype(solver),
-                     GeneralizedEigensolverHermite<float>>::value must
-            be_truthy;
+        GeneralizedEigensolverHermite solver(a, b);
+        std::is_same<decltype(solver), GEH>::value must be_truthy;
       });
 #else
-      xit("should deduce scalar type properly", [] {  });
+      xit("should deduce scalar type properly", [] {});
 #endif
     });
   });
