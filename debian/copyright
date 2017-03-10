@@ -11,6 +11,12 @@ Copyright: 2009, Benoit Jacob <jacob.benoit.1@gmail.com>
   2006, 2007, Montel Laurent, <montel@kde.org>
 License: BSD-2-clause
 
+Files: cmake/FindMathJax.cmake
+Copyright: 2014, 2016 Jason Rhinelander <jason@imaginary.ca>
+License: GPL-3.0+
+Comment: Fetched from:
+ https://github.com/erisproject/eris/raw/master/cmake/Modules/FindMathJax.cmake
+
 Files: debian/*
 Copyright: 2015 Katsuhiko Nishimra <ktns.87@gmail.com>
 License: GPL-3.0+
