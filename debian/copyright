@@ -17,7 +17,7 @@ License: GPL-3.0+
 
 Files: extlib/codecov/
 Copyright: 2015, 2016, RWTH Aachen University, Federal Republic of Germany
-License: BSL-3-clause
+License: BSD-3-clause
 
 Files: extlib/bandit/*
 Copyright: Copyright (c) 2013 Joakim Karlsson
