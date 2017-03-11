@@ -36,12 +36,30 @@ namespace ketcpp::wrapper::matrix::eigensolver {
     const M &a;
     const M &b;
 
+    template <typename U> using optional = ketcpp::wrapper::matrix::optional<U>;
+
   public:
     //! @brief Initialize the solver with two references to matrices.
     //! @param[in] a A reference to the hermitian matrix \f$A\f$.
-    //! @param[in] b A reference to the hermitian matrix \f$B\f$.
+    //! @param[in] b A reference to the positive definite hermitian matrix
+    //! \f$B\f$.
     //! @note Solvers do not hold copies of the matrices.
-    GeneralizedEigensolverHermite(const M &a, const M &b) : a(a), b(b) {}
+    GeneralizedEigensolverHermite(const M &a, const M &b) : a(a), b(b) {
+      assert(a.for_each([&a](size_t i, size_t j) -> optional<bool> {
+                if (a.at(i, j) != a.at(j, i))
+                  return false;
+                else
+                  return {};
+              }).value_or(true));
+
+      assert(b.for_each([&b](size_t i, size_t j) -> optional<bool> {
+                if (b.at(i, j) != b.at(j, i))
+                  return false;
+                else
+                  return {};
+              }).value_or(true));
+      assert(a.dimension() == b.dimension());
+    }
     //! @brief Solve the generalized eigenproblem.
     void solve() {}
   };
