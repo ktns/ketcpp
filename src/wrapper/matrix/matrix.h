@@ -111,6 +111,8 @@ namespace ketcpp::wrapper::matrix {
 
   template <typename T> class MatrixBase {
   public:
+    typedef T value_type;
+
     virtual size_t get_num_rows() const = 0;
     virtual size_t get_num_columns() const = 0;
     virtual size_t get_row_size() const = 0;
@@ -231,6 +233,9 @@ namespace ketcpp::wrapper::matrix {
     }
 
   public:
+    typedef decltype(reflist->begin()) iterator;
+    typedef decltype(reflist->cbegin()) const_iterator;
+
     auto begin() {
       prepare_reflist();
       return reflist->begin();
@@ -252,10 +257,6 @@ namespace ketcpp::wrapper::matrix {
 
     MatrixBase() : reflist(nullptr) {}
     MatrixBase(const MatrixBase<T> &) : reflist(nullptr) {}
-
-    typedef T value_type;
-    typedef decltype(reflist->begin()) iterator;
-    typedef decltype(reflist->cbegin()) const_iterator;
 
     virtual ~MatrixBase(){};
   };
