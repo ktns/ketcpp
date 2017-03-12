@@ -35,6 +35,7 @@ namespace ketcpp::wrapper::matrix {
                           Eigen::StorageOptions::RowMajor>
         matrix_t;
     matrix_t matrix;
+    using Base = MatrixBase<T>;
     using Common = MatrixEigenCommon<T>;
     using common_matrix_ref = typename Common::common_matrix_ref;
     using const_common_matrix_ref = typename Common::const_common_matrix_ref;
@@ -74,11 +75,18 @@ namespace ketcpp::wrapper::matrix {
     }
 
     MatrixEigen(const MatrixEigen &from) : matrix(from.matrix){};
-    std::unique_ptr<MatrixBase<T>> copy() const override {
-      std::unique_ptr<MatrixBase<T>> copy;
+    std::unique_ptr<Base> copy() const override {
+      std::unique_ptr<Base> copy;
       copy.reset(new MatrixEigen(*this));
       return copy;
     }
+
+    MatrixEigen(const Base &from)
+        : matrix(from.get_num_rows(), from.get_num_columns()) {
+      this->Base::operator=(from);
+    }
+
+    MatrixEigen(const const_common_matrix_ref &from) : matrix(from) {}
   };
 }
 #endif

@@ -28,14 +28,14 @@
 #include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
+  constexpr bool MatrixEigenImplemented = true;
   template <typename T> class MatrixEigenCommon : public MatrixBase<T> {
   public:
-    typedef Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
-                                     Eigen::StorageOptions::RowMajor>>
-        common_matrix_ref;
-    typedef Eigen::Ref<const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
-                                           Eigen::StorageOptions::RowMajor>>
-        const_common_matrix_ref;
+    typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
+                          Eigen::StorageOptions::RowMajor>
+        EigenBase;
+    typedef Eigen::Ref<EigenBase> common_matrix_ref;
+    typedef Eigen::Ref<const EigenBase> const_common_matrix_ref;
     virtual common_matrix_ref matrix_instance() = 0;
     virtual const_common_matrix_ref matrix_instance() const = 0;
 
@@ -47,5 +47,9 @@ namespace ketcpp::wrapper::matrix {
       return *this;
     }
   };
+}
+#else
+namespace ketcpp::wrapper::matrix {
+  constexpr bool MatrixEigenImplemented = false;
 }
 #endif

@@ -21,6 +21,7 @@
 
 #include <type_traits>
 
+#include "wrapper/matrix/eigen.h"
 #include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix::eigensolver {
@@ -61,7 +62,37 @@ namespace ketcpp::wrapper::matrix::eigensolver {
       assert(a.dimension() == b.dimension());
     }
     //! @brief Solve the generalized eigenproblem.
-    void solve() {}
+    //! @return std::pair<Matrix<T>, Matrix<T>> that contains an eigenvalues
+    //! vector and an eigenvectors matrix
+    std::pair<Matrix<T>, Matrix<T>> solve() {
+#ifdef __cpp_if_constexpr
+      if
+        constexpr(ketcpp::wrapper::matrix::MatrixEigenImplemented) {
+#endif
+#if defined(__cpp_if_constexpr) || __has_include("Eigen/Core")
+          if (dynamic_cast<const MatrixEigenCommon<T> *>(&a) == nullptr)
+            return GeneralizedEigensolverHermite<T>(MatrixEigen<T>(a), b)
+                .solve();
+          if (dynamic_cast<const MatrixEigenCommon<T> *>(&b) == nullptr)
+            return GeneralizedEigensolverHermite<T>(a, MatrixEigen<T>(b))
+                .solve();
+          auto &ae = dynamic_cast<const MatrixEigenCommon<T> &>(a),
+               &be = dynamic_cast<const MatrixEigenCommon<T> &>(b);
+          auto ai = ae.matrix_instance(), bi = be.matrix_instance();
+          Eigen::GeneralizedSelfAdjointEigenSolver<
+              typename MatrixEigenCommon<T>::EigenBase>
+              solver(ai, bi, Eigen::ComputeEigenvectors | Eigen::Ax_lBx);
+          MatrixEigen<T> values(solver.eigenvalues()),
+              vectors(solver.eigenvectors());
+          return std::make_pair<Matrix<T>, Matrix<T>>(std::move(values),
+                                                      std::move(vectors));
+#endif
+#ifdef __cpp_if_constexpr
+        }
+      else
+#endif
+        throw std::logic_error("No solver implemented!");
+    }
   };
 #ifdef __cpp_deduction_guides
   template <class M>

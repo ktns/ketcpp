@@ -22,6 +22,7 @@
 #include <bandit/bandit.h>
 
 #include "wrapper/matrix/default.h"
+#include "wrapper/matrix/dummy.h"
 #include "wrapper/matrix/eigensolver/generalized_eigensolver_hermite.h"
 
 using namespace bandit;
@@ -32,17 +33,45 @@ using namespace ketcpp::wrapper::matrix::eigensolver;
 typedef GeneralizedEigensolverHermite<float> GEH;
 go_bandit([] {
   describe("GeneralizedEigensolverHermite<float>", [] {
-    describe("ctor", [] {
+    auto a = make_dummy_matrix<float>(), b = a;
+
+    before_each([&] {
+      a = make_symmetric_matrix<float>({{2}, {-2, -4}});
+      b = make_symmetric_matrix<float>({{2}, {2, 4}});
+    });
+
+    describe("ctor", [&] {
 #ifdef __cpp_deduction_guides
-      it("should deduce type properly", [] {
-        auto a = make_symmetric_matrix<float>({{1}, {2, 3}}),
-             b = make_symmetric_matrix<float>({{1}, {2, 1}});
+      it("should deduce type properly", [&] {
         GeneralizedEigensolverHermite solver(a, b);
         std::is_same<decltype(solver), GEH>::value must be_truthy;
       });
 #else
       xit("should deduce scalar type properly", [] {});
 #endif
+    });
+    describe("solve()", [&] {
+      it("should return correct eigenvalues", [&] {
+        GEH solver(a, b);
+        auto values = solver.solve().first,
+             correct_values = make_matrix<float, 1, 2>({{-1}, {3}});
+        auto within_delta = [](float a, float b) {
+          return std::abs(a - b) < 1e-5;
+        };
+
+        AssertThat(values, EqualsContainer(correct_values, within_delta));
+      });
+
+      it("should return correct eigenvectors", [&] {
+        GEH solver(a, b);
+        auto vectors = solver.solve().second,
+             correct_vectors = make_matrix<float, 2, 2>({{0, 1}, {0.5, -0.5}});
+        auto within_delta = [](float a, float b) {
+          return std::abs(a - b) < 1e-5;
+        };
+
+        AssertThat(vectors, EqualsContainer(correct_vectors, within_delta));
+      });
     });
   });
 });

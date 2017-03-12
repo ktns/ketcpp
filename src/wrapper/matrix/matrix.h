@@ -158,6 +158,13 @@ namespace ketcpp::wrapper::matrix {
       }
     }
 
+    MatrixBase &operator=(const MatrixBase &rhs) {
+      assert(this->dimension() == rhs.dimension());
+      for_each(
+          [this, &rhs](size_t i, size_t j) { this->at(i, j) = rhs.at(i, j); });
+      return *this;
+    }
+
     Matrix<T> operator+(const MatrixBase &rhs) {
       Matrix<T> res(*this);
       static_cast<MatrixBase<T> &>(res) += rhs;
