@@ -21,6 +21,7 @@
 
 #if __has_include("Eigen/Dense")
 
+#include <cassert>
 #include <type_traits>
 
 #include "wrapper/matrix/eigen_common.h"
