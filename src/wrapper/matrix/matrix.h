@@ -255,6 +255,8 @@ namespace ketcpp::wrapper::matrix {
     auto begin() const { return cbegin(); }
     auto end() const { return cend(); }
 
+    Matrix<T> transpose() const;
+
     MatrixBase() : reflist(nullptr) {}
     MatrixBase(const MatrixBase<T> &) : reflist(nullptr) {}
 
@@ -283,3 +285,5 @@ namespace ketcpp::wrapper::matrix {
     return out;
   }
 }
+
+#include "wrapper/matrix/transposed.h"
