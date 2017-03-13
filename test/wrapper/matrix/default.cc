@@ -98,4 +98,18 @@ go_bandit([] {
       });
     });
   });
+
+  describe("make_diagonal_matrix", [] {
+    it("should return a diagonal matrix", [] {
+      auto diag = make_diagonal_matrix<float>({1, 2, 3}),
+           mat = make_matrix<float, 3>({{1, 0, 0}, {0, 2, 0}, {0, 0, 3}});
+      diag must equal(mat);
+    });
+
+    it("should accept iterators", [] {
+      std::initializer_list<float> list = {1, 2, 3};
+      auto diag = make_diagonal_matrix(list.begin(), list.end()),
+           mat = make_matrix<float, 3>({{1, 0, 0}, {0, 2, 0}, {0, 0, 3}});
+    });
+  });
 });
