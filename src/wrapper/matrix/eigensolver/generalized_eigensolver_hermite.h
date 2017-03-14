@@ -97,6 +97,6 @@ namespace ketcpp::wrapper::matrix::eigensolver {
 #ifdef __cpp_deduction_guides
   template <class M>
   GeneralizedEigensolverHermite(const M &a, const M &b)
-      ->GeneralizedEigensolverHermite<typename M::scalar_t>;
+      ->GeneralizedEigensolverHermite<typename M::value_type>;
 #endif
 }
