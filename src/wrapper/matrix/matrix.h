@@ -51,7 +51,7 @@ namespace ketcpp::wrapper::matrix {
     unique_ptr base;
 
   public:
-    typedef T scalar_t;
+    typedef T value_type;
     Matrix(const Matrix &src) : base(src.base->copy()) {}
     Matrix(const Base &src) : base(src.copy()) {}
     Matrix(Matrix &&src) : base(std::move(src.base)) {}
@@ -92,7 +92,6 @@ namespace ketcpp::wrapper::matrix {
       return *this;
     }
 
-    typedef T value_type;
     typedef typename MatrixBase<T>::iterator iterator;
     typedef typename MatrixBase<T>::const_iterator const_iterator;
 
@@ -112,7 +111,6 @@ namespace ketcpp::wrapper::matrix {
 
   template <typename T> class MatrixBase {
   public:
-    typedef T scalar_t;
     virtual size_t get_num_rows() const = 0;
     virtual size_t get_num_columns() const = 0;
     virtual size_t get_row_size() const = 0;
@@ -243,6 +241,9 @@ namespace ketcpp::wrapper::matrix {
     }
 
   public:
+    typedef decltype(reflist->begin()) iterator;
+    typedef decltype(reflist->cbegin()) const_iterator;
+
     auto begin() {
       prepare_reflist();
       return reflist->begin();
@@ -262,12 +263,10 @@ namespace ketcpp::wrapper::matrix {
     auto begin() const { return cbegin(); }
     auto end() const { return cend(); }
 
+    Matrix<T> transpose() const;
+
     MatrixBase() : reflist(nullptr) {}
     MatrixBase(const MatrixBase<T> &) : reflist(nullptr) {}
-
-    typedef T value_type;
-    typedef decltype(reflist->begin()) iterator;
-    typedef decltype(reflist->cbegin()) const_iterator;
 
     virtual ~MatrixBase(){};
   };
@@ -294,3 +293,5 @@ namespace ketcpp::wrapper::matrix {
     return out;
   }
 }
+
+#include "wrapper/matrix/transposed.h"

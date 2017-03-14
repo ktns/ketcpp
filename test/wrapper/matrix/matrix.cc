@@ -284,6 +284,31 @@ go_bandit([] {
       });
     });
 
+    describe("transpose()", [&matrix1] {
+      auto matrix2 = make_dummy_matrix<float>();
+
+      before_each([&matrix1, &matrix2] { matrix2 = matrix1->transpose(); });
+
+      it("should correctly transpose elements of the matrix",
+         [&matrix1, &matrix2] {
+           matrix1->for_each([&matrix1, &matrix2](size_t i, size_t j) {
+             matrix2->at(j, i) must equal(matrix1->at(i, j));
+           });
+           const auto matrix3 = matrix2;
+           matrix1->for_each([&matrix1, &matrix3](size_t i, size_t j) {
+             matrix3->at(j, i) must equal(matrix1->at(i, j));
+           });
+         });
+
+      it("should change the dimension of the matrix correctly",
+         [&matrix1, &matrix2] {
+           matrix1->get_num_rows() must equal(matrix2->get_num_columns());
+           matrix1->get_num_columns() must equal(matrix2->get_num_rows());
+           matrix1->get_row_size() must equal(matrix2->get_column_size());
+           matrix1->get_column_size() must equal(matrix2->get_row_size());
+         });
+    });
+
     describe("::operator<<", [&matrix1] {
       it("should properly output matrix contents", [&matrix1] {
         std::stringstream ss;

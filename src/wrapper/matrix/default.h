@@ -19,7 +19,10 @@
 
 #pragma once
 
+#include <cassert>
+#include <iterator>
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 #include "wrapper/matrix/array.h"
@@ -76,6 +79,30 @@ namespace ketcpp {
           i++;
         }
         return Matrix<T>(std::move(ptr));
+      }
+
+      template <typename Iter>
+      std::enable_if_t<std::is_base_of_v<std::input_iterator_tag,
+                                         typename std::iterator_traits<
+                                             Iter>::iterator_category> &&
+                           std::is_arithmetic_v<
+                               typename std::iterator_traits<Iter>::value_type>,
+                       Matrix<typename std::iterator_traits<Iter>::value_type>>
+      make_diagonal_matrix(Iter begin, Iter end) {
+        typedef typename std::iterator_traits<Iter>::value_type T;
+        const auto n = std::distance(begin, end);
+        assert(n > 0);
+        auto ret = make_zero_matrix<T>(n);
+        size_t i = 0;
+        for (Iter iter = begin; iter != end; i++, iter++) {
+          ret->at(i, i) = *iter;
+        }
+        return ret;
+      }
+
+      template <typename T>
+      Matrix<T> make_diagonal_matrix(std::initializer_list<T> list) {
+        return make_diagonal_matrix(list.begin(), list.end());
       }
     }
   }
