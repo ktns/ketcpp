@@ -69,8 +69,8 @@ namespace ketcpp::wrapper::matrix {
     bool operator==(const Base &rhs) const { return *base == rhs; }
     bool operator!=(const Base &rhs) const { return *base != rhs; }
 
-    Matrix operator+(const Base &rhs) { return *base + rhs; }
-    Matrix operator-(const Base &rhs) { return *base - rhs; }
+    Matrix operator+(const Base &rhs) const { return *base + rhs; }
+    Matrix operator-(const Base &rhs) const { return *base - rhs; }
     Matrix operator*(T rhs) const { return *base * rhs; }
     Matrix operator/(T rhs) const { return *base / rhs; }
 
@@ -155,12 +155,12 @@ namespace ketcpp::wrapper::matrix {
       }
     }
 
-    Matrix<T> operator+(const MatrixBase &rhs) {
+    Matrix<T> operator+(const MatrixBase &rhs) const {
       Matrix<T> res(*this);
       static_cast<MatrixBase<T> &>(res) += rhs;
       return res;
     }
-    Matrix<T> operator-(const MatrixBase &rhs) {
+    Matrix<T> operator-(const MatrixBase &rhs) const {
       Matrix<T> res(*this);
       static_cast<MatrixBase<T> &>(res) -= rhs;
       return res;
