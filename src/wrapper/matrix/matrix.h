@@ -95,6 +95,7 @@ namespace ketcpp::wrapper::matrix {
     typedef typename MatrixBase<T>::iterator iterator;
     typedef typename MatrixBase<T>::const_iterator const_iterator;
 
+    // These functions are needed to treat Matrix<T> as a container
     size_t size() const { return base->size(); }
     iterator begin() { return base->begin(); }
     iterator end() { return base->end(); }
