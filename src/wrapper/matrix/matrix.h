@@ -99,8 +99,8 @@ namespace ketcpp::wrapper::matrix {
     size_t size() const { return base->size(); }
     iterator begin() { return base->begin(); }
     iterator end() { return base->end(); }
-    const_iterator begin() const { return base->begin(); }
-    const_iterator end() const { return base->end(); }
+    const_iterator begin() const { return base->cbegin(); }
+    const_iterator end() const { return base->cend(); }
     const_iterator cbegin() const { return base->cbegin(); }
     const_iterator cend() const { return base->cend(); }
   };
@@ -218,15 +218,65 @@ namespace ketcpp::wrapper::matrix {
     virtual std::unique_ptr<MatrixBase> copy() const = 0;
 
   private:
-    struct refwrapper : public std::reference_wrapper<T> {
-      using std::reference_wrapper<T>::reference_wrapper;
-      T &operator=(T v) { return static_cast<T &>(*this) = v; }
+    class reflist_t : private std::list<std::reference_wrapper<T>> {
+    private:
+      using base_t = std::list<std::reference_wrapper<T>>;
+      template <typename Iter>
+      using iterator_base_t = std::iterator<
+          typename std::iterator_traits<Iter>::iterator_category, T,
+          typename std::iterator_traits<Iter>::difference_type,
+          typename std::conditional_t<
+              std::is_same_v<Iter, typename base_t::const_iterator>, const T *,
+              T *>,
+          typename std::conditional_t<
+              std::is_same_v<Iter, typename base_t::const_iterator>, T, T &>>;
+      template <typename Iter> class iterator_t : public iterator_base_t<Iter> {
+      private:
+        Iter iter;
+
+      public:
+        typedef typename iterator_base_t<Iter>::difference_type difference_type;
+        typedef typename iterator_base_t<Iter>::value_type value_type;
+        typedef typename iterator_base_t<Iter>::pointer pointer;
+        typedef typename iterator_base_t<Iter>::reference reference;
+        typedef
+            typename iterator_base_t<Iter>::iterator_category iterator_category;
+
+        iterator_t() : iter() {}
+        iterator_t(Iter iter) : iter(iter) {}
+        iterator_t(const iterator_t &iter) : iter(iter.iter) {}
+        reference operator*() { return *iter; }
+        iterator_t &operator++() {
+          ++iter;
+          return *this;
+        }
+        iterator_t operator++(int) {
+          auto ret = *this;
+          ++(*this);
+          return ret;
+        }
+        bool operator==(iterator_t other) const { return iter == other.iter; }
+        bool operator!=(iterator_t other) const { return iter != other.iter; }
+      };
+
+    public:
+      reflist_t() = default;
+      reflist_t(const reflist_t &) = delete;
+      void push_back(T &ref) { base_t::push_back(ref); }
+      typedef iterator_t<typename base_t::iterator> iterator;
+      typedef iterator_t<typename base_t::const_iterator> const_iterator;
+      iterator begin() { return base_t::begin(); }
+      iterator end() { return base_t::end(); }
+      const_iterator begin() const { return base_t::cbegin(); }
+      const_iterator end() const { return base_t::cend(); }
+      const_iterator cbegin() const { return base_t::cbegin(); }
+      const_iterator cend() const { return base_t::cend(); }
     };
-    std::unique_ptr<std::list<refwrapper>> reflist = nullptr;
+    std::unique_ptr<reflist_t> reflist = nullptr;
     void prepare_reflist() {
       if (reflist != nullptr)
         return;
-      reflist.reset(new std::list<refwrapper>);
+      reflist.reset(new reflist_t);
       for_each([this](size_t i, size_t j) { reflist->push_back(at(i, j)); });
     }
     void prepare_reflist_const() const {
