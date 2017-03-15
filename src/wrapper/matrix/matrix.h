@@ -27,21 +27,21 @@
 #include <type_traits>
 #if __has_include(<optional>)
 #include <optional>
-namespace {
-  template <typename T> using optional = std::optional<T>;
-}
 #else
 #include <experimental/optional>
-namespace {
+#endif
+
+namespace ketcpp::wrapper::matrix {
+#if __has_include(<optional>)
+  template <typename T> using optional = std::optional<T>;
+#else
   template <typename T>
   struct optional : public std::experimental::optional<T> {
     using std::experimental::optional<T>::optional;
     bool has_value() { return static_cast<bool>(*this); }
   };
-}
 #endif
 
-namespace ketcpp::wrapper::matrix {
   template <typename T> class MatrixBase;
   template <typename T> class Matrix {
   private:
@@ -51,6 +51,7 @@ namespace ketcpp::wrapper::matrix {
     unique_ptr base;
 
   public:
+    typedef T value_type;
     Matrix(const Matrix &src) : base(src.base->copy()) {}
     Matrix(const Base &src) : base(src.copy()) {}
     Matrix(Matrix &&src) : base(std::move(src.base)) {}
@@ -92,7 +93,6 @@ namespace ketcpp::wrapper::matrix {
       return *this;
     }
 
-    typedef T value_type;
     typedef typename MatrixBase<T>::iterator iterator;
     typedef typename MatrixBase<T>::const_iterator const_iterator;
 
@@ -115,14 +115,15 @@ namespace ketcpp::wrapper::matrix {
 
   template <typename T> class MatrixBase {
   public:
-    typedef T value_type;
-
     virtual size_t get_num_rows() const = 0;
     virtual size_t get_num_columns() const = 0;
     virtual size_t get_row_size() const = 0;
     virtual size_t get_column_size() const = 0;
     virtual T &at(size_t irow, size_t icol) = 0;
     virtual T at(size_t irow, size_t icol) const = 0;
+    auto dimension() const {
+      return std::make_pair(get_num_rows(), get_num_columns());
+    }
     size_t size() const { return get_num_rows() * get_num_columns(); }
 
     template <typename F, typename R = typename std::result_of_t<
@@ -157,6 +158,13 @@ namespace ketcpp::wrapper::matrix {
           lmd(i, j);
         }
       }
+    }
+
+    MatrixBase &operator=(const MatrixBase &rhs) {
+      assert(this->dimension() == rhs.dimension());
+      for_each(
+          [this, &rhs](size_t i, size_t j) { this->at(i, j) = rhs.at(i, j); });
+      return *this;
     }
 
     Matrix<T> operator+(const MatrixBase &rhs) const {
