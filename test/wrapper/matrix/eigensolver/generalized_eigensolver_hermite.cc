@@ -72,6 +72,23 @@ go_bandit([] {
 
         AssertThat(vectors, EqualsContainer(correct_vectors, within_delta));
       });
+
+      it("should return solution for the generalized eigenproblem", [&a, &b] {
+        GEH solver(a, b);
+#ifdef __cpp_structured_bindings
+        auto[values, vectors] = solver.solve();
+#else
+        auto pair = solver.solve();
+        auto values = pair.first;
+        auto vectors = pair.last;
+#endif
+        auto diag = make_diagonal_matrix(values.cbegin(), values.cend());
+        auto with_delta = [](float a, float b) {
+          return std::abs(a - b) < 1e-6;
+        };
+        AssertThat(a * vectors,
+                   EqualsContainer(b * vectors * diag, with_delta));
+      });
     });
   });
 });
