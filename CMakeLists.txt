@@ -44,12 +44,17 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 find_package(PkgConfig)
-pkg_check_modules(EIGEN3_PC eigen3)
-if(EIGEN3_PC_FOUND)
-  set(EIGEN3_INCLUDE_DIR ${EIGEN3_PC_INCLUDE_DIRS})
-endif(EIGEN3_PC_FOUND)
+
 find_package(Eigen3)
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+if(EIGEN3_FOUND)
+	include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+else(EIGEN3_FOUND)
+	pkg_check_modules(EIGEN3_PC eigen3)
+	if(EIGEN3_PC_FOUND)
+		set(EIGEN3_INCLUDE_DIR ${EIGEN3_PC_INCLUDE_DIRS})
+		include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+	endif(EIGEN3_PC_FOUND)
+endif(EIGEN3_FOUND)
 
 file(GLOB_RECURSE SRCS src/*.cc)
 

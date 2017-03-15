@@ -49,6 +49,6 @@ namespace ketcpp::wrapper::matrix {
   };
 
   template <typename T> Matrix<T> MatrixBase<T>::transpose() const {
-    return MatrixTransposed(this->copy());
+    return MatrixTransposed<T>(this->copy());
   }
 }

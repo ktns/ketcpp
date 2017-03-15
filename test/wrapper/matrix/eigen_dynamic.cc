@@ -397,6 +397,41 @@ go_bandit([] {
           matrix1 must equal(matrix2);
         });
       });
+
+      describe("(Matrix)", [] {
+        auto matrix_a = make_dummy_matrix<float>(), matrix_b = matrix_a,
+             matrix_c = matrix_a, matrix_d = matrix_a;
+        before_each([&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
+          matrix_a = MatrixEigen<float>({{-1, 2}, {3, -1}, {0, 3}});
+          matrix_b = MatrixEigen<float>({{1, 1, 3}, {-1, 1, 0}});
+          matrix_c = MatrixEigen<float>({{-3, 1, -3}, {4, 2, 9}, {-3, 3, 0}});
+          matrix_d = MatrixEigen<float>({{2, 10}, {4, -3}});
+        });
+        it("should return a correct matrix product",
+           [&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
+             (matrix_a * matrix_b) must equal(matrix_c);
+             (matrix_b * matrix_a) must equal(matrix_d);
+           });
+        it("should return a correct matrix product for transposed matrices",
+           [&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
+             (matrix_a->transpose() * matrix_b->transpose())
+                 must equal(matrix_d->transpose());
+             (matrix_b->transpose() * matrix_a->transpose())
+                 must equal(matrix_c->transpose());
+           });
+        it("should not change elements", [&matrix_a, &matrix_b] {
+          auto matrix_a2 = matrix_a;
+          auto matrix_b2 = matrix_b;
+          matrix_a must equal(matrix_a2);
+          matrix_b must equal(matrix_b2);
+          matrix_a *matrix_b;
+          matrix_a must equal(matrix_a2);
+          matrix_b must equal(matrix_b2);
+          matrix_a *matrix_b;
+          matrix_a must equal(matrix_a2);
+          matrix_b must equal(matrix_b2);
+        });
+      });
     });
 
     describe("::operator/", [&matrix1, &matrix2] {

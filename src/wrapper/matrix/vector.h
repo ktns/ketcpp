@@ -84,11 +84,16 @@ namespace ketcpp::wrapper::matrix {
       auto *prhs = dynamic_cast<const MatrixVector *>(&rhs);
       if (prhs == nullptr)
         return Base::operator==(rhs);
-      else
-        return this->get_row_size() == prhs->get_row_size() &&
-               this->get_column_size() == prhs->get_column_size() &&
-               std::equal(this->storage.cbegin(), this->storage.cend(),
-                          prhs->storage.cbegin());
+      else {
+        const size_t mlhs = this->get_num_rows(),
+                     nlhs = this->get_num_columns(),
+                     mrhs = prhs->get_num_rows(),
+                     nrhs = prhs->get_num_columns();
+        const bool equals =
+            std::equal(this->storage.cbegin(), this->storage.cend(),
+                       prhs->storage.cbegin());
+        return (mlhs == mrhs) && (nlhs == nrhs) && equals;
+      }
     }
 
     Base &operator+=(const Base &rhsbase) override {
