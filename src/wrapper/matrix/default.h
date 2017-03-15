@@ -54,7 +54,7 @@ namespace ketcpp {
         return std::move(Matrix<T>(std::move(ptr)));
       }
 
-      template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n = 0) {
+      template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n) {
         if (n == 0)
           n = m;
         assert(n > 0 && m > 0);

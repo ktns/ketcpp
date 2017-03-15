@@ -71,6 +71,7 @@ namespace ketcpp::wrapper::matrix {
 
     Matrix operator+(const Base &rhs) const { return *base + rhs; }
     Matrix operator-(const Base &rhs) const { return *base - rhs; }
+    Matrix operator*(const Base &rhs) const { return *base * rhs; }
     Matrix operator*(T rhs) const { return *base * rhs; }
     Matrix operator/(T rhs) const { return *base / rhs; }
 
@@ -109,6 +110,8 @@ namespace ketcpp::wrapper::matrix {
   std::ostream &operator<<(std::ostream &ost, const Matrix<T> &matrix) {
     return ost << static_cast<const MatrixBase<T> &>(matrix);
   }
+
+  template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n = 0);
 
   template <typename T> class MatrixBase {
   public:
@@ -176,6 +179,18 @@ namespace ketcpp::wrapper::matrix {
       static_cast<MatrixBase<T> &>(res) /= rhs;
       return res;
     }
+    virtual Matrix<T> operator*(const MatrixBase &rhs) const {
+      assert(this->get_num_columns() == rhs.get_num_rows());
+      const size_t l = this->get_num_columns(), m = this->get_num_rows(),
+                   n = rhs.get_num_columns();
+      auto res = make_zero_matrix<T>(m, n);
+      res->for_each([this, &rhs, &res, l](size_t i, size_t j) {
+        for (size_t k = 0; k < l; k++) {
+          res->at(i, j) += this->at(i, k) * rhs.at(k, j);
+        }
+      });
+      return res;
+    }
 
     virtual MatrixBase &operator+=(const MatrixBase &rhs) {
       for_each(
@@ -219,6 +234,7 @@ namespace ketcpp::wrapper::matrix {
 
   private:
     class reflist_t : private std::list<std::reference_wrapper<T>> {
+
     private:
       using base_t = std::list<std::reference_wrapper<T>>;
       template <typename Iter>
