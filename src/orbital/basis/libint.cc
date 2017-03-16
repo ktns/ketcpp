@@ -65,6 +65,7 @@ namespace {
   template <> void set_param(libint2::Engine &, std::nullptr_t) {}
 }
 
+//! @cond PRIVATE
 class Libint2Basis::Impl {
   friend Libint2Basis;
 
@@ -193,6 +194,7 @@ private:
     return fock;
   }
 };
+//! @endcond
 
 // Libint2Basis::Libint2Basis(const std::string &xyz_file,
 //                           const std::string &basisset_name)

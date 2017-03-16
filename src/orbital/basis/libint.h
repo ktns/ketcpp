@@ -38,29 +38,53 @@ namespace ketcpp {
       using pointcharge_t = ketcpp::wrapper::molecule::pointcharge_t;
       using atom_t = ketcpp::wrapper::molecule::atom_t;
 
+      //! Represents the basis of LCAO gaussian orbitals for a molecule and
+      //! computes integrals via libint2.
       class Libint2Basis {
       private:
+        //! @cond PRIVATE
         class Impl;
         std::unique_ptr<Impl> impl;
+        //! @endcond
 
       public:
         //// for test
         // Libint2Basis(const std::string &xyz_file,
         //             const std::string &basisset_name);
 
+        //! @brief Initialize a basis object for a molecule
+        //! @param[in] mol A molecule
+        //! @param[in] basisset_name Specify the basisset to be used by the name
+        //! @todo Implement a parser for basisset definition files
         Libint2Basis(const wrapper::molecule::Base &mol,
                      const std::string &basisset_name);
 
         ~Libint2Basis();
 
         typedef wrapper::matrix::Matrix<double> matrix_t;
+        //! @return Overlap matrix of basis functions.
         matrix_t get_overlap();
+        //! @return Kinetic energy matrix of basis functions.
         matrix_t get_kinetic();
+        //! @return Nuclear attraction energy matrix of basis functions.
+        //! @details Uses atoms in the molecule passed by initializer.
         matrix_t get_nuclear();
+        //! @return Nuclear attraction energy matrix of basis functions.
+        //! @details Uses atoms or point-charges in the passed vector.
+        //! @note Atoms specified during initialization will be ignored.
         matrix_t get_nuclear(const std::vector<pointcharge_t> &charges);
+        //! Compute the electron repulsion energy part of the Fock matrix for
+        //! the specified electron population.
+        //! @param[in,out] fock The matrix to add up electron repulsion matrix
+        //! @param[in] density The population matrix of electrons
+        //! @return A reference to @p fock
         matrix_t &add_rhf_electron_repulsion(matrix_t &fock,
                                              const matrix_t &density);
         template <typename... Args>
+        //! Compute the Fock matrix for the specified electron population.
+        //! @param[in] density The population matrix of electrons
+        //! @param[in] args Parameters to be passed to \p get_nuclear(args)
+        //! @return Fock matrix
         matrix_t get_rhf_fock(const matrix_t &density, Args... args) {
           auto fock = get_kinetic() + get_nuclear(args...);
           return add_rhf_electron_repulsion(fock, density);
