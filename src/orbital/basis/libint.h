@@ -28,10 +28,14 @@
 #include <vector>
 
 #include "wrapper/matrix/matrix.h"
+#include "wrapper/molecule/base.h"
 
 namespace ketcpp {
   namespace orbital {
     namespace basis {
+      using pointcharge_t = ketcpp::wrapper::molecule::pointcharge_t;
+      using atom_t = ketcpp::wrapper::molecule::atom_t;
+
       class Libint2Basis {
       private:
         class Impl;
@@ -42,16 +46,6 @@ namespace ketcpp {
                      const std::string &basisset_name);
         ~Libint2Basis();
 
-        struct pointcharge_t {
-          double x, y, z, charge;
-          pointcharge_t(
-              const std::tuple<double, double, double, double> &tuple) {
-            std::tie(x, y, z, charge) = tuple;
-          }
-          operator std::tuple<double, double, double, double>() {
-            return std::make_tuple(x, y, z, charge);
-          }
-        };
         typedef wrapper::matrix::Matrix<double> matrix_t;
         matrix_t get_overlap();
         matrix_t get_kinetic();
