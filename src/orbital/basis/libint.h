@@ -73,6 +73,23 @@ namespace ketcpp {
         //! @details Uses atoms or point-charges in the passed vector.
         //! @note Atoms specified during initialization will be ignored.
         matrix_t get_nuclear(const std::vector<pointcharge_t> &charges);
+        //! @return Nuclear attraction energy matrix of basis functions.
+        //! @tparam Iter Iterator over point-charges.
+        //! @note Atoms specified during initialization will be ignored.
+        template <typename Iter>
+        std::enable_if_t<std::is_convertible_v<
+                             typename std::iterator_traits<Iter>::value_type,
+                             const pointcharge_t &>,
+                         matrix_t>
+        get_nuclear(Iter begin, Iter end) {
+          std::vector<pointcharge_t> charges;
+          if (std::is_base_of_v<
+                  std::forward_iterator_tag,
+                  typename std::iterator_traits<Iter>::iterator_category>)
+            charges.reserve(std::distance(begin, end));
+          std::copy(begin, end, std::back_inserter(charges));
+          this->get_nuclear(charges);
+        }
         //! Compute the electron repulsion energy part of the Fock matrix for
         //! the specified electron population.
         //! @param[in,out] fock The matrix to add up electron repulsion matrix
