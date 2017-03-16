@@ -62,7 +62,7 @@ namespace ketcpp {
                                              const matrix_t &density);
         template <typename... Args>
         matrix_t get_rhf_fock(const matrix_t &density, Args... args) {
-          auto fock = get_kinetic(args...) + get_nuclear();
+          auto fock = get_kinetic() + get_nuclear(args...);
           return add_rhf_electron_repulsion(fock, density);
         }
       };

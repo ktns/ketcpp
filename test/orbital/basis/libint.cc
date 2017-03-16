@@ -169,12 +169,28 @@ go_bandit([] {
     });
 
     describe("::get_rhf_fock", [&] {
-      it("Should return correct fock matrix", [&] {
-        auto fock = basis->get_rhf_fock(density);
-        auto within_delta = [](double a, double b) -> bool {
-          return std::abs(a - b) < 1e-5;
-        };
-        AssertThat(fock, EqualsContainer(correct_fock, within_delta));
+      describe("()", [&] {
+        it("Should return correct fock matrix", [&] {
+          auto fock = basis->get_rhf_fock(density);
+          auto within_delta = [](double a, double b) -> bool {
+            return std::abs(a - b) < 1e-5;
+          };
+          AssertThat(fock, EqualsContainer(correct_fock, within_delta));
+        });
+      });
+
+      describe("(std::vector<pointcharge_t>)", [&] {
+        it("Should return correct fock matrix", [&] {
+          FixtureH2O mol;
+          std::vector<pointcharge_t> charges;
+          std::copy(mol.atoms().cbegin(), mol.atoms().cend(),
+                    std::back_inserter(charges));
+          auto fock = basis->get_rhf_fock(density, charges);
+          auto within_delta = [](double a, double b) -> bool {
+            return std::abs(a - b) < 1e-5;
+          };
+          AssertThat(fock, EqualsContainer(correct_fock, within_delta));
+        });
       });
     });
   });
