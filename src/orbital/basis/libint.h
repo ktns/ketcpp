@@ -23,8 +23,10 @@
 
 #ifdef LIBINT2_FOUND
 
+#include <iterator>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include "wrapper/matrix/matrix.h"
@@ -42,8 +44,13 @@ namespace ketcpp {
         std::unique_ptr<Impl> impl;
 
       public:
-        Libint2Basis(const std::string &xyz_file,
+        //// for test
+        // Libint2Basis(const std::string &xyz_file,
+        //             const std::string &basisset_name);
+
+        Libint2Basis(const wrapper::molecule::Base &mol,
                      const std::string &basisset_name);
+
         ~Libint2Basis();
 
         typedef wrapper::matrix::Matrix<double> matrix_t;

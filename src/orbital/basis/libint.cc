@@ -70,19 +70,45 @@ class Libint2Basis::Impl {
 
 private:
   std::shared_ptr<const Libint2Resource> resource;
-  std::unique_ptr<libint2::BasisSet> basis;
   std::vector<libint2::Atom> atoms;
+  std::unique_ptr<libint2::BasisSet> basis;
   size_t basis_size;
   std::vector<size_t> shell2bf;
-  Impl(const std::string &xyz_file_name, const std::string &basisset_name) {
-    resource = Libint2Resource::acquire_resource();
-    std::ifstream xyz_file(xyz_file_name);
-    atoms = libint2::read_dotxyz(xyz_file);
+  //// for test
+  // Impl(const std::string &xyz_file_name, const std::string &basisset_name) {
+  //  resource = Libint2Resource::acquire_resource();
+  //  std::ifstream xyz_file(xyz_file_name);
+  //  atoms = libint2::read_dotxyz(xyz_file);
+  //  auto coutbuf = std::cout.rdbuf();
+  //  struct nullbuf_t : public std::streambuf {
+  //    int overflow(int c) override { return c; }
+  //  } nullbuf;
+  //  std::cout.rdbuf(&nullbuf);
+  //  basis = std::make_unique<libint2::BasisSet>(basisset_name, atoms);
+  //  std::cout.rdbuf(coutbuf);
+  //  basis_size = basis->nbf();
+  //  shell2bf = basis->shell2bf();
+  //}
+  template <typename Iter>
+  Impl(Iter begin, Iter end,
+       std::enable_if_t<
+           std::is_convertible_v<
+               std::decay_t<typename std::iterator_traits<Iter>::value_type>,
+               atom_t>,
+           const std::string &>
+           basisset_name) {
+    std::transform(begin, end, std::back_inserter(atoms),
+                   [](const atom_t &a) -> libint2::Atom {
+                     libint2::Atom o;
+                     std::tie(o.x, o.y, o.z, o.atomic_number) = a;
+                     return o;
+                   });
     auto coutbuf = std::cout.rdbuf();
     struct nullbuf_t : public std::streambuf {
       int overflow(int c) override { return c; }
     } nullbuf;
     std::cout.rdbuf(&nullbuf);
+    resource = Libint2Resource::acquire_resource();
     basis = std::make_unique<libint2::BasisSet>(basisset_name, atoms);
     std::cout.rdbuf(coutbuf);
     basis_size = basis->nbf();
@@ -168,9 +194,15 @@ private:
   }
 };
 
-Libint2Basis::Libint2Basis(const std::string &xyz_file,
+// Libint2Basis::Libint2Basis(const std::string &xyz_file,
+//                           const std::string &basisset_name)
+//    : impl(new Impl(xyz_file, basisset_name)) {}
+// Libint2Basis::~Libint2Basis() {}
+
+Libint2Basis::Libint2Basis(const wrapper::molecule::Base &mol,
                            const std::string &basisset_name)
-    : impl(new Impl(xyz_file, basisset_name)) {}
+    : impl(new Impl(mol.atoms().cbegin(), mol.atoms().cend(), basisset_name)) {}
+
 Libint2Basis::~Libint2Basis() {}
 
 matrix_t Libint2Basis::get_overlap() {

@@ -31,17 +31,19 @@
 #include "orbital/basis/libint.h"
 #include "wrapper/matrix/default.h"
 #include "wrapper/matrix/dummy.h"
+#include "wrapper/molecule/fixture.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp;
 using namespace ketcpp::wrapper::matrix;
+using namespace ketcpp::wrapper::molecule;
 using namespace ketcpp::orbital::basis;
 
 typedef typename Libint2Basis::matrix_t matrix_t;
 
 go_bandit([] {
-  describe("orbital::basisset::Libint2Basis", [] {
+  describe("Libint2Basis", [] {
     std::unique_ptr<Libint2Basis> basis;
     matrix_t correct_overlap = make_dummy_matrix<double>(),
              correct_kinetic = correct_overlap,
@@ -49,7 +51,8 @@ go_bandit([] {
              correct_repulsion = correct_overlap, density = correct_overlap;
 
     before_each([&] {
-      basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
+      // basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
+      basis = std::make_unique<Libint2Basis>(FixtureH2O(), "STO-3G");
       correct_overlap = wrapper::matrix::make_symmetric_matrix<double>(
           {{+0.10000000e+01},
            {+0.23670392e+00, +0.10000000e+01},
@@ -120,7 +123,7 @@ go_bandit([] {
       libint2::initialized() must be_truthy;
       basis.reset();
       libint2::initialized() must be_falsy;
-      basis = std::make_unique<Libint2Basis>(FIXTURE_PATH_H2O_XYZ, "STO-3G");
+      basis = std::make_unique<Libint2Basis>(FixtureH2O(), "STO-3G");
       libint2::initialized() must be_truthy;
     });
 
