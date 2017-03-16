@@ -216,7 +216,16 @@ matrix_t Libint2Basis::get_nuclear() {
                               make_point_charges(impl->atoms));
 }
 matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
-  return impl->get_1el_matrix(libint2::Operator::nuclear, charges);
+  decltype(libint2::make_point_charges(impl->atoms)) libint2_charges;
+  libint2_charges.reserve(charges.size());
+  std::transform(charges.cbegin(), charges.cend(),
+                 std::back_inserter(libint2_charges),
+                 [](const pointcharge_t c) {
+                   std::array<double, 3> coord = {{c.x(), c.y(), c.z()}};
+                   return std::make_pair(c.q(), coord);
+                 });
+  assert(libint2_charges.size() == charges.size());
+  return impl->get_1el_matrix(libint2::Operator::nuclear, libint2_charges);
 }
 
 matrix_t &Libint2Basis::add_rhf_electron_repulsion(matrix_t &fock,
