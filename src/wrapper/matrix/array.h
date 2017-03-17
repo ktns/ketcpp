@@ -88,15 +88,13 @@ namespace ketcpp::wrapper::matrix {
   public:
     using MatrixArrayCore<T, m, n>::MatrixArrayCore;
 
-    bool operator==(const Base &rhs) const override {
+    bool operator!=(const Base &rhs) const override {
       auto *prhs = dynamic_cast<const MatrixArray *>(&rhs);
       if (prhs == nullptr)
-        return Base::operator==(rhs);
+        return Base::operator!=(rhs);
       else
-        return
-
-            std::equal(this->storage.cbegin(), this->storage.cend(),
-                       prhs->storage.cbegin());
+        return !std::equal(this->storage.cbegin(), this->storage.cend(),
+                           prhs->storage.cbegin());
     }
 
     Base &operator+=(const Base &rhsbase) override {
