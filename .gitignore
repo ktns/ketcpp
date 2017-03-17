@@ -1,6 +1,8 @@
+/*_cotire.cmake
 /Doxyfile
 /Makefile
 /Testing/
+/cotire/
 /doc/
 /ket_cpp
 /lcov/

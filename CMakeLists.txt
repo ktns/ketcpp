@@ -96,6 +96,11 @@ configure_file(
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
 
+if(${COTIRE_CMAKE_MODULE_VERSION} VERSION_GREATER "1.7.2.99")
+	cotire(run_tests)
+	cotire(ket_cpp)
+endif(${COTIRE_CMAKE_MODULE_VERSION} VERSION_GREATER "1.7.2.99")
+
 list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/extlib/*'" "'${PROJECT_SOURCE_DIR}/test/*'")
 add_coverage(run_tests)
 coverage_evaluate()
