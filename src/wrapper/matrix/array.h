@@ -30,15 +30,21 @@
 #include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
+  //! @brief Matrix instance using std::array as its storage.
+  //! @note No specializations are made for testing purpose.
   template <typename T, size_t m, size_t n = m>
   class MatrixArrayCore : public MatrixBase<T> {
   protected:
+    //! @cond PRIVATE
     using array = std::array<T, m * n>;
     array storage;
     using Base = MatrixBase<T>;
+    //! @endcond
 
   public:
+    //! Number of rows in matrices
     constexpr static size_t num_rows = m;
+    //! Number of rows in matrices
     constexpr static size_t num_columns = n;
     constexpr static size_t row_size = n;
     constexpr static size_t column_size = m;
@@ -52,6 +58,7 @@ namespace ketcpp::wrapper::matrix {
       return storage[i * num_columns + j];
     }
 
+    //! Construction by nested initalizer list
     MatrixArrayCore(const std::initializer_list<std::initializer_list<T>> &list)
         : storage() {
       auto dest = storage.begin();
@@ -60,12 +67,16 @@ namespace ketcpp::wrapper::matrix {
         dest = std::copy(i.begin(), end, dest);
       }
     }
+    //! Construction by flat initializer list
     MatrixArrayCore(const std::initializer_list<T> &list) : storage() {
       auto end = std::min(list.begin() + this->size(), list.end());
       std::copy(list.begin(), end, storage.begin());
     }
+    //! Default constructor
     MatrixArrayCore() = default;
+    //! Copy constructor
     MatrixArrayCore(const MatrixArrayCore &other) = default;
+    //! Assignment operator
     MatrixArrayCore &operator=(const MatrixArrayCore &other) {
       storage = other.storage;
       return *this;
@@ -80,6 +91,7 @@ namespace ketcpp::wrapper::matrix {
     virtual ~MatrixArrayCore() override {}
   };
 
+  //! Matrix instance using std::array as its storage.
   template <typename T, size_t m, size_t n = m>
   class MatrixArray : public MatrixArrayCore<T, m, n> {
   private:
@@ -88,6 +100,7 @@ namespace ketcpp::wrapper::matrix {
   public:
     using MatrixArrayCore<T, m, n>::MatrixArrayCore;
 
+    //! Inequality operator
     bool operator!=(const Base &rhs) const override {
       auto *prhs = dynamic_cast<const MatrixArray *>(&rhs);
       if (prhs == nullptr)
@@ -97,6 +110,7 @@ namespace ketcpp::wrapper::matrix {
                            prhs->storage.cbegin());
     }
 
+    //! Addition assignment operator
     Base &operator+=(const Base &rhsbase) override {
       auto *prhs = dynamic_cast<const MatrixArray *>(&rhsbase);
       if (prhs == nullptr)
@@ -107,6 +121,7 @@ namespace ketcpp::wrapper::matrix {
       return *this;
     }
 
+    //! Subtraction assignment operator
     Base &operator-=(const Base &rhsbase) override {
       auto *prhs = dynamic_cast<const MatrixArray *>(&rhsbase);
       if (prhs == nullptr)
@@ -117,6 +132,8 @@ namespace ketcpp::wrapper::matrix {
       return *this;
     }
 
+    //! @brief Multiplication assignment operator with a scalar
+    //! @post All elements of the matrix are scaled by a scalar
     Base &operator*=(T rhs) override {
       std::transform(this->storage.cbegin(), this->storage.cend(),
                      this->storage.begin(),

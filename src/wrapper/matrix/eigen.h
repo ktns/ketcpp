@@ -19,7 +19,9 @@
 
 #pragma once
 
-#if __has_include("Eigen/Dense")
+#include "config/ketcpp_config.h"
+
+#ifdef EIGEN3_FOUND
 
 #include "wrapper/matrix/eigen_constant.h"
 #include "wrapper/matrix/eigen_dynamic.h"

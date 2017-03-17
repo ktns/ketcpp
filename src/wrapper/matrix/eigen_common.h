@@ -19,7 +19,9 @@
 
 #pragma once
 
-#if __has_include("Eigen/Dense")
+#include "config/ketcpp_config.h"
+
+#ifdef EIGEN3_FOUND
 
 #include <type_traits>
 
@@ -28,20 +30,30 @@
 #include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
+  //! Whether MatrixEigen is implemented
   constexpr bool MatrixEigenImplemented = true;
+  //! Common underlying class for matrix instances using Eigen3
   template <typename T> class MatrixEigenCommon : public MatrixBase<T> {
   public:
+    //! Dynamic-size and row-major ordered Eigen::Matrix
     typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
                           Eigen::StorageOptions::RowMajor>
         EigenBase;
+    //! Reference to Eigen::Matrix
     typedef Eigen::Ref<EigenBase> common_matrix_ref;
+    //! Constant reference to Eigen::Matrix
     typedef Eigen::Ref<const EigenBase> const_common_matrix_ref;
+    //! Returns a reference to an underlying Eigen::Matrix
     virtual common_matrix_ref matrix_instance() = 0;
+    //! Returns a constant reference to an underlying Eigen::Matrix
     virtual const_common_matrix_ref matrix_instance() const = 0;
 
+    //! Base matrix class
     using Base = MatrixBase<T>;
+    //! Base matrix class for matrices using Eigen
     using Common = MatrixEigenCommon<T>;
 
+    //! Assignment operator
     MatrixEigenCommon &operator=(const MatrixEigenCommon &other) {
       this->matrix_instance() = other.matrix_instance();
       return *this;

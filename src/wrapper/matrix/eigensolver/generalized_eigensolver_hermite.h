@@ -69,7 +69,7 @@ namespace ketcpp::wrapper::matrix::eigensolver {
       if
         constexpr(ketcpp::wrapper::matrix::MatrixEigenImplemented) {
 #endif
-#if defined(__cpp_if_constexpr) || __has_include("Eigen/Core")
+#if defined(__cpp_if_constexpr) || defined(EIGEN3_FOUND)
           if (dynamic_cast<const MatrixEigenCommon<T> *>(&a) == nullptr)
             return GeneralizedEigensolverHermite<T>(MatrixEigen<T>(a), b)
                 .solve();

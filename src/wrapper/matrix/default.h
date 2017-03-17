@@ -29,6 +29,9 @@
 #include "wrapper/matrix/vector.h"
 
 namespace ketcpp::wrapper::matrix {
+  //! Factory method that creates an instance of default implementation of
+  //! a fixed-size matrix.
+  //! @param [in] list Nested initializer list
   template <typename T, size_t m, size_t n = m>
   Matrix<T> make_matrix(std::initializer_list<std::initializer_list<T>> list) {
     std::unique_ptr<MatrixBase<T>> ptr;
@@ -36,6 +39,9 @@ namespace ketcpp::wrapper::matrix {
     return std::move(Matrix<T>(std::move(ptr)));
   }
 
+  //! Factory method that creates an instance of default implementation of
+  //! a fixed-size matrix.
+  //! @param [in] list Non-nested initializer list
   template <typename T, size_t m, size_t n = m>
   Matrix<T> make_matrix(std::initializer_list<T> list) {
     std::unique_ptr<MatrixBase<T>> ptr;
@@ -43,6 +49,9 @@ namespace ketcpp::wrapper::matrix {
     return std::move(Matrix<T>(std::move(ptr)));
   }
 
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size matrix.
+  //! @param [in] list Nested initializer list
   template <typename T>
   Matrix<T> make_matrix(std::initializer_list<std::initializer_list<T>> list) {
     std::unique_ptr<MatrixBase<T>> ptr;
@@ -50,6 +59,10 @@ namespace ketcpp::wrapper::matrix {
     return std::move(Matrix<T>(std::move(ptr)));
   }
 
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size zero-matrix.
+  //! @param [in] m Number of rows in a matrix
+  //! @param [in] n Number of columns in a matrix
   template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n) {
     if (n == 0)
       n = m;
@@ -59,6 +72,10 @@ namespace ketcpp::wrapper::matrix {
     return Matrix<T>(std::move(ptr));
   }
 
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size symmetric matrix.
+  //! @param [in] list Nested initializer list that contains lower
+  //! triangular elements of the matrix in the row-major order.
   template <typename T>
   Matrix<T>
   make_symmetric_matrix(std::initializer_list<std::initializer_list<T>> list) {
@@ -76,12 +93,19 @@ namespace ketcpp::wrapper::matrix {
     return Matrix<T>(std::move(ptr));
   }
 
+  //! @brief Metafunction that transform an iterator type to a matrix type.
+  //! @tparam Iter An iterator type over the type of elements in the matrix.
+  //! @pre @p Iter is an input iterator.
   template <typename Iter>
   using matrix_from_input_iterator_t = std::enable_if_t<
       std::is_base_of_v<std::input_iterator_tag,
                         typename std::iterator_traits<Iter>::iterator_category>,
       Matrix<std::decay_t<typename std::iterator_traits<Iter>::value_type>>>;
 
+  //! @brief Factory method that creates an instance of default implementation
+  //! of a dynamic-size diagonal matrix.
+  //! @param [in] begin,end iterators that iterates over diagonal elements
+  //! of the matrix.
   template <typename Iter>
   matrix_from_input_iterator_t<Iter> make_diagonal_matrix(Iter begin,
                                                           Iter end) {
@@ -108,6 +132,10 @@ namespace ketcpp::wrapper::matrix {
     }
   }
 
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size diagonal matrix.
+  //! @param [in] list Nested initializer list that contains lower
+  //! triangular elements of the matrix in the row-major order.
   template <typename T>
   Matrix<T> make_diagonal_matrix(std::initializer_list<T> list) {
     return make_diagonal_matrix(list.begin(), list.end());

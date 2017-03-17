@@ -19,16 +19,18 @@
 
 #pragma once
 
-#if __has_include("Eigen/Dense")
+#include "config/ketcpp_config.h"
+
+#ifdef EIGEN3_FOUND
 
 #include <type_traits>
 
 #include "wrapper/matrix/eigen_constant.h"
 
 namespace ketcpp::wrapper::matrix {
+  //! Matrix instance using dynamic-size Eigen::Matrix as underlying matrix
   template <typename T>
   class MatrixEigen<T, 0, 0> : public MatrixEigenCommon<T> {
-    // This difinition is for variable sized matrix.
 
   private:
     typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic,
@@ -53,6 +55,7 @@ namespace ketcpp::wrapper::matrix {
     T at(size_t i, size_t j) const override { return matrix(i, j); }
 
   private:
+    //! @return Maximum length in inner lists
     static size_t
     max_size(const std::initializer_list<std::initializer_list<T>> &list) {
       const auto max_size_element =
@@ -63,7 +66,11 @@ namespace ketcpp::wrapper::matrix {
     }
 
   public:
+    //! @brief Initialize a matrix to specified size
+    //! @post Constructed matrix is a zero-matrix with a dimension @p m,n
     MatrixEigen(size_t m, size_t n = 0) : matrix(m, n == 0 ? m : n) {}
+
+    //! @brief Initialize a matrix with nested list
     MatrixEigen(const std::initializer_list<std::initializer_list<T>> &list) {
       size_t m = list.size(), n = max_size(list);
       matrix.resize(m, n);
@@ -74,6 +81,7 @@ namespace ketcpp::wrapper::matrix {
       }
     }
 
+    //! Copy constructor
     MatrixEigen(const MatrixEigen &from) : matrix(from.matrix){};
     std::unique_ptr<Base> copy() const override {
       std::unique_ptr<Base> copy;
@@ -81,11 +89,14 @@ namespace ketcpp::wrapper::matrix {
       return copy;
     }
 
+    //! Copy constructor
     MatrixEigen(const Base &from)
         : matrix(from.get_num_rows(), from.get_num_columns()) {
       this->Base::operator=(from);
     }
 
+    //! Copy constructor
+    //! @param from A reference to an underlying Eigen::Matrix
     MatrixEigen(const const_common_matrix_ref &from) : matrix(from) {}
   };
 }

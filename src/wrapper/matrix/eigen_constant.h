@@ -19,7 +19,9 @@
 
 #pragma once
 
-#if __has_include("Eigen/Dense")
+#include "config/ketcpp_config.h"
+
+#ifdef EIGEN3_FOUND
 
 #include <cassert>
 #include <type_traits>
@@ -27,9 +29,9 @@
 #include "wrapper/matrix/eigen_common.h"
 
 namespace ketcpp::wrapper::matrix {
+  //! Matrix instance using fixed-size Eigen::Matrix as underlying matrix
   template <typename T, size_t Rows = 0, size_t Cols = Rows>
   class MatrixEigen : public MatrixEigenCommon<T> {
-    // This difinition is for constant sized matrix.
     static_assert(Rows > 0 && Cols > 0);
 
   private:
@@ -43,7 +45,9 @@ namespace ketcpp::wrapper::matrix {
     const_common_matrix_ref matrix_instance() const override { return matrix; }
 
   public:
+    //! Number of rows in matrices
     constexpr static size_t num_rows = Rows;
+    //! Number of columns in matrices
     constexpr static size_t num_columns = Cols;
     constexpr static size_t row_size = Cols;
     constexpr static size_t column_size = Rows;
@@ -56,13 +60,23 @@ namespace ketcpp::wrapper::matrix {
     T at(size_t i, size_t j) const override { return matrix(i, j); }
 
   public:
+    //! @brief Default constructor
+    //! @post The constructed matrix is a zero-matrix.
     MatrixEigen() : matrix(matrix_t::Zero()){};
+    //! Initialize a matrix with flat list.
+    //! @param list A flat initializer list that contains elements in the
+    //! row-major order.
+
     MatrixEigen(const std::initializer_list<T> &list) {
       if (list.size() < this->size()) {
         throw std::logic_error("Too short initialization list!");
       }
       matrix = Eigen::Map<const matrix_t>(list.begin());
     }
+
+    //! Initialize a matrix with nested list.
+    //! @param list A nested initializer list that contains elements in the
+    //! row-major order.
     MatrixEigen(const std::initializer_list<std::initializer_list<T>> &list) {
       size_t i = 0;
       for (auto l : list) {
@@ -74,6 +88,8 @@ namespace ketcpp::wrapper::matrix {
       }
     }
 
+    //! @brief Copy constructor
+    //! @param from fixed-size or dynamic-size MatrixEigen
     MatrixEigen(const Common &from) : matrix(from.matrix_instance()) {
       assert(row_size == from.get_row_size() &&
              column_size == from.get_column_size());

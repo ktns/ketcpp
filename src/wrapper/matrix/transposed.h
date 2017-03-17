@@ -22,6 +22,7 @@
 #include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
+  //! Matrix instance that is a transpose matrix of another matrix instance.
   template <typename T> class MatrixTransposed : public MatrixBase<T> {
   private:
     using Base = MatrixBase<T>;

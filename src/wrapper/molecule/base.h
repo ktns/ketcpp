@@ -69,6 +69,7 @@ namespace ketcpp::wrapper::molecule {
     //! @brief Accessor to atomic_number
     auto atomic_number() const { return Z(); }
 
+    //! Initialize an atom with a coordinates with specified units
     atom_t(LengthUnit u, double x, double y, double z, unsigned int Z)
         : tuple(x * scale(u), y * scale(u), z * scale(u), Z) {}
   };

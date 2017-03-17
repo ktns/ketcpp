@@ -28,6 +28,7 @@
 #include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
+  //! Matrix instance using std::vector as its storage.
   template <typename T> class MatrixVector : public MatrixBase<T> {
   private:
     const size_t num_rows;
@@ -56,6 +57,7 @@ namespace ketcpp::wrapper::matrix {
     }
 
   public:
+    //! Initialize a matrix with a nested list
     MatrixVector(const std::initializer_list<std::initializer_list<T>> list)
         : num_rows(list.size()), num_columns(max_size(list)),
           storage(num_rows * num_columns) {
@@ -65,11 +67,16 @@ namespace ketcpp::wrapper::matrix {
         dest += row_size;
       }
     }
+    //! Initialize a square zero-matrix with dimension m*m
     MatrixVector(size_t m) : num_rows(m), num_columns(m), storage(m * m) {}
+    //! Initialize a zero-matrix with dimension m*n
     MatrixVector(size_t m, size_t n)
         : num_rows(m), num_columns(n), storage(m * n) {}
     MatrixVector() = delete;
+    //! Assignment operator
+    //! @pre @p this and @p other has the same dimension
     MatrixVector &operator=(const MatrixVector &other) {
+      assert(this->dimension() == other.dimension());
       storage = other.storage;
       return *this;
     }

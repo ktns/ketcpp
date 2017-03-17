@@ -17,7 +17,9 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if __has_include("Eigen/Dense")
+#include "config/ketcpp_config.h"
+
+#ifdef EIGEN3_FOUND
 
 #include <bandit/bandit.h>
 

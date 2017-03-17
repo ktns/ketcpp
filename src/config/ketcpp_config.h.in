@@ -17,4 +17,5 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#cmakedefine EIGEN3_FOUND
 #cmakedefine LIBINT2_FOUND
