@@ -43,7 +43,7 @@ if(DOXYGEN_FOUND)
 	add_custom_target(doc ${DOXYGEN_EXECUTABLE})
 endif(DOXYGEN_FOUND)
 
-find_package(PkgConfig)
+find_package(PkgConfig REQUIRED)
 
 find_package(Eigen3)
 if(EIGEN3_FOUND)
@@ -55,6 +55,20 @@ else(EIGEN3_FOUND)
 		include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 	endif(EIGEN3_PC_FOUND)
 endif(EIGEN3_FOUND)
+
+pkg_check_modules(LIBINT2 libint2)
+if(LIBINT2_FOUND)
+	include_directories(SYSTEM ${LIBINT2_INCLUDE_DIRS})
+	link_libraries(int2)
+	if(LIBINT2_VERSION VERSION_LESS "2.2")
+		MESSAGE(WARNING "Not using libint2 ${LIBINT2_VERSION} < 2.2")
+		unset(LIBINT2_FOUND CACHE)
+	endif()
+endif(LIBINT2_FOUND)
+
+configure_file(
+	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h.in
+	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h)
 
 file(GLOB_RECURSE SRCS src/*.cc)
 
@@ -72,6 +86,12 @@ if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.1)
 	target_compile_options(run_tests PUBLIC "-Wsuggest-override")
 endif(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.1)
 add_test(NAME run_tests COMMAND $<TARGET_FILE:run_tests> --reporter=spec)
+set(KETCPP_TEST_FIXTURE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/test/fixture")
+target_include_directories(run_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/test/")
+target_include_directories(run_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/test/")
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/test/config/ketcpp_test_config.h.in
+	${CMAKE_CURRENT_BINARY_DIR}/test/config/ketcpp_test_config.h)
 
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
 set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
