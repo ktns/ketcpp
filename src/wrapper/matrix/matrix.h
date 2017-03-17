@@ -232,12 +232,6 @@ namespace ketcpp::wrapper::matrix {
     virtual bool operator==(const MatrixBase &rhs) const {
       return !((*this) != rhs);
     }
-    bool operator!=(const Matrix<T> &rhs) const {
-      return (*this) != (*rhs.base.get());
-    }
-    bool operator==(const Matrix<T> &rhs) const {
-      return (*this) == (*rhs.base.get());
-    }
 
     virtual std::unique_ptr<MatrixBase> copy() const = 0;
 
