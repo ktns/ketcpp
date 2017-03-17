@@ -78,11 +78,9 @@ namespace ketcpp::wrapper::matrix {
 
   template <typename Iter>
   using matrix_from_input_iterator_t = std::enable_if_t<
-      std::is_base_of_v<
-          std::input_iterator_tag,
-          typename std::iterator_traits<Iter>::iterator_category> &&
-          std::is_arithmetic_v<typename std::iterator_traits<Iter>::value_type>,
-      Matrix<typename std::iterator_traits<Iter>::value_type>>;
+      std::is_base_of_v<std::input_iterator_tag,
+                        typename std::iterator_traits<Iter>::iterator_category>,
+      Matrix<std::decay_t<typename std::iterator_traits<Iter>::value_type>>>;
 
   template <typename Iter>
   matrix_from_input_iterator_t<Iter> make_diagonal_matrix(Iter begin,
