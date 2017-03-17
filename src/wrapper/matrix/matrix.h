@@ -255,11 +255,7 @@ namespace ketcpp::wrapper::matrix {
 
       public:
         typedef typename iterator_base_t<Iter>::difference_type difference_type;
-        typedef typename iterator_base_t<Iter>::value_type value_type;
-        typedef typename iterator_base_t<Iter>::pointer pointer;
         typedef typename iterator_base_t<Iter>::reference reference;
-        typedef
-            typename iterator_base_t<Iter>::iterator_category iterator_category;
 
         iterator_t() : iter() {}
         iterator_t(Iter iter) : iter(iter) {}
