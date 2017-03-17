@@ -28,82 +28,78 @@
 #include "wrapper/matrix/array.h"
 #include "wrapper/matrix/vector.h"
 
-namespace ketcpp {
-  namespace wrapper {
-    namespace matrix {
-      template <typename T, size_t m, size_t n = m>
-      Matrix<T>
-      make_matrix(std::initializer_list<std::initializer_list<T>> list) {
-        std::unique_ptr<MatrixBase<T>> ptr;
-        ptr.reset(new MatrixArray<T, m, n>(list));
-        return std::move(Matrix<T>(std::move(ptr)));
-      }
+namespace ketcpp::wrapper::matrix {
+  template <typename T, size_t m, size_t n = m>
+  Matrix<T> make_matrix(std::initializer_list<std::initializer_list<T>> list) {
+    std::unique_ptr<MatrixBase<T>> ptr;
+    ptr.reset(new MatrixArray<T, m, n>(list));
+    return std::move(Matrix<T>(std::move(ptr)));
+  }
 
-      template <typename T, size_t m, size_t n = m>
-      Matrix<T> make_matrix(std::initializer_list<T> list) {
-        std::unique_ptr<MatrixBase<T>> ptr;
-        ptr.reset(new MatrixArray<T, m, n>(list));
-        return std::move(Matrix<T>(std::move(ptr)));
-      }
+  template <typename T, size_t m, size_t n = m>
+  Matrix<T> make_matrix(std::initializer_list<T> list) {
+    std::unique_ptr<MatrixBase<T>> ptr;
+    ptr.reset(new MatrixArray<T, m, n>(list));
+    return std::move(Matrix<T>(std::move(ptr)));
+  }
 
-      template <typename T>
-      Matrix<T>
-      make_matrix(std::initializer_list<std::initializer_list<T>> list) {
-        std::unique_ptr<MatrixBase<T>> ptr;
-        ptr.reset(new MatrixVector<T>(list));
-        return std::move(Matrix<T>(std::move(ptr)));
-      }
+  template <typename T>
+  Matrix<T> make_matrix(std::initializer_list<std::initializer_list<T>> list) {
+    std::unique_ptr<MatrixBase<T>> ptr;
+    ptr.reset(new MatrixVector<T>(list));
+    return std::move(Matrix<T>(std::move(ptr)));
+  }
 
-      template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n) {
-        if (n == 0)
-          n = m;
-        assert(n > 0 && m > 0);
-        auto ptr = std::make_unique<MatrixVector<T>>(n, m);
-        ptr->for_each(
-            [&ptr](size_t i, size_t j) { assert(ptr->at(i, j) == 0); });
-        return Matrix<T>(std::move(ptr));
-      }
+  template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n) {
+    if (n == 0)
+      n = m;
+    assert(n > 0 && m > 0);
+    auto ptr = std::make_unique<MatrixVector<T>>(n, m);
+    ptr->for_each([&ptr](size_t i, size_t j) { assert(ptr->at(i, j) == 0); });
+    return Matrix<T>(std::move(ptr));
+  }
 
-      template <typename T>
-      Matrix<T> make_symmetric_matrix(
-          std::initializer_list<std::initializer_list<T>> list) {
-        size_t i = 0;
-        auto ptr = std::make_unique<MatrixVector<T>>(list.size());
-        for (auto l : list) {
-          assert(l.size() == i + 1);
-          size_t j = 0;
-          for (T v : l) {
-            ptr->at(i, j) = ptr->at(j, i) = v;
-            j++;
-          }
-          i++;
-        }
-        return Matrix<T>(std::move(ptr));
+  template <typename T>
+  Matrix<T>
+  make_symmetric_matrix(std::initializer_list<std::initializer_list<T>> list) {
+    size_t i = 0;
+    auto ptr = std::make_unique<MatrixVector<T>>(list.size());
+    for (auto l : list) {
+      assert(l.size() == i + 1);
+      size_t j = 0;
+      for (T v : l) {
+        ptr->at(i, j) = ptr->at(j, i) = v;
+        j++;
       }
-
-      template <typename Iter>
-      std::enable_if_t<std::is_base_of_v<std::input_iterator_tag,
-                                         typename std::iterator_traits<
-                                             Iter>::iterator_category> &&
-                           std::is_arithmetic_v<
-                               typename std::iterator_traits<Iter>::value_type>,
-                       Matrix<typename std::iterator_traits<Iter>::value_type>>
-      make_diagonal_matrix(Iter begin, Iter end) {
-        typedef typename std::iterator_traits<Iter>::value_type T;
-        const auto n = std::distance(begin, end);
-        assert(n > 0);
-        auto ret = make_zero_matrix<T>(n);
-        size_t i = 0;
-        for (Iter iter = begin; iter != end; i++, iter++) {
-          ret->at(i, i) = *iter;
-        }
-        return ret;
-      }
-
-      template <typename T>
-      Matrix<T> make_diagonal_matrix(std::initializer_list<T> list) {
-        return make_diagonal_matrix(list.begin(), list.end());
-      }
+      i++;
     }
+    return Matrix<T>(std::move(ptr));
+  }
+
+  template <typename Iter>
+  using matrix_from_input_iterator_t = std::enable_if_t<
+      std::is_base_of_v<
+          std::input_iterator_tag,
+          typename std::iterator_traits<Iter>::iterator_category> &&
+          std::is_arithmetic_v<typename std::iterator_traits<Iter>::value_type>,
+      Matrix<typename std::iterator_traits<Iter>::value_type>>;
+
+  template <typename Iter>
+  matrix_from_input_iterator_t<Iter> make_diagonal_matrix(Iter begin,
+                                                          Iter end) {
+    typedef typename std::iterator_traits<Iter>::value_type T;
+    const auto n = std::distance(begin, end);
+    assert(n > 0);
+    auto ret = make_zero_matrix<T>(n);
+    size_t i = 0;
+    for (Iter iter = begin; iter != end; i++, iter++) {
+      ret->at(i, i) = *iter;
+    }
+    return ret;
+  }
+
+  template <typename T>
+  Matrix<T> make_diagonal_matrix(std::initializer_list<T> list) {
+    return make_diagonal_matrix(list.begin(), list.end());
   }
 }
