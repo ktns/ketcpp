@@ -25,7 +25,7 @@
 
 #include <type_traits>
 
-#include "wrapper/matrix/eigen_constant.h"
+#include "wrapper/matrix/eigen_fixed.h"
 
 namespace ketcpp::wrapper::matrix {
   //! Matrix instance using dynamic-size Eigen::Matrix as underlying matrix

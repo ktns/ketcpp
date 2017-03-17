@@ -23,7 +23,7 @@
 
 #ifdef EIGEN3_FOUND
 
-#include "wrapper/matrix/eigen_constant.h"
 #include "wrapper/matrix/eigen_dynamic.h"
+#include "wrapper/matrix/eigen_fixed.h"
 
 #endif
