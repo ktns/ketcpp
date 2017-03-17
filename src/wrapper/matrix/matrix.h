@@ -106,12 +106,6 @@ namespace ketcpp::wrapper::matrix {
     const_iterator cend() const { return base->cend(); }
   };
 
-  template <typename T, typename Char, typename Traits>
-  std::basic_ostream<Char, Traits> &
-  operator<<(std::basic_ostream<Char, Traits> &ost, const Matrix<T> &matrix) {
-    return ost << static_cast<const MatrixBase<T> &>(matrix);
-  }
-
   template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n = 0);
 
   template <typename T> class MatrixBase {
@@ -337,8 +331,16 @@ namespace ketcpp::wrapper::matrix {
     return mat * static_cast<T>(scalar);
   }
 
-  template <typename T>
-  std::ostream &operator<<(std::ostream &out, const MatrixBase<T> &matrix) {
+  template <typename T, typename Char, typename Traits>
+  std::basic_ostream<Char, Traits> &
+  operator<<(std::basic_ostream<Char, Traits> &out, const Matrix<T> &matrix) {
+    return out << static_cast<const MatrixBase<T> &>(matrix);
+  }
+
+  template <typename T, typename Char, typename Traits>
+  std::basic_ostream<Char, Traits> &
+  operator<<(std::basic_ostream<Char, Traits> &out,
+             const MatrixBase<T> &matrix) {
     for (size_t i = 0; i < matrix.get_num_rows(); i++) {
       out << '{';
       for (size_t j = 0; j < matrix.get_num_columns(); j++) {
