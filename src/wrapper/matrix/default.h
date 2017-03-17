@@ -85,15 +85,27 @@ namespace ketcpp::wrapper::matrix {
   template <typename Iter>
   matrix_from_input_iterator_t<Iter> make_diagonal_matrix(Iter begin,
                                                           Iter end) {
-    typedef typename std::iterator_traits<Iter>::value_type T;
-    const auto n = std::distance(begin, end);
-    assert(n > 0);
-    auto ret = make_zero_matrix<T>(n);
-    size_t i = 0;
-    for (Iter iter = begin; iter != end; i++, iter++) {
-      ret->at(i, i) = *iter;
+    typedef typename matrix_from_input_iterator_t<Iter>::value_type T;
+    if
+#ifdef __cpp_if_constexpr
+      constexpr
+#endif
+          (std::is_base_of_v<
+              std::forward_iterator_tag,
+              typename std::iterator_traits<Iter>::iterator_category>) {
+        const auto n = std::distance(begin, end);
+        assert(n > 0);
+        auto ret = make_zero_matrix<T>(n);
+        size_t i = 0;
+        for (Iter iter = begin; iter != end; i++, iter++) {
+          ret->at(i, i) = *iter;
+        }
+        return ret;
+      }
+    else {
+      std::vector<T> v(begin, end);
+      return make_diagonal_matrix(v.cbegin(), v.cend());
     }
-    return ret;
   }
 
   template <typename T>
