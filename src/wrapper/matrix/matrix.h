@@ -106,8 +106,9 @@ namespace ketcpp::wrapper::matrix {
     const_iterator cend() const { return base->cend(); }
   };
 
-  template <typename T>
-  std::ostream &operator<<(std::ostream &ost, const Matrix<T> &matrix) {
+  template <typename T, typename Char, typename Traits>
+  std::basic_ostream<Char, Traits> &
+  operator<<(std::basic_ostream<Char, Traits> &ost, const Matrix<T> &matrix) {
     return ost << static_cast<const MatrixBase<T> &>(matrix);
   }
 
