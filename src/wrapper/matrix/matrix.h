@@ -327,9 +327,11 @@ namespace ketcpp::wrapper::matrix {
 
     Matrix<T> transpose() const;
 
+  protected:
     MatrixBase() : reflist(nullptr) {}
     MatrixBase(const MatrixBase<T> &) : reflist(nullptr) {}
 
+  public:
     virtual ~MatrixBase(){};
   };
 
