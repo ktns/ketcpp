@@ -17,9 +17,13 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "jobs/rhf.h"
-#include "wrapper/matrix/default.h"
 #include <bandit/bandit.h>
+
+#include "wrapper/matrix/default.h"
+#include "wrapper/molecule/base.h"
+
+#include "jobs/rhf.h"
+
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp;
@@ -31,6 +35,11 @@ class TestMolecule : public wrapper::molecule::Base {
 public:
   TestMolecule(bool &alive) : alive(alive) { alive = true; }
   ~TestMolecule() { alive = false; }
+
+  const std::vector<wrapper::molecule::atom_t> &atoms() const override {
+    static const std::vector<wrapper::molecule::atom_t> empty;
+    return empty;
+  };
 };
 
 static const wrapper::matrix::Matrix<double> overlap_matrix =
