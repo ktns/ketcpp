@@ -28,6 +28,7 @@ using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp;
 using namespace ketcpp::jobs;
+using orbital::basis::matrix_t;
 
 class TestMolecule : public wrapper::molecule::Base {
   bool &alive;
@@ -42,17 +43,30 @@ public:
   };
 };
 
-static const wrapper::matrix::Matrix<double> overlap_matrix =
+static const matrix_t overlap_matrix = wrapper::matrix::make_matrix<double, 2>(
+    {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+
+static const matrix_t kinetic_matrix = wrapper::matrix::make_matrix<double, 2>(
+    {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+
+static const matrix_t nuclear_attraction_matrix =
     wrapper::matrix::make_matrix<double, 2>(
         {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
 
-static const wrapper::matrix::Matrix<double> kinetic_matrix =
+static const matrix_t electron_repulsion_matrix =
     wrapper::matrix::make_matrix<double, 2>(
         {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
 
 class TestBasis : public orbital::basis::Base {
-  decltype(overlap_matrix) get_overlap() { return overlap_matrix; }
-  decltype(kinetic_matrix) get_kinetic() { return kinetic_matrix; }
+  matrix_t get_overlap() { return overlap_matrix; }
+  matrix_t get_kinetic() { return kinetic_matrix; }
+  matrix_t get_nuclear(const std::vector<wrapper::molecule::pointcharge_t> &) {
+    return nuclear_attraction_matrix;
+  }
+  matrix_t &add_rhf_electron_repulsion(matrix_t &fock,
+                                       const matrix_t &density) {
+    return fock += electron_repulsion_matrix;
+  }
 };
 
 class TestBasisSet : public orbital::basisset::Base {

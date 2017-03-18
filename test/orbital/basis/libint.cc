@@ -149,7 +149,7 @@ go_bandit([] {
 
     describe("::get_nuclear", [&] {
       it("Should return correct nuclear matrix", [&] {
-        auto kinetic = basis->get_nuclear();
+        auto kinetic = basis->get_nuclear(FixtureH2O());
         auto within_delta = [](double a, double b) -> bool {
           return std::abs(a - b) < 1e-5;
         };
@@ -171,7 +171,7 @@ go_bandit([] {
     describe("::get_rhf_fock", [&] {
       describe("()", [&] {
         it("Should return correct fock matrix", [&] {
-          auto fock = basis->get_rhf_fock(density);
+          auto fock = basis->get_rhf_fock(density, FixtureH2O());
           auto within_delta = [](double a, double b) -> bool {
             return std::abs(a - b) < 1e-5;
           };

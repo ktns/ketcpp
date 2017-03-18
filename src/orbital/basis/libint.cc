@@ -213,10 +213,6 @@ matrix_t Libint2Basis::get_overlap() {
 matrix_t Libint2Basis::get_kinetic() {
   return impl->get_1el_matrix(libint2::Operator::kinetic);
 }
-matrix_t Libint2Basis::get_nuclear() {
-  return impl->get_1el_matrix(libint2::Operator::nuclear,
-                              make_point_charges(impl->atoms));
-}
 matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
   decltype(libint2::make_point_charges(impl->atoms)) libint2_charges;
   libint2_charges.reserve(charges.size());
