@@ -30,36 +30,36 @@ using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
 
 go_bandit([] {
-  describe("MatrixArray", [] {
-    MatrixArray<float, 3, 2> matrix1, matrix2, matrix3;
+  describe("MatrixArrayCore", [] {
+    MatrixArrayCore<float, 3, 2> matrix1, matrix2, matrix3;
 
     before_each([&] {
       matrix1 = matrix2 = matrix3 =
-          MatrixArray<float, 3, 2>({1.f, 2.f, 3.f, 4.f, 5.f, 6.f});
+          MatrixArrayCore<float, 3, 2>({1.f, 2.f, 3.f, 4.f, 5.f, 6.f});
       matrix2 *= 2;
       matrix3 *= 3;
     });
 
     it("should not be abstract class", [] {
-      std::is_abstract<MatrixArray<float, 3>>::value must_not be_truthy;
+      std::is_abstract<MatrixArrayCore<float, 3>>::value must_not be_truthy;
     });
 
     it("should be initialized with list", [] {
       [] {
-        MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
-        MatrixArray<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
+        MatrixArrayCore<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
+        MatrixArrayCore<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
       } must_not throw_exception;
     });
 
     it("should be correctly initialized with nested list", [] {
-      MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
-      MatrixArray<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
+      MatrixArrayCore<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
+      MatrixArrayCore<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
       matrix1 must equal(matrix2);
     });
 
     describe("copy ctor", [&matrix1] {
       it("should copy a matrix", [&matrix1] {
-        MatrixArray<float, 3, 2> matrix2(matrix1);
+        MatrixArrayCore<float, 3, 2> matrix2(matrix1);
         matrix2 must equal(matrix1);
       });
     });
@@ -164,8 +164,8 @@ go_bandit([] {
         matrix1 must_not equal(matrix2);
         (matrix1 == matrix2) must be_falsy;
       });
-      it("should be comparable with MatrixArrayCore", [&matrix1, &matrix2] {
-        MatrixArrayCore<float, 3, 2> array = {1, 2, 3, 4, 5, 6};
+      it("should be comparable with MatrixArray", [&matrix1, &matrix2] {
+        MatrixArray<float, 3, 2> array = {1, 2, 3, 4, 5, 6};
         (matrix1 == array) must be_truthy;
         (array == matrix1) must be_truthy;
         (matrix2 == array) must be_falsy;
@@ -198,8 +198,8 @@ go_bandit([] {
         matrix1 must_not equal(matrix2);
         (matrix1 != matrix2) must be_truthy;
       });
-      it("should be comparable with MatrixArrayCore", [&matrix1, &matrix2] {
-        MatrixArrayCore<float, 3, 2> array = {{1, 2, 3, 4, 5, 6}};
+      it("should be comparable with MatrixArray", [&matrix1, &matrix2] {
+        MatrixArray<float, 3, 2> array = {{1, 2, 3, 4, 5, 6}};
         (matrix1 != array) must be_falsy;
         (array != matrix1) must be_falsy;
         (matrix2 != array) must be_truthy;
@@ -215,9 +215,9 @@ go_bandit([] {
 
       describe("(Matrix<float>)", [&matrix1, matrix2] {
         it("should work", [&matrix1, matrix2] {
-          Matrix<float> matrix3 = matrix1;
-          (matrix1 != matrix3) must be_falsy;
-          (matrix2 != matrix3) must be_truthy;
+          Matrix<float> matrix = matrix1;
+          (matrix1 != matrix) must be_falsy;
+          (matrix2 != matrix) must be_truthy;
         });
       });
     });
@@ -231,9 +231,9 @@ go_bandit([] {
         matrix4 must_not equal(matrix1);
         matrix4 must equal(matrix3);
       });
-      it("should work with MatrixArrayCore", [&matrix1] {
-        MatrixArrayCore<float, 3, 2> array = {6, 5, 4, 3, 2, 1},
-                                     array2 = {7, 7, 7, 7, 7, 7};
+      it("should work with MatrixArray", [&matrix1] {
+        MatrixArray<float, 3, 2> array = {6, 5, 4, 3, 2, 1},
+                                 array2 = {7, 7, 7, 7, 7, 7};
         matrix1 must_not equal(array2);
         matrix1 += array;
         matrix1 must equal(array2);
@@ -257,9 +257,9 @@ go_bandit([] {
         matrix4 must_not equal(matrix3);
         matrix4 must equal(matrix2);
       });
-      it("should work with MatrixArrayCore", [&matrix1] {
-        MatrixArrayCore<float, 3, 2> array1 = {{6, 5}, {4, 3}, {2, 1}},
-                                     array2 = {{-5, -3}, {-1, 1}, {3, 5}};
+      it("should work with MatrixArray", [&matrix1] {
+        MatrixArray<float, 3, 2> array1 = {{6, 5}, {4, 3}, {2, 1}},
+                                 array2 = {{-5, -3}, {-1, 1}, {3, 5}};
         matrix1 must_not equal(array2);
         matrix1 -= array1;
         matrix1 must equal(array2);
@@ -365,10 +365,11 @@ go_bandit([] {
         auto matrix_a = make_dummy_matrix<float>(), matrix_b = matrix_a,
              matrix_c = matrix_a, matrix_d = matrix_a;
         before_each([&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
-          matrix_a = MatrixArray<float, 3, 2>({-1, 2, 3, -1, 0, 3});
-          matrix_b = MatrixArray<float, 2, 3>({1, 1, 3, -1, 1, 0});
-          matrix_c = MatrixArray<float, 3, 3>({-3, 1, -3, 4, 2, 9, -3, 3, 0});
-          matrix_d = MatrixArray<float, 2, 2>({2, 10, 4, -3});
+          matrix_a = MatrixArrayCore<float, 3, 2>({-1, 2, 3, -1, 0, 3});
+          matrix_b = MatrixArrayCore<float, 2, 3>({1, 1, 3, -1, 1, 0});
+          matrix_c =
+              MatrixArrayCore<float, 3, 3>({-3, 1, -3, 4, 2, 9, -3, 3, 0});
+          matrix_d = MatrixArrayCore<float, 2, 2>({2, 10, 4, -3});
         });
         it("should return a correct matrix product",
            [&matrix_a, &matrix_b, &matrix_c, &matrix_d] {

@@ -1,0 +1,4 @@
+---
+cmake/FindMathJax.cmake:
+  copyright: 2014, 2016 Jason Rhinelander <jason@imaginary.ca>
+  license: GPL-3.0+

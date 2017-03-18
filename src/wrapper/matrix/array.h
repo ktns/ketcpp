@@ -6,7 +6,7 @@
  *
  * ketcpp is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or any later version.
+ * Foundation, either version 3.0 of the License, or any later version.
  *
  * ketcpp is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS
@@ -27,185 +27,131 @@
 #include <numeric>
 #include <sstream>
 
-#include "wrapper/matrix/base.h"
+#include "wrapper/matrix/matrix.h"
 
-namespace ketcpp {
-  namespace wrapper {
-    namespace matrix {
-      template <typename T, size_t m, size_t n = m>
-      class MatrixArray : public MatrixBase<T> {
-      public:
-        constexpr static size_t num_rows = m;
-        constexpr static size_t num_columns = n;
-        constexpr static size_t row_size = n;
-        constexpr static size_t column_size = m;
-        size_t get_num_rows() const { return num_rows; }
-        size_t get_num_columns() const { return num_columns; }
-        size_t get_row_size() const { return row_size; }
-        size_t get_column_size() const { return column_size; }
+namespace ketcpp::wrapper::matrix {
+  //! @brief Matrix instance using std::array as its storage.
+  //! @note No specializations are made for testing purpose.
+  template <typename T, size_t m, size_t n = m>
+  class MatrixArrayCore : public MatrixBase<T> {
+  protected:
+    //! @cond PRIVATE
+    using array = std::array<T, m * n>;
+    array storage;
+    using Base = MatrixBase<T>;
+    //! @endcond
 
-      private:
-        using array = std::array<T, m * n>;
-        array storage;
-        using Base = MatrixBase<T>;
-        typedef typename Base::RowVectorIterator RowVectorIterator;
-        typedef typename Base::RowElementIterator RowElementIterator;
-        typedef typename Base::ColumnVectorIterator ColumnVectorIterator;
-        typedef typename Base::ColumnElementIterator ColumnElementIterator;
-        typedef typename Base::RowVectorConstIterator RowVectorConstIterator;
-        typedef typename Base::RowElementConstIterator RowElementConstIterator;
-        typedef
-            typename Base::ColumnVectorConstIterator ColumnVectorConstIterator;
-        typedef typename Base::ColumnElementConstIterator
-            ColumnElementConstIterator;
+  public:
+    //! Number of rows in matrices
+    constexpr static size_t num_rows = m;
+    //! Number of rows in matrices
+    constexpr static size_t num_columns = n;
+    constexpr static size_t row_size = n;
+    constexpr static size_t column_size = m;
+    size_t get_num_rows() const override { return num_rows; }
+    size_t get_num_columns() const override { return num_columns; }
+    size_t get_row_size() const override { return row_size; }
+    size_t get_column_size() const override { return column_size; }
 
-        template <bool is_const>
-        class GenericIterator
-            : public Base::template BaseGenericIterator<is_const> {
-          using BaseIterator =
-              typename Base::template BaseGenericIterator<is_const>;
-          using unique_ptr = std::unique_ptr<BaseIterator>;
-          typename std::conditional<
-              is_const, typename MatrixArray::array::const_iterator,
-              typename MatrixArray::array::iterator>::type iterator;
-          constexpr static size_t row_size = MatrixArray::row_size;
-          constexpr static size_t column_size = MatrixArray::column_size;
-
-        protected:
-          void advance_in_column() { this->iterator += row_size; }
-          void advance_in_row() { this->iterator++; }
-          unique_ptr row_begin() {
-            return std::move(std::make_unique<GenericIterator>(this->iterator));
-          }
-          unique_ptr row_end() {
-            return std::move(
-                std::make_unique<GenericIterator>(this->iterator + row_size));
-          }
-          unique_ptr column_begin() {
-            return std::move(std::make_unique<GenericIterator>(this->iterator));
-          }
-          unique_ptr column_end() {
-            return std::move(std::make_unique<GenericIterator>(
-                this->iterator + row_size * column_size));
-          }
-          unique_ptr copy() {
-            return std::move(std::make_unique<GenericIterator>(this->iterator));
-          }
-          bool operator==(BaseIterator &rhs) const throw(std::bad_cast &) {
-            auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
-            return this->iterator == rhs_cast.iterator;
-          }
-          bool operator!=(BaseIterator &rhs) const throw(std::bad_cast &) {
-            auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
-            return this->iterator != rhs_cast.iterator;
-          }
-          typename BaseIterator::difference_type
-          operator-(const BaseIterator &rhs) const throw(std::bad_cast &) {
-            auto &rhs_cast = dynamic_cast<decltype(*this)>(rhs);
-            return this->iterator - rhs_cast.iterator;
-          }
-          typename std::conditional<is_const, const T &, T &>::type
-          operator*() {
-            return *iterator;
-          }
-
-        public:
-          GenericIterator(decltype(iterator) src) : iterator(src) {}
-        };
-        using Iterator = GenericIterator<false>;
-        using ConstIterator = GenericIterator<true>;
-
-      protected:
-        RowVectorConstIterator row_cbegin() const {
-          return RowVectorConstIterator(
-              std::make_unique<ConstIterator>(storage.cbegin()));
-        }
-        RowVectorConstIterator row_cend() const {
-          return RowVectorConstIterator(
-              std::move(std::make_unique<ConstIterator>(storage.cend())));
-        }
-        ColumnVectorConstIterator column_cbegin() const {
-          return ColumnVectorConstIterator(
-              std::move(std::make_unique<ConstIterator>(storage.cbegin())));
-        }
-        ColumnVectorConstIterator column_cend() const {
-          return ColumnVectorConstIterator(std::move(
-              std::make_unique<ConstIterator>(storage.cbegin() + row_size)));
-        }
-        RowVectorIterator row_begin() {
-          return RowVectorIterator(std::make_unique<Iterator>(storage.begin()));
-        }
-        RowVectorIterator row_end() {
-          return RowVectorIterator(
-              std::move(std::make_unique<Iterator>(storage.end())));
-        }
-        ColumnVectorIterator column_begin() {
-          return ColumnVectorIterator(
-              std::move(std::make_unique<Iterator>(storage.begin())));
-        }
-        ColumnVectorIterator column_end() {
-          return ColumnVectorIterator(std::move(
-              std::make_unique<Iterator>(storage.begin() + row_size)));
-        }
-
-      public:
-        MatrixArray(const std::initializer_list<std::initializer_list<T>> &list)
-            : storage() {
-          auto dest = storage.begin();
-          for (auto i : list) {
-            dest = std::copy(i.begin(), i.end(), dest);
-          }
-        }
-        MatrixArray(const std::initializer_list<T> &list) : storage() {
-          std::copy(list.begin(), list.end(), storage.begin());
-        }
-        MatrixArray() = default;
-
-        bool operator==(const MatrixArray &rhs) const {
-          return std::equal(this->storage.cbegin(), this->storage.cend(),
-                            rhs.storage.cbegin());
-        }
-        Base &operator+=(const Base &rhsbase) {
-          try {
-            auto &rhs = dynamic_cast<const MatrixArray &>(rhsbase);
-            std::transform(this->storage.cbegin(), this->storage.cend(),
-                           rhs.storage.cbegin(), this->storage.begin(),
-                           [](T l, T r) -> T { return l + r; });
-            return *this;
-          } catch (std::bad_cast &ex) {
-            return Base::operator+=(rhsbase);
-          }
-        }
-
-        Base &operator*=(T rhs) {
-          std::transform(this->storage.cbegin(), this->storage.cend(),
-                         this->storage.begin(),
-                         [rhs](T l) -> T { return l * rhs; });
-          return *this;
-        }
-        using MatrixBase<T>::operator*;
-        template <size_t l>
-        MatrixArray<T, m, l> operator*(const MatrixArray<T, n, l> &rhs) const {
-          MatrixArray<T, m, l> buf;
-          auto lr = this->rows().begin();
-          for (auto br = buf.rows().begin(); br != buf.rows().end();
-               ++br, ++lr) {
-            auto rc = rhs.columns().begin();
-            for (auto b = br.begin(); b != br.end(); ++b, ++rc) {
-              *b = std::inner_product(lr.begin(), lr.end(), rc.begin(), 0);
-            }
-          }
-          return std::move(buf);
-        }
-
-        std::unique_ptr<MatrixBase<T>> copy() const {
-          std::unique_ptr<MatrixBase<T>> copy;
-          copy.reset(new MatrixArray(*this));
-          return std::move(copy);
-        }
-
-        ~MatrixArray() {}
-      };
+    T &at(size_t i, size_t j) override { return storage[i * num_columns + j]; }
+    T at(size_t i, size_t j) const override {
+      return storage[i * num_columns + j];
     }
-  }
+
+    //! Construction by nested initalizer list
+    MatrixArrayCore(const std::initializer_list<std::initializer_list<T>> &list)
+        : storage() {
+      auto dest = storage.begin();
+      for (auto i : list) {
+        auto end = std::min(i.begin() + this->size(), i.end());
+        dest = std::copy(i.begin(), end, dest);
+      }
+    }
+    //! Construction by flat initializer list
+    MatrixArrayCore(const std::initializer_list<T> &list) : storage() {
+      auto end = std::min(list.begin() + this->size(), list.end());
+      std::copy(list.begin(), end, storage.begin());
+    }
+    //! Default constructor
+    MatrixArrayCore() = default;
+    //! Copy constructor
+    MatrixArrayCore(const MatrixArrayCore &other) = default;
+    //! Assignment operator
+    MatrixArrayCore &operator=(const MatrixArrayCore &other) {
+      storage = other.storage;
+      return *this;
+    }
+
+    virtual std::unique_ptr<MatrixBase<T>> copy() const override {
+      std::unique_ptr<MatrixBase<T>> copy;
+      copy.reset(new MatrixArrayCore(*this));
+      return std::move(copy);
+    }
+
+    virtual ~MatrixArrayCore() override {}
+  };
+
+  //! Matrix instance using std::array as its storage.
+  template <typename T, size_t m, size_t n = m>
+  class MatrixArray : public MatrixArrayCore<T, m, n> {
+  private:
+    using Base = typename MatrixArrayCore<T, m, n>::Base;
+
+  public:
+    using MatrixArrayCore<T, m, n>::MatrixArrayCore;
+
+    //! Inequality operator
+    bool operator!=(const Base &rhs) const override {
+      auto *prhs = dynamic_cast<const MatrixArray *>(&rhs);
+      if (prhs == nullptr)
+        return Base::operator!=(rhs);
+      else
+        return !std::equal(this->storage.cbegin(), this->storage.cend(),
+                           prhs->storage.cbegin());
+    }
+
+    //! Addition assignment operator
+    Base &operator+=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const MatrixArray *>(&rhsbase);
+      if (prhs == nullptr)
+        return Base::operator+=(rhsbase);
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     prhs->storage.cbegin(), this->storage.begin(),
+                     [](T l, T r) -> T { return l + r; });
+      return *this;
+    }
+
+    //! Subtraction assignment operator
+    Base &operator-=(const Base &rhsbase) override {
+      auto *prhs = dynamic_cast<const MatrixArray *>(&rhsbase);
+      if (prhs == nullptr)
+        return Base::operator-=(rhsbase);
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     prhs->storage.cbegin(), this->storage.begin(),
+                     [](T l, T r) -> T { return l - r; });
+      return *this;
+    }
+
+    //! @brief Multiplication assignment operator with a scalar
+    //! @post All elements of the matrix are scaled by a scalar
+    Base &operator*=(T rhs) override {
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     this->storage.begin(),
+                     [rhs](T l) -> T { return l * rhs; });
+      return *this;
+    }
+
+    Base &operator/=(T rhs) override {
+      std::transform(this->storage.cbegin(), this->storage.cend(),
+                     this->storage.begin(),
+                     [rhs](T l) -> T { return l / rhs; });
+      return *this;
+    }
+
+    std::unique_ptr<MatrixBase<T>> copy() const override {
+      std::unique_ptr<MatrixBase<T>> copy;
+      copy.reset(new MatrixArray(*this));
+      return std::move(copy);
+    }
+  };
 }

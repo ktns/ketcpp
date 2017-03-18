@@ -1,0 +1,8 @@
+---
+ignore:
+  pattern:
+    - CMakeCache.txt
+    - CMakeFiles/
+    - doc/
+    - ket_cpp
+    - run_tests

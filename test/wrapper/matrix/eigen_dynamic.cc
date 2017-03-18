@@ -1,6 +1,6 @@
 /*
  * ketcpp: Quantum chemical toolset made of C++
- * Copyright (C) 2015 Katsuhiko Nishimra
+ * Copyright (C) 2017 Katsuhiko Nishimra
  *
  * This file is part of ketcpp.
  *
@@ -17,49 +17,51 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <array>
+#include "config/ketcpp_config.h"
+
+#ifdef EIGEN3_FOUND
 
 #include <bandit/bandit.h>
 
 #include "wrapper/matrix/array.h"
 #include "wrapper/matrix/dummy.h"
+#include "wrapper/matrix/eigen.h"
 #include "wrapper/matrix/vector.h"
-
 using namespace bandit;
 using namespace bandit::Matchers;
 using namespace ketcpp::wrapper::matrix;
 
+static MatrixEigen<float> eigen_stat = {{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}};
+
 go_bandit([] {
-  describe("MatrixArray", [] {
-    MatrixArray<float, 3, 2> matrix1, matrix2, matrix3;
+  describe("MatrixEigen(dynamically sized)", [] {
+    MatrixEigen<float> matrix1(3, 2), matrix2(3, 2), matrix3(3, 2);
 
     before_each([&] {
-      matrix1 = matrix2 = matrix3 =
-          MatrixArray<float, 3, 2>({1.f, 2.f, 3.f, 4.f, 5.f, 6.f});
+      MatrixEigen<float> eigen = {{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}};
+      matrix1 = matrix2 = matrix3 = eigen;
       matrix2 *= 2;
       matrix3 *= 3;
     });
 
-    it("should not be abstract class", [] {
-      std::is_abstract<MatrixArray<float, 3>>::value must_not be_truthy;
-    });
+    it("should not be abstract class",
+       [] { std::is_abstract<MatrixEigen<float>>::value must_not be_truthy; });
 
-    it("should be initialized with list", [] {
+    it("should be initialized with nested list", [] {
       [] {
-        MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
-        MatrixArray<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
+        MatrixEigen<float> matrix2 = {{1.f, 2.f}, {3.f, 4.f}};
       } must_not throw_exception;
     });
 
     it("should be correctly initialized with nested list", [] {
-      MatrixArray<float, 3, 2> matrix1 = {1, 2, 3, 4, 5, 6};
-      MatrixArray<float, 3, 2> matrix2 = {{1, 2}, {3, 4}, {5, 6}};
-      matrix1 must equal(matrix2);
+      MatrixEigen<float, 3, 2> matrix = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f};
+      MatrixEigen<float> matrix2 = {{1.f, 2.f}, {3.f, 4.f}, {5.f, 6.f}};
+      matrix must equal(matrix2);
     });
 
     describe("copy ctor", [&matrix1] {
       it("should copy a matrix", [&matrix1] {
-        MatrixArray<float, 3, 2> matrix2(matrix1);
+        MatrixEigen<float, 3, 2> matrix2(matrix1);
         matrix2 must equal(matrix1);
       });
     });
@@ -178,6 +180,14 @@ go_bandit([] {
         (matrix2 == vector) must be_falsy;
         (vector == matrix2) must be_falsy;
       });
+      it("should be comparable with MatrixEigen<fixed size>",
+         [&matrix1, &matrix2] {
+           MatrixEigen<float, 3, 2> eigen_c = {{1, 2}, {3, 4}, {5, 6}};
+           (matrix1 == eigen_c) must be_truthy;
+           (eigen_c == matrix1) must be_truthy;
+           (matrix2 == eigen_c) must be_falsy;
+           (eigen_c == matrix2) must be_falsy;
+         });
 
       describe("(Matrix<float>)", [&matrix1, matrix2] {
         it("should work", [&matrix1, matrix2] {
@@ -212,6 +222,14 @@ go_bandit([] {
         (matrix2 != vector) must be_truthy;
         (vector != matrix2) must be_truthy;
       });
+      it("should be comparable with MatrixEigen<fixed size>",
+         [&matrix1, &matrix2] {
+           MatrixEigen<float, 3, 2> eigen_c = {{1, 2}, {3, 4}, {5, 6}};
+           (matrix1 != eigen_c) must be_falsy;
+           (eigen_c != matrix1) must be_falsy;
+           (matrix2 != eigen_c) must be_truthy;
+           (eigen_c != matrix2) must be_truthy;
+         });
 
       describe("(Matrix<float>)", [&matrix1, matrix2] {
         it("should work", [&matrix1, matrix2] {
@@ -238,12 +256,26 @@ go_bandit([] {
         matrix1 += array;
         matrix1 must equal(array2);
       });
+      it("should work with MatrixArray", [&matrix1] {
+        MatrixArray<float, 3, 2> array = {6, 5, 4, 3, 2, 1},
+                                 array2 = {7, 7, 7, 7, 7, 7};
+        matrix1 must_not equal(array2);
+        matrix1 += array;
+        matrix1 must equal(array2);
+      });
       it("should work with MatrixVector", [&matrix1] {
         MatrixVector<float> vector1 = {{6, 5}, {4, 3}, {2, 1}},
                             vector2 = {{7, 7}, {7, 7}, {7, 7}};
         matrix1 must_not equal(vector2);
         matrix1 += vector1;
         matrix1 must equal(vector2);
+      });
+      it("should work with MatrixEigen<fixed size>", [&matrix1] {
+        MatrixEigen<float, 3, 2> eigen_c1 = {{6, 5}, {4, 3}, {2, 1}},
+                                 eigen_c2 = {{7, 7}, {7, 7}, {7, 7}};
+        matrix1 must_not equal(eigen_c2);
+        matrix1 += eigen_c1;
+        matrix1 must equal(eigen_c2);
       });
     });
 
@@ -257,11 +289,11 @@ go_bandit([] {
         matrix4 must_not equal(matrix3);
         matrix4 must equal(matrix2);
       });
-      it("should work with MatrixArrayCore", [&matrix1] {
-        MatrixArrayCore<float, 3, 2> array1 = {{6, 5}, {4, 3}, {2, 1}},
-                                     array2 = {{-5, -3}, {-1, 1}, {3, 5}};
+      it("should work with MatrixArray", [&matrix1] {
+        MatrixArray<float, 3, 2> array = {6, 5, 4, 3, 2, 1},
+                                 array2 = {-5, -3, -1, 1, 3, 5};
         matrix1 must_not equal(array2);
-        matrix1 -= array1;
+        matrix1 -= array;
         matrix1 must equal(array2);
       });
       it("should work with MatrixVector", [&matrix1] {
@@ -270,6 +302,13 @@ go_bandit([] {
         matrix1 must_not equal(vector2);
         matrix1 -= vector1;
         matrix1 must equal(vector2);
+      });
+      it("should work with MatrixEigen<fixed size>", [&matrix1] {
+        MatrixEigen<float, 3, 2> eigen_c = {6, 5, 4, 3, 2, 1},
+                                 eigen_c2 = {-5, -3, -1, 1, 3, 5};
+        matrix1 must_not equal(eigen_c2);
+        matrix1 -= eigen_c;
+        matrix1 must equal(eigen_c2);
       });
     });
 
@@ -284,7 +323,7 @@ go_bandit([] {
           matrix3 must equal(matrix2);
         });
       });
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should change elements", [&matrix1, &matrix2] {
           auto matrix3 = matrix1;
           matrix3 must equal(matrix1);
@@ -307,7 +346,7 @@ go_bandit([] {
           matrix3 must_not equal(matrix2);
         });
       });
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should change elements", [&matrix1, &matrix2] {
           auto matrix3 = matrix2;
           matrix3 must_not equal(matrix1);
@@ -320,7 +359,7 @@ go_bandit([] {
     });
 
     describe("::operator+", [&matrix1, &matrix2, &matrix3] {
-      it("should not change elements", [&matrix1, &matrix2, &matrix3] {
+      it("should change elements", [&matrix1, &matrix2, &matrix3] {
         auto matrix4 = matrix1 + matrix2;
         matrix4 must equal(matrix3);
         matrix1 must_not equal(matrix3);
@@ -328,7 +367,7 @@ go_bandit([] {
     });
 
     describe("::operator-", [&matrix1, &matrix2, &matrix3] {
-      it("should not change elements", [&matrix1, &matrix2, &matrix3] {
+      it("should change elements", [&matrix1, &matrix2, &matrix3] {
         auto matrix4 = matrix3 - matrix1;
         matrix4 must equal(matrix2);
         matrix3 must_not equal(matrix2);
@@ -342,19 +381,19 @@ go_bandit([] {
              auto matrix3 = matrix1 * 2.f;
              matrix3 must equal(matrix2);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 * 2.f;
           matrix1 must equal(matrix2);
         });
       });
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should return a matrix multiplied by the scalar",
            [&matrix1, &matrix2] {
              auto matrix3 = matrix1 * 2u;
              matrix3 must equal(matrix2);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 * 2u;
           matrix1 must equal(matrix2);
@@ -365,10 +404,10 @@ go_bandit([] {
         auto matrix_a = make_dummy_matrix<float>(), matrix_b = matrix_a,
              matrix_c = matrix_a, matrix_d = matrix_a;
         before_each([&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
-          matrix_a = MatrixArray<float, 3, 2>({-1, 2, 3, -1, 0, 3});
-          matrix_b = MatrixArray<float, 2, 3>({1, 1, 3, -1, 1, 0});
-          matrix_c = MatrixArray<float, 3, 3>({-3, 1, -3, 4, 2, 9, -3, 3, 0});
-          matrix_d = MatrixArray<float, 2, 2>({2, 10, 4, -3});
+          matrix_a = MatrixEigen<float>({{-1, 2}, {3, -1}, {0, 3}});
+          matrix_b = MatrixEigen<float>({{1, 1, 3}, {-1, 1, 0}});
+          matrix_c = MatrixEigen<float>({{-3, 1, -3}, {4, 2, 9}, {-3, 3, 0}});
+          matrix_d = MatrixEigen<float>({{2, 10}, {4, -3}});
         });
         it("should return a correct matrix product",
            [&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
@@ -404,20 +443,20 @@ go_bandit([] {
              auto matrix3 = matrix2 / 2.f;
              matrix3 must equal(matrix1);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 / 2.f;
           matrix1 must equal(matrix2);
         });
       });
 
-      describe("(unsigned int)", [&matrix1, &matrix2] {
+      describe("(unsinged int)", [&matrix1, &matrix2] {
         it("should return a matrix divided by the scalar",
            [&matrix1, &matrix2] {
              auto matrix3 = matrix2 / 2u;
              matrix3 must equal(matrix1);
            });
-        it("should not change elements", [&matrix1] {
+        it("should not change elenments", [&matrix1] {
           auto matrix2 = matrix1;
           auto matrix3 = matrix1 / 2.f;
           matrix1 must equal(matrix2);
@@ -466,3 +505,4 @@ go_bandit([] {
     });
   });
 });
+#endif
