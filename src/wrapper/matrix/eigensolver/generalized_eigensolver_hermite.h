@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <type_traits>
 
 #include "wrapper/matrix.h"

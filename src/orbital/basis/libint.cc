@@ -21,6 +21,7 @@
 
 #ifdef LIBINT2_FOUND
 
+#include <cassert>
 #include <memory>
 
 #include <libint2.hpp>
