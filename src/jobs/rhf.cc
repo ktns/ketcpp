@@ -17,6 +17,8 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+
 #include "jobs/rhf.h"
 
 using namespace ketcpp;
