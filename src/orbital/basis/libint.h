@@ -29,7 +29,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "wrapper/matrix/matrix.h"
+#include "wrapper/matrix.h"
 #include "wrapper/molecule/base.h"
 
 namespace ketcpp {

@@ -25,8 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "wrapper/matrix/array.h"
-#include "wrapper/matrix/vector.h"
+#include "wrapper/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
   //! Factory method that creates an instance of default implementation of

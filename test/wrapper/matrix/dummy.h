@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "wrapper/matrix/matrix.h"
+#include "wrapper/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
   template <typename T> class MatrixDummy : public MatrixBase<T> {

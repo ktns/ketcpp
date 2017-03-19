@@ -27,7 +27,7 @@
 #include <numeric>
 #include <sstream>
 
-#include "wrapper/matrix/matrix.h"
+#include "wrapper/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
   //! @brief Matrix instance using std::array as its storage.

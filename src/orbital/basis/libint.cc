@@ -26,7 +26,7 @@
 #include <libint2.hpp>
 
 #include "orbital/basis/libint.h"
-#include "wrapper/matrix/default.h"
+#include "wrapper/matrix.h"
 
 using namespace ketcpp;
 using namespace ketcpp::orbital::basis;

@@ -27,7 +27,7 @@
 
 #include <Eigen/Dense>
 
-#include "wrapper/matrix/matrix.h"
+#include "wrapper/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
   //! Whether MatrixEigen is implemented

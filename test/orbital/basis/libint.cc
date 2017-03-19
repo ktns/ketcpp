@@ -29,7 +29,7 @@
 
 #include "config/fixture.h"
 #include "orbital/basis/libint.h"
-#include "wrapper/matrix/default.h"
+#include "wrapper/matrix.h"
 #include "wrapper/matrix/dummy.h"
 #include "wrapper/molecule/fixture.h"
 
