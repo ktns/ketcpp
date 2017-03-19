@@ -130,7 +130,8 @@ go_bandit([] {
         job.get_core_hamiltonian() must be_falsy;
         job.prepare(std::move(t.mol), std::move(t.set));
         job.get_core_hamiltonian() must be_truthy;
-        //*job.get_overlap() must equal(overlap_matrix);
+        *job.get_core_hamiltonian()
+             must equal(kinetic_matrix + nuclear_attraction_matrix);
       });
     });
 
