@@ -26,36 +26,50 @@
 #include "wrapper/matrix/matrix.h"
 #include "wrapper/molecule/base.h"
 
-namespace ketcpp {
-  namespace jobs {
-    class RHF {
-      bool prepared;
-      typedef wrapper::molecule::Base molecule_t;
-      typedef orbital::basisset::Base basisset_t;
-      typedef orbital::basis::Base basis_t;
-      typedef wrapper::matrix::Matrix<double> matrix_t;
-      std::unique_ptr<const molecule_t> molecule;
-      std::unique_ptr<const basisset_t> basisset;
-      std::unique_ptr<basis_t> basis;
-      std::unique_ptr<const matrix_t> overlap;
-      std::unique_ptr<matrix_t> core_hamiltonian;
+//! Job administrators
+namespace ketcpp::jobs {
+  //! Administrates a job that solves a Restricted Hartree Forck problem.
+  class RHF {
+    //! Whether the job is prepared to run
+    bool prepared;
+    typedef wrapper::molecule::Base molecule_t;
+    typedef orbital::basisset::Base basisset_t;
+    typedef orbital::basis::Base basis_t;
+    typedef wrapper::matrix::Matrix<double> matrix_t;
+    //! Molecule to solve
+    std::unique_ptr<const molecule_t> molecule;
+    //! BasisSet to use
+    std::unique_ptr<const basisset_t> basisset;
+    //! LCAO basis function system
+    std::unique_ptr<basis_t> basis;
+    //! Overlap matrix of basis functions
+    std::unique_ptr<const matrix_t> overlap;
+    //! Core Hamiltonian matrix
+    std::unique_ptr<matrix_t> core_hamiltonian;
 
-    public:
-      RHF() : prepared(false) {}
-      ~RHF() {}
-      void prepare(std::unique_ptr<const molecule_t> &&,
-                   std::unique_ptr<const basisset_t> &&);
-      void release(std::unique_ptr<molecule_t> &,
-                   std::unique_ptr<basisset_t> &);
-      auto release() {
-        std::unique_ptr<molecule_t> mol;
-        std::unique_ptr<basisset_t> set;
-        release(mol, set);
-        return make_tuple(std::move(mol), std::move(set));
-      }
-      const auto &get_basis() { return basis; }
-      const auto &get_overlap() { return overlap; }
-      const auto &get_core_hamiltonian() { return core_hamiltonian; }
-    };
-  }
+  public:
+    //! Default constructor
+    RHF() : prepared(false) {}
+    //! Empty destructor
+    ~RHF() {}
+    //! Prepare an RHF job and lock a molecule and a basisset to use.
+    void prepare(std::unique_ptr<const molecule_t> &&,
+                 std::unique_ptr<const basisset_t> &&);
+    //! Release resources that job has locked
+    void release(std::unique_ptr<molecule_t> &, std::unique_ptr<basisset_t> &);
+    //! Release resources that job has locked
+    //! @return std::pair that holds unique_ptr to a molecule and a basisset.
+    auto release() {
+      std::unique_ptr<molecule_t> mol;
+      std::unique_ptr<basisset_t> set;
+      release(mol, set);
+      return make_tuple(std::move(mol), std::move(set));
+    }
+    //! Accessor to the basis
+    const auto &get_basis() { return basis; }
+    //! Accessor to the overlap matrix
+    const auto &get_overlap() { return overlap; }
+    //! Accessor to the core hamiltonian matrix
+    const auto &get_core_hamiltonian() { return core_hamiltonian; }
+  };
 }
