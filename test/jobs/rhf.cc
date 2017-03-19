@@ -92,19 +92,29 @@ public:
   };
 };
 
-static const matrix_t overlap_matrix = wrapper::matrix::make_matrix<double, 2>(
-    {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+static const matrix_t overlap_matrix = [] {
+  auto x = wrapper::matrix::make_matrix<double, 2>(
+      {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+  return x * x->transpose();
+}();
 
-static const matrix_t kinetic_matrix = wrapper::matrix::make_matrix<double, 2>(
-    {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+static const matrix_t kinetic_matrix = [] {
+  auto x = wrapper::matrix::make_matrix<double, 2>(
+      {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+  return x + x->transpose();
+}();
 
-static const matrix_t nuclear_attraction_matrix =
-    wrapper::matrix::make_matrix<double, 2>(
-        {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+static const matrix_t nuclear_attraction_matrix = [] {
+  auto x = wrapper::matrix::make_matrix<double, 2>(
+      {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+  return x + x->transpose();
+}();
 
-static const matrix_t electron_repulsion_matrix =
-    wrapper::matrix::make_matrix<double, 2>(
-        {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+static const matrix_t electron_repulsion_matrix = [] {
+  auto x = wrapper::matrix::make_matrix<double, 2>(
+      {rand() * 1., rand() * 1., rand() * 1., rand() * 1.});
+  return x + x->transpose();
+}();
 
 class TestBasis : public orbital::basis::Base {
   matrix_t get_overlap() { return overlap_matrix; }
@@ -226,6 +236,28 @@ go_bandit([] {
         ret must equal(InitialGuessType::Fock);
         job.get_initial_guess_type() must be_truthy;
         job.get_initial_guess_type().value() must equal(InitialGuessType::Fock);
+      });
+    });
+
+    describe(".update_orbital()", [] {
+      it("should set orbital energies", [] {
+        TestSuite t;
+        RHF job;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_initial_guess_type() must be_falsy;
+        job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+        job.update_orbital();
+        job.get_energies() must be_truthy;
+      });
+
+      it("should set orbital coefficients", [] {
+        TestSuite t;
+        RHF job;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_initial_guess_type() must be_falsy;
+        job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+        job.update_orbital();
+        job.get_coefficients() must be_truthy;
       });
     });
   });

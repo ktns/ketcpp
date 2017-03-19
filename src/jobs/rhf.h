@@ -65,6 +65,10 @@ namespace ketcpp::jobs {
     std::unique_ptr<matrix_t> core_hamiltonian;
     //! Fock matrix
     std::unique_ptr<matrix_t> fock;
+    //! Orbital energies
+    std::unique_ptr<matrix_t> energies;
+    //! Orbital coefficients matrix
+    std::unique_ptr<matrix_t> coefficients;
 
   public:
     //! Default constructor
@@ -90,10 +94,20 @@ namespace ketcpp::jobs {
     const auto &get_overlap() { return overlap; }
     //! Accessor to the core hamiltonian matrix
     const auto &get_core_hamiltonian() { return core_hamiltonian; }
+    //! Accessor to the Fock matrix
+    const auto &get_fock() { return fock; }
+    //! Accessor to the orbital energies
+    const auto &get_energies() { return energies; }
+    //! Accessor to the orbital coefficients
+    const auto &get_coefficients() { return coefficients; }
 
     //! Make initial guess for the RHF problem
     InitialGuessType make_initial_guess(InitialGuessMethod);
     //! Accessor to initial guess type
     auto get_initial_guess_type() { return initial_guess_type; }
+
+    //! @brief Update orbital energies and coefficients based on the current
+    //! Fock matrix.
+    void update_orbital();
   };
 }

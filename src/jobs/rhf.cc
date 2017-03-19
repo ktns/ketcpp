@@ -21,6 +21,8 @@
 
 #include "jobs/rhf.h"
 
+#include "wrapper/matrix/eigensolver/generalized_eigensolver_hermite.h"
+
 using namespace ketcpp;
 using namespace ketcpp::jobs;
 
@@ -57,4 +59,14 @@ InitialGuessType RHF::make_initial_guess(InitialGuessMethod method) {
   }();
   assert(initial_guess_type.has_value());
   return initial_guess_type.value();
+}
+
+void RHF::update_orbital() {
+  assert(overlap);
+  assert(fock);
+  const auto &S = *overlap, &F = *fock;
+  wrapper::matrix::eigensolver::GeneralizedEigensolverHermite geh(S, F);
+  auto[E, C] = geh.solve();
+  energies.reset(new matrix_t(std::move(E)));
+  coefficients.reset(new matrix_t(std::move(C)));
 }
