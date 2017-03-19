@@ -137,6 +137,17 @@ go_bandit([] {
       });
     });
 
+    describe("::operator=", [&matrix1, &matrix2] {
+      it("should change contents of a matrix", [&matrix1, &matrix2] {
+        auto matrix3 = matrix1;
+        matrix3 must equal(matrix1);
+        matrix3 must_not equal(matrix2);
+        matrix3 = matrix2;
+        matrix3 must_not equal(matrix1);
+        matrix3 must equal(matrix2);
+      });
+    });
+
     describe("::operator==", [&matrix1, &matrix2] {
       it("should return true for same matrix", [&matrix1] {
         auto matrix2 = matrix1;
