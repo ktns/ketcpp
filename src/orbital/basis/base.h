@@ -47,7 +47,7 @@ namespace ketcpp::orbital::basis {
         std::is_convertible_v<typename std::iterator_traits<Iter>::value_type,
                               const pointcharge_t &>,
         matrix_t>
-    get_nuclear(Iter begin, Iter end) {
+    get_nuclear(const Iter &begin, const Iter &end) {
       std::vector<pointcharge_t> charges;
       if (std::is_base_of_v<
               std::forward_iterator_tag,
@@ -73,7 +73,7 @@ namespace ketcpp::orbital::basis {
     //! @param[in] args Parameters to be passed to \p get_nuclear(args)
     //! @return Fock matrix
     template <typename... Args>
-    matrix_t get_rhf_fock(const matrix_t &density, Args... args) {
+    matrix_t get_rhf_fock(const matrix_t &density, const Args &... args) {
       auto fock = get_kinetic() + get_nuclear(args...);
       return add_rhf_electron_repulsion(fock, density);
     }
