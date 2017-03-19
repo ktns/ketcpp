@@ -25,25 +25,12 @@
 #include <memory>
 #include <ostream>
 #include <type_traits>
-#if __has_include(<optional>)
-#include <optional>
-#else
-#include <experimental/optional>
-#endif
+
+#include "util/optional.h"
 
 //! Matrix wrapper classes
 namespace ketcpp::wrapper::matrix {
-//! @cond PRIVATE
-#if __has_include(<optional>)
-  template <typename T> using optional = std::optional<T>;
-#else
-  template <typename T>
-  struct optional : public std::experimental::optional<T> {
-    using std::experimental::optional<T>::optional;
-    bool has_value() { return static_cast<bool>(*this); }
-  };
-#endif
-  //! @endcond
+  using ketcpp::util::optional;
 
   template <typename T> class MatrixBase;
   //! Matrix wrapper class that conceals implementations of matrix instances.
