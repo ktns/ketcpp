@@ -23,9 +23,7 @@
 
 #include <bandit/bandit.h>
 
-#include "wrapper/matrix/matrix.h"
-
-#include "wrapper/matrix/default.h"
+#include "wrapper/matrix.h"
 #include "wrapper/matrix/dummy.h"
 
 using namespace bandit;
@@ -134,6 +132,17 @@ go_bandit([] {
         std::fill(matrix1.begin(), matrix1.end(), 0);
         std::count(matrix1.cbegin(), matrix1.cend(), 0)
             must equal(matrix1.size());
+      });
+    });
+
+    describe("::operator=", [&matrix1, &matrix2] {
+      it("should change contents of a matrix", [&matrix1, &matrix2] {
+        auto matrix3 = matrix1;
+        matrix3 must equal(matrix1);
+        matrix3 must_not equal(matrix2);
+        matrix3 = matrix2;
+        matrix3 must_not equal(matrix1);
+        matrix3 must equal(matrix2);
       });
     });
 

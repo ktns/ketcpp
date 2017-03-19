@@ -21,9 +21,8 @@
 
 #include <bandit/bandit.h>
 
-#include "wrapper/matrix/array.h"
+#include "wrapper/matrix.h"
 #include "wrapper/matrix/dummy.h"
-#include "wrapper/matrix/vector.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;

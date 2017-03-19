@@ -22,7 +22,7 @@
 
 #include <bandit/bandit.h>
 
-#include "wrapper/matrix/default.h"
+#include "wrapper/matrix.h"
 #include "wrapper/matrix/dummy.h"
 
 using namespace bandit;

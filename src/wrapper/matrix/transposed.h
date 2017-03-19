@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "wrapper/matrix/matrix.h"
+#include "wrapper/matrix.h"
 
 namespace ketcpp::wrapper::matrix {
   //! Matrix instance that is a transpose matrix of another matrix instance.

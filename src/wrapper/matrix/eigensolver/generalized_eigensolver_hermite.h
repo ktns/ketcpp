@@ -19,10 +19,11 @@
 
 #pragma once
 
+#include <cassert>
 #include <type_traits>
 
+#include "wrapper/matrix.h"
 #include "wrapper/matrix/eigen.h"
-#include "wrapper/matrix/matrix.h"
 
 namespace ketcpp::wrapper::matrix::eigensolver {
   //! @brief Generalized Eigenproblem solver for Hermitian matrices.
