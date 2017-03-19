@@ -23,7 +23,7 @@
 #include <type_traits>
 
 #include "orbital/basisset/base.h"
-#include "wrapper/matrix/matrix.h"
+#include "wrapper/matrix.h"
 #include "wrapper/molecule/base.h"
 
 //! Job administrators
