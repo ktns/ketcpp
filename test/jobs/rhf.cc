@@ -276,5 +276,20 @@ go_bandit([] {
         job.get_density() must be_truthy;
       });
     });
+
+    describe(".update_fock()", [] {
+      it("should change Fock matrix", [] {
+        TestSuite t;
+        RHF job;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_initial_guess_type() must be_falsy;
+        job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+        job.update_orbital();
+        job.update_density();
+        const auto fock = *job.get_fock();
+        job.update_fock();
+        *job.get_fock() must_not equal(fock);
+      });
+    });
   });
 });

@@ -122,5 +122,8 @@ namespace ketcpp::jobs {
 
     //! @brief Update the density matrix based on the current orbitals.
     void update_density();
+
+    //! @brief Update the Fock matrix based on the current density matrix.
+    void update_fock();
   };
 }

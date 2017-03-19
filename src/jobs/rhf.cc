@@ -87,3 +87,8 @@ void RHF::update_density() {
   const auto n = wrapper::matrix::make_diagonal_matrix(v.cbegin(), v.cend());
   density.reset(new matrix_t(C->transpose() * n * C));
 }
+
+void RHF::update_fock() {
+  assert(density);
+  fock.reset(new matrix_t(basis->get_rhf_fock(*density, *molecule)));
+}
