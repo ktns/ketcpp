@@ -68,7 +68,14 @@ namespace ketcpp::wrapper::matrix {
       n = m;
     assert(n > 0 && m > 0);
     auto ptr = std::make_unique<MatrixVector<T>>(n, m);
-    ptr->for_each([&ptr](size_t i, size_t j) { assert(ptr->at(i, j) == 0); });
+    assert(ptr->for_each([&ptr](size_t i, size_t j) -> util::optional<bool> {
+                if (ptr->at(i, j) == 0)
+                  return {};
+                else
+                  return false;
+              })
+               .value_or(true));
+    ;
     return Matrix<T>(std::move(ptr));
   }
 
