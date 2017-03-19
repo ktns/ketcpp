@@ -127,5 +127,7 @@ namespace ketcpp::wrapper::molecule {
   public:
     //! @brief Returns all atoms in the molecule
     virtual const std::vector<atom_t> &atoms() const = 0;
+    //! @brief Empty virtual destructor
+    virtual ~Base() {}
   };
 }

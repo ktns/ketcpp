@@ -86,7 +86,7 @@ struct TestSuite {
   std::unique_ptr<wrapper::molecule::Base> mol;
   std::unique_ptr<orbital::basisset::Base> set;
   TestSuite() {
-    mol_alive = set_alive = true;
+    mol_alive = set_alive = false;
     mol = std::make_unique<TestMolecule>(mol_alive);
     set = std::make_unique<TestBasisSet>(set_alive);
   }
@@ -97,10 +97,11 @@ go_bandit([] {
   describe("RHF", [] {
     it("should destruct its resources", [] {
       TestSuite t;
-      [&t] {
-        RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
-      }();
+      std::unique_ptr<RHF> pjob(new RHF);
+      pjob->prepare(std::move(t.mol), std::move(t.set));
+      t.mol_alive must be_truthy;
+      t.set_alive must be_truthy;
+      pjob.reset();
       t.mol_alive must be_falsy;
       t.set_alive must be_falsy;
     });
