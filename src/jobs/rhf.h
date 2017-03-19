@@ -69,6 +69,8 @@ namespace ketcpp::jobs {
     std::unique_ptr<matrix_t> energies;
     //! Orbital coefficients matrix
     std::unique_ptr<matrix_t> coefficients;
+    //! Density matrix
+    std::unique_ptr<matrix_t> density;
 
   public:
     //! Default constructor
@@ -100,6 +102,14 @@ namespace ketcpp::jobs {
     const auto &get_energies() { return energies; }
     //! Accessor to the orbital coefficients
     const auto &get_coefficients() { return coefficients; }
+    //! Accessor to the orbital coefficients
+    const auto &get_density() { return density; }
+
+    //! Number of electrons
+    size_t num_electrons() {
+      assert(molecule);
+      return molecule->total_nuclear_charge() - molecule->formal_charge();
+    }
 
     //! Make initial guess for the RHF problem
     InitialGuessType make_initial_guess(InitialGuessMethod);
@@ -109,5 +119,8 @@ namespace ketcpp::jobs {
     //! @brief Update orbital energies and coefficients based on the current
     //! Fock matrix.
     void update_orbital();
+
+    //! @brief Update the density matrix based on the current orbitals.
+    void update_density();
   };
 }

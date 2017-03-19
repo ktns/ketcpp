@@ -127,6 +127,11 @@ namespace ketcpp::wrapper::molecule {
   public:
     //! @brief Returns all atoms in the molecule
     virtual const std::vector<atom_t> &atoms() const = 0;
+    //! @brief Total nuclear charge
+    virtual size_t total_nuclear_charge() const = 0;
+    //! @brief Formal molecular charge
+    virtual int formal_charge() const = 0;
+
     //! @brief Empty virtual destructor
     virtual ~Base() {}
   };

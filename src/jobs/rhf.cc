@@ -17,6 +17,7 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cassert>
 
 #include "jobs/rhf.h"
@@ -69,4 +70,20 @@ void RHF::update_orbital() {
   auto[E, C] = geh.solve();
   energies.reset(new matrix_t(std::move(E)));
   coefficients.reset(new matrix_t(std::move(C)));
+}
+
+// TODO: Degeneracy handling
+void RHF::update_density() {
+  typedef matrix_t::value_type T;
+  assert(energies);
+  assert(coefficients);
+  const auto &E = *energies, &C = *coefficients;
+  std::vector<T> v(E->size());
+  std::copy(E->cbegin(), E->cend(), v.begin());
+  std::sort(v.begin(), v.end());
+  const T thresh = v.at(num_electrons() / 2);
+  std::transform(E.cbegin(), E.cend(), v.begin(),
+                 [thresh](T e) -> T { return e <= thresh ? 2 : 0; });
+  const auto n = wrapper::matrix::make_diagonal_matrix(v.cbegin(), v.cend());
+  density.reset(new matrix_t(C->transpose() * n * C));
 }

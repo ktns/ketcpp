@@ -90,6 +90,8 @@ public:
     static const std::vector<wrapper::molecule::atom_t> empty;
     return empty;
   };
+  size_t total_nuclear_charge() const override { return 1; }
+  int formal_charge() const override { return 0; }
 };
 
 static const matrix_t overlap_matrix = [] {
@@ -258,6 +260,20 @@ go_bandit([] {
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
         job.update_orbital();
         job.get_coefficients() must be_truthy;
+      });
+    });
+
+    describe(".update_density()", [] {
+      it("should set density matrix", [] {
+        TestSuite t;
+        RHF job;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_initial_guess_type() must be_falsy;
+        job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+        job.update_orbital();
+        job.get_density() must be_falsy;
+        job.update_density();
+        job.get_density() must be_truthy;
       });
     });
   });
