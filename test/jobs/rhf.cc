@@ -17,18 +17,67 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <bandit/bandit.h>
+#include <ios>
 
 #include "wrapper/matrix/default.h"
 #include "wrapper/molecule/base.h"
 
 #include "jobs/rhf.h"
 
-using namespace bandit;
-using namespace bandit::Matchers;
 using namespace ketcpp;
 using namespace ketcpp::jobs;
 using orbital::basis::matrix_t;
+
+namespace bandit::Matchers {
+  template <typename C, typename T>
+  std::basic_ostream<C, T> &operator<<(std::basic_ostream<C, T> &out,
+                                       const InitialGuessType type) {
+    return out << [type] {
+      switch (type) {
+      case InitialGuessType::Density:
+        return "InitialGuessType::Density";
+      case InitialGuessType::Fock:
+        return "InitialGuessType::Fock";
+      }
+    }();
+  }
+
+  template <typename C, typename T>
+  std::basic_ostream<C, T> &operator<<(std::basic_ostream<C, T> &out,
+                                       const InitialGuessMethod method) {
+    return out << [method] {
+      switch (method) {
+      case InitialGuessMethod::CoreHamiltonian:
+        return "InitialGuessMethod::CoreHamiltonian";
+      }
+    }();
+  }
+
+  template <typename C, typename T>
+  std::basic_ostream<C, T> &
+  operator<<(std::basic_ostream<C, T> &out,
+             const util::optional<InitialGuessType> type) {
+    if (type)
+      return out << type.value();
+    else
+      return out << "{}";
+  }
+
+  template <typename C, typename T>
+  std::basic_ostream<C, T> &
+  operator<<(std::basic_ostream<C, T> &out,
+             const util::optional<InitialGuessMethod> method) {
+    if (method)
+      return out << method.value();
+    else
+      return out << "{}";
+  }
+}
+
+#include <bandit/bandit.h>
+
+using namespace bandit;
+using namespace bandit::Matchers;
 
 class TestMolecule : public wrapper::molecule::Base {
   bool &alive;
@@ -164,6 +213,19 @@ go_bandit([] {
         t.set must be_truthy;
         t.mol.get() must equal(mol_ptr);
         t.set.get() must equal(set_ptr);
+      });
+    });
+
+    describe(".make_initial_guess()", [] {
+      it("should set the type of initial guess made", [] {
+        TestSuite t;
+        RHF job;
+        job.prepare(std::move(t.mol), std::move(t.set));
+        job.get_initial_guess_type() must be_falsy;
+        auto ret = job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+        ret must equal(InitialGuessType::Fock);
+        job.get_initial_guess_type() must be_truthy;
+        job.get_initial_guess_type().value() must equal(InitialGuessType::Fock);
       });
     });
   });

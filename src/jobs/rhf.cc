@@ -24,6 +24,7 @@ using namespace ketcpp::jobs;
 
 void RHF::prepare(std::unique_ptr<const molecule_t> &&mol,
                   std::unique_ptr<const basisset_t> &&set) {
+  initial_guess_type = {};
   molecule = std::move(mol);
   basisset = std::move(set);
   basis = basisset->get_basis(*molecule.get());
@@ -39,4 +40,19 @@ void RHF::release(std::unique_ptr<wrapper::molecule::Base> &mol,
   prepared = false;
   mol.reset(const_cast<wrapper::molecule::Base *>(molecule.release()));
   set.reset(const_cast<orbital::basisset::Base *>(basisset.release()));
+}
+
+InitialGuessType RHF::make_initial_guess(InitialGuessMethod method) {
+  assert(prepared);
+  initial_guess_type = [this, method] {
+    switch (method) {
+    case InitialGuessMethod::CoreHamiltonian:
+      fock.reset(new matrix_t(*core_hamiltonian));
+      return InitialGuessType::Fock;
+    default:
+      throw std::logic_error("Unknown initial guess method");
+    }
+  }();
+  assert(initial_guess_type.has_value());
+  return initial_guess_type.value();
 }

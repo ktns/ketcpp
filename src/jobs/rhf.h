@@ -28,14 +28,31 @@
 
 //! Job administrators
 namespace ketcpp::jobs {
+  //! Type of initial guess.
+  enum class InitialGuessType {
+    //! Guess density matrix.
+    Density,
+    //! Guess Fock matrix.
+    Fock
+  };
+
+  //! Enumerates implemented initial guess method.
+  enum class InitialGuessMethod {
+    //! Use core hamiltonian as initial guess of Fock matrix.
+    CoreHamiltonian
+  };
+
+  typedef wrapper::molecule::Base molecule_t;
+  typedef orbital::basisset::Base basisset_t;
+  typedef orbital::basis::Base basis_t;
+  typedef wrapper::matrix::Matrix<double> matrix_t;
+
   //! Administrates a job that solves a Restricted Hartree Forck problem.
   class RHF {
     //! Whether the job is prepared to run
     bool prepared;
-    typedef wrapper::molecule::Base molecule_t;
-    typedef orbital::basisset::Base basisset_t;
-    typedef orbital::basis::Base basis_t;
-    typedef wrapper::matrix::Matrix<double> matrix_t;
+    //! Which type of initialguess have made
+    util::optional<InitialGuessType> initial_guess_type;
     //! Molecule to solve
     std::unique_ptr<const molecule_t> molecule;
     //! BasisSet to use
@@ -46,10 +63,12 @@ namespace ketcpp::jobs {
     std::unique_ptr<const matrix_t> overlap;
     //! Core Hamiltonian matrix
     std::unique_ptr<matrix_t> core_hamiltonian;
+    //! Fock matrix
+    std::unique_ptr<matrix_t> fock;
 
   public:
     //! Default constructor
-    RHF() : prepared(false) {}
+    RHF() : prepared(false), initial_guess_type({}) {}
     //! Empty destructor
     ~RHF() {}
     //! Prepare an RHF job and lock a molecule and a basisset to use.
@@ -71,5 +90,10 @@ namespace ketcpp::jobs {
     const auto &get_overlap() { return overlap; }
     //! Accessor to the core hamiltonian matrix
     const auto &get_core_hamiltonian() { return core_hamiltonian; }
+
+    //! Make initial guess for the RHF problem
+    InitialGuessType make_initial_guess(InitialGuessMethod);
+    //! Accessor to initial guess type
+    auto get_initial_guess_type() { return initial_guess_type; }
   };
 }
