@@ -31,7 +31,7 @@ void RHF::prepare(std::unique_ptr<const molecule_t> &&mol,
                   const basisset_t &set) {
   initial_guess_type = {};
   molecule = std::move(mol);
-  basis = set.get_basis(*molecule.get());
+  basis = set.get_basis(molecule);
   overlap = std::make_unique<const wrapper::matrix::Matrix<double>>(
       basis->get_overlap());
   core_hamiltonian = std::make_unique<wrapper::matrix::Matrix<double>>(

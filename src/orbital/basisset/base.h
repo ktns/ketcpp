@@ -30,5 +30,9 @@ namespace ketcpp::orbital::basisset {
     virtual ~Base() {}
     virtual std::unique_ptr<orbital::basis::Base>
     get_basis(const wrapper::molecule::Base &) const = 0;
+    std::unique_ptr<orbital::basis::Base>
+    get_basis(std::unique_ptr<const wrapper::molecule::Base> &pmol) const {
+      return get_basis(*pmol);
+    }
   };
 }
