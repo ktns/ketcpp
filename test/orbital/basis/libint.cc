@@ -27,7 +27,6 @@
 
 #include <bandit/bandit.h>
 
-#include "config/fixture.h"
 #include "orbital/basis/libint.h"
 #include "wrapper/matrix.h"
 #include "wrapper/matrix/dummy.h"
