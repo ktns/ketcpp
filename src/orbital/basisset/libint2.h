@@ -1,3 +1,4 @@
+
 /*
  * ketcpp: Quantum chemical toolset made of C++
  * Copyright (C) 2017 Katsuhiko Nishimra
@@ -19,16 +20,30 @@
 
 #pragma once
 
+#include "config/ketcpp_config.h"
+
+#ifdef LIBINT2_FOUND
+
 #include <string>
 
-#include "orbital/basis/base.h"
-#include "wrapper/molecule/base.h"
+#include "orbital/basis/libint.h"
+#include "orbital/basisset/base.h"
 
 namespace ketcpp::orbital::basisset {
-  class Base {
+  //! Create Libint2Basis
+  class Libint2BasisSet : public Base {
+  private:
+    const std::string name;
+
   public:
-    virtual ~Base() {}
-    virtual std::unique_ptr<orbital::basis::Base>
-    get_basis(const wrapper::molecule::Base &) const = 0;
+    //! Load a basisset from its name using libint2
+    Libint2BasisSet(const std::string &basisset_name) : name(basisset_name) {}
+    //! Factory method for Libint2Basis
+    std::unique_ptr<orbital::basis::Base>
+    get_basis(const wrapper::molecule::Base &mol) const {
+      return std::make_unique<orbital::basis::Libint2Basis>(mol, name);
+    }
   };
 }
+
+#endif
