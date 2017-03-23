@@ -28,11 +28,10 @@ using namespace ketcpp;
 using namespace ketcpp::jobs;
 
 void RHF::prepare(std::unique_ptr<const molecule_t> &&mol,
-                  std::unique_ptr<const basisset_t> &&set) {
+                  const basisset_t &set) {
   initial_guess_type = {};
   molecule = std::move(mol);
-  basisset = std::move(set);
-  basis = basisset->get_basis(*molecule.get());
+  basis = set.get_basis(*molecule.get());
   overlap = std::make_unique<const wrapper::matrix::Matrix<double>>(
       basis->get_overlap());
   core_hamiltonian = std::make_unique<wrapper::matrix::Matrix<double>>(
@@ -40,11 +39,9 @@ void RHF::prepare(std::unique_ptr<const molecule_t> &&mol,
   prepared = true;
 }
 
-void RHF::release(std::unique_ptr<wrapper::molecule::Base> &mol,
-                  std::unique_ptr<orbital::basisset::Base> &set) {
+void RHF::release(std::unique_ptr<wrapper::molecule::Base> &mol) {
   prepared = false;
   mol.reset(const_cast<wrapper::molecule::Base *>(molecule.release()));
-  set.reset(const_cast<orbital::basisset::Base *>(basisset.release()));
 }
 
 InitialGuessType RHF::make_initial_guess(InitialGuessMethod method) {

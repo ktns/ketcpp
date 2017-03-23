@@ -131,11 +131,9 @@ class TestBasis : public orbital::basis::Base {
 };
 
 class TestBasisSet : public orbital::basisset::Base {
-  bool &alive;
-
 public:
-  TestBasisSet(bool &alive) : alive(alive) { alive = true; }
-  ~TestBasisSet() { alive = false; }
+  TestBasisSet() {}
+  ~TestBasisSet() {}
   std::unique_ptr<ketcpp::orbital::basis::Base>
   get_basis(const wrapper::molecule::Base &) const {
     return std::make_unique<TestBasis>();
@@ -143,13 +141,13 @@ public:
 };
 
 struct TestSuite {
-  bool mol_alive, set_alive;
+  bool mol_alive;
   std::unique_ptr<wrapper::molecule::Base> mol;
   std::unique_ptr<orbital::basisset::Base> set;
   TestSuite() {
-    mol_alive = set_alive = false;
+    mol_alive = false;
     mol = std::make_unique<TestMolecule>(mol_alive);
-    set = std::make_unique<TestBasisSet>(set_alive);
+    set = std::make_unique<TestBasisSet>();
   }
   ~TestSuite() {}
 };
@@ -159,12 +157,10 @@ go_bandit([] {
     it("should destruct its resources", [] {
       TestSuite t;
       std::unique_ptr<RHF> pjob(new RHF);
-      pjob->prepare(std::move(t.mol), std::move(t.set));
+      pjob->prepare(std::move(t.mol), *t.set);
       t.mol_alive must be_truthy;
-      t.set_alive must be_truthy;
       pjob.reset();
       t.mol_alive must be_falsy;
-      t.set_alive must be_falsy;
     });
 
     describe(".prepare(mol, set)", [] {
@@ -172,7 +168,7 @@ go_bandit([] {
         TestSuite t;
         RHF job;
         job.get_basis() must be_falsy;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_basis() must be_truthy;
       });
 
@@ -180,7 +176,7 @@ go_bandit([] {
         TestSuite t;
         RHF job;
         job.get_overlap() must be_falsy;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_overlap() must be_truthy;
         *job.get_overlap() must equal(overlap_matrix);
       });
@@ -189,7 +185,7 @@ go_bandit([] {
         TestSuite t;
         RHF job;
         job.get_core_hamiltonian() must be_falsy;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_core_hamiltonian() must be_truthy;
         *job.get_core_hamiltonian()
              must equal(kinetic_matrix + nuclear_attraction_matrix);
@@ -201,12 +197,10 @@ go_bandit([] {
         TestSuite t;
         void *mol_ptr = t.mol.get(), *set_ptr = t.set.get();
         RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         t.mol must be_falsy;
-        t.set must be_falsy;
-        job.release(t.mol, t.set);
+        job.release(t.mol);
         t.mol must be_truthy;
-        t.set must be_truthy;
         t.mol.get() must equal(mol_ptr);
         t.set.get() must equal(set_ptr);
       });
@@ -215,16 +209,13 @@ go_bandit([] {
     describe(".release()", [] {
       it("should release resources", [] {
         TestSuite t;
-        void *mol_ptr = t.mol.get(), *set_ptr = t.set.get();
+        void *mol_ptr = t.mol.get();
         RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         t.mol must be_falsy;
-        t.set must be_falsy;
-        std::tie(t.mol, t.set) = job.release();
+        t.mol = job.release();
         t.mol must be_truthy;
-        t.set must be_truthy;
         t.mol.get() must equal(mol_ptr);
-        t.set.get() must equal(set_ptr);
       });
     });
 
@@ -232,7 +223,7 @@ go_bandit([] {
       it("should set the type of initial guess made", [] {
         TestSuite t;
         RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_initial_guess_type() must be_falsy;
         auto ret = job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
         ret must equal(InitialGuessType::Fock);
@@ -245,7 +236,7 @@ go_bandit([] {
       it("should set orbital energies", [] {
         TestSuite t;
         RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
         job.update_orbital();
@@ -255,7 +246,7 @@ go_bandit([] {
       it("should set orbital coefficients", [] {
         TestSuite t;
         RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
         job.update_orbital();
@@ -267,7 +258,7 @@ go_bandit([] {
       it("should set density matrix", [] {
         TestSuite t;
         RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
         job.update_orbital();
@@ -281,7 +272,7 @@ go_bandit([] {
       it("should change Fock matrix", [] {
         TestSuite t;
         RHF job;
-        job.prepare(std::move(t.mol), std::move(t.set));
+        job.prepare(std::move(t.mol), *t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
         job.update_orbital();

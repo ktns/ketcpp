@@ -55,8 +55,6 @@ namespace ketcpp::jobs {
     util::optional<InitialGuessType> initial_guess_type;
     //! Molecule to solve
     std::unique_ptr<const molecule_t> molecule;
-    //! BasisSet to use
-    std::unique_ptr<const basisset_t> basisset;
     //! LCAO basis function system
     std::unique_ptr<basis_t> basis;
     //! Overlap matrix of basis functions
@@ -78,17 +76,15 @@ namespace ketcpp::jobs {
     //! Empty destructor
     ~RHF() {}
     //! Prepare an RHF job and lock a molecule and a basisset to use.
-    void prepare(std::unique_ptr<const molecule_t> &&,
-                 std::unique_ptr<const basisset_t> &&);
+    void prepare(std::unique_ptr<const molecule_t> &&, const basisset_t &);
     //! Release resources that job has locked
-    void release(std::unique_ptr<molecule_t> &, std::unique_ptr<basisset_t> &);
+    void release(std::unique_ptr<molecule_t> &);
     //! Release resources that job has locked
     //! @return std::pair that holds unique_ptr to a molecule and a basisset.
     auto release() {
       std::unique_ptr<molecule_t> mol;
-      std::unique_ptr<basisset_t> set;
-      release(mol, set);
-      return make_tuple(std::move(mol), std::move(set));
+      release(mol);
+      return mol;
     }
     //! Accessor to the basis
     const auto &get_basis() { return basis; }
