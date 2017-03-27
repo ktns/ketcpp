@@ -318,7 +318,7 @@ namespace ketcpp::wrapper::matrix {
     //! Returns a iterator to the ending of the matrix.
     auto end() const { return cend(); }
 
-    //! Transpose matrix.
+    //! @brief Returns a transposed matrix of itself.
     //! @return Transposed matrix
     //! @post Does not change the instance.
     Matrix<T> transpose() const;
