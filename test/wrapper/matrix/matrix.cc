@@ -318,6 +318,16 @@ go_bandit([] {
          });
     });
 
+    describe("::trace()", [&matrix1] {
+      it("should return a correct trace of a matrix",
+         [&matrix1] { matrix1->trace() must equal(1 + 4); });
+
+      it("should be callable for a constant matrix", [&matrix1] {
+        const auto &matrix2 = matrix1;
+        matrix2->trace() must equal(1 + 4);
+      });
+    });
+
     describe("::operator<<", [&matrix1] {
       it("should properly output matrix contents", [&matrix1] {
         std::stringstream ss;

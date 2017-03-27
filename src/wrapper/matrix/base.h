@@ -318,10 +318,20 @@ namespace ketcpp::wrapper::matrix {
     //! Returns a iterator to the ending of the matrix.
     auto end() const { return cend(); }
 
-    //! Transpose matrix.
+    //! @brief Returns a transposed matrix of itself.
     //! @return Transposed matrix
     //! @post Does not change the instance.
     Matrix<T> transpose() const;
+
+    //! Returns a trace @f$ \operatorname{Tr} A@f$
+    T trace() const {
+      const size_t n = std::min(get_num_rows(), get_num_columns());
+      T trace = 0;
+      for (size_t i = 0; i < n; i++) {
+        trace += at(i, i);
+      }
+      return trace;
+    }
 
   protected:
     //! Protected default constructor.
