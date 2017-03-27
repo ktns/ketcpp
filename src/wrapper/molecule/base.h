@@ -142,6 +142,22 @@ namespace ketcpp::wrapper::molecule {
     virtual size_t total_nuclear_charge() const = 0;
     //! @brief Formal molecular charge
     virtual int formal_charge() const = 0;
+    //! @brief Returns nuclear repulsion energy
+    virtual double nuclear_repulsion_energy() const {
+      const auto &atoms = this->atoms();
+      double nuclear_repulsion_energy = 0;
+      for (auto ai = atoms.begin(); ai < atoms.end(); ai++) {
+        for (auto aj = ai + 1; aj < atoms.end(); aj++) {
+          auto coordinates = ai->coordinates() - aj->coordinates();
+          const auto x = coordinates->at(0, 0), y = coordinates->at(0, 1),
+                     z = coordinates->at(0, 2);
+          const auto Zi = ai->atomic_number(), Zj = aj->atomic_number();
+          const auto r = std::sqrt(x * x + y * y + z * z);
+          nuclear_repulsion_energy += Zi * Zj / r;
+        }
+      }
+      return nuclear_repulsion_energy;
+    }
 
     //! @brief Empty virtual destructor
     virtual ~Base() {}

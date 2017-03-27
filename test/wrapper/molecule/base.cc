@@ -34,6 +34,7 @@ namespace bandit::Matchers {
 
 #include "wrapper/matrix.h"
 #include "wrapper/molecule/base.h"
+#include "wrapper/molecule/fixture.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
@@ -120,6 +121,16 @@ go_bandit([] {
         pointcharge.z() = 3;
         pointcharge.q() = 42;
         pointcharge must equal(std::make_tuple(1.0, 2.0, 3.0, 42u));
+      });
+    });
+  });
+
+  describe("wrapper::molecule::Base", [] {
+    describe("::nuclear_repulsion_energy()", [] {
+      it("should return the correct value", [] {
+        FixtureH2O mol;
+        mol.nuclear_repulsion_energy() must be_close_to(9.0842433585)
+            .within(1e-7);
       });
     });
   });
