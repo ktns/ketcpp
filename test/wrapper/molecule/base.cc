@@ -32,10 +32,12 @@ namespace bandit::Matchers {
 
 #include <bandit/bandit.h>
 
+#include "wrapper/matrix.h"
 #include "wrapper/molecule/base.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
+using namespace ketcpp;
 using namespace ketcpp::wrapper::molecule;
 
 go_bandit([] {
@@ -68,6 +70,15 @@ go_bandit([] {
         atom.Z() = 42;
         atom.atomic_number() = 42;
         atom must equal(std::make_tuple(1.0, 2.0, 3.0, 42u));
+      });
+    });
+
+    describe("::coordinates", [] {
+      it("should return correct matrix", [] {
+        atom_t atom(1, 2, 3, 42);
+        auto coordinates =
+            wrapper::matrix::make_matrix<double, 1, 3>({1, 2, 3});
+        AssertThat(atom.coordinates(), EqualsContainer(coordinates));
       });
     });
   });

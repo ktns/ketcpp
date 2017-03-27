@@ -19,7 +19,10 @@
 
 #pragma once
 
+#include <cmath>
 #include <tuple>
+
+#include "wrapper/matrix/array.h"
 
 //! molecule adaptors
 namespace ketcpp::wrapper::molecule {
@@ -41,6 +44,8 @@ namespace ketcpp::wrapper::molecule {
   //! @details Holds coordinates in atomic units and an atomic number.
   struct atom_t : public std::tuple<double, double, double, unsigned int> {
   private:
+    template <typename T, size_t m, size_t n>
+    using MatrixArray = wrapper::matrix::MatrixArray<T, m, n>;
     typedef std::tuple<double, double, double, unsigned int> tuple;
 
   public:
@@ -68,6 +73,12 @@ namespace ketcpp::wrapper::molecule {
     auto Z() const { return const_cast<atom_t *>(this)->Z(); }
     //! @brief Accessor to atomic_number
     auto atomic_number() const { return Z(); }
+
+    //! @brief Returns coordinates of the atom
+    MatrixArray<double, 1, 3> coordinates() const {
+      MatrixArray<double, 1, 3> coordinates = {x(), y(), z()};
+      return coordinates;
+    }
 
     //! Initialize an atom with a coordinates with specified units
     atom_t(LengthUnit u, double x, double y, double z, unsigned int Z)
