@@ -82,6 +82,13 @@ namespace ketcpp::jobs {
     //! @param set A reference to a basis-set to be used.
     void prepare(std::unique_ptr<const molecule_t> &&mol,
                  const basisset_t &set);
+    //! Prepare an RHF job and lock a molecule and a basisset to use.
+    template <typename BS>
+    std::enable_if_t<std::is_convertible_v<BS &, const basisset_t &>, void>
+    prepare(std::unique_ptr<const molecule_t> &&mol,
+            const std::unique_ptr<BS> &set) {
+      return prepare(std::move(mol), *set);
+    }
     //! Release resources that job has locked
     void release(std::unique_ptr<molecule_t> &);
     //! Release resources that job has locked

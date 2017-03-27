@@ -198,6 +198,14 @@ go_bandit([] {
         *job.get_core_hamiltonian()
              must equal(kinetic_matrix + nuclear_attraction_matrix);
       });
+
+      it("should accept a unique_ptr to a derived basis-set class", [] {
+        TestSuite t;
+        RHF job;
+        std::unique_ptr<TestBasisSet> set = std::make_unique<TestBasisSet>();
+        job.prepare(std::move(t.mol), set);
+        job.is_prepared() must be_truthy;
+      });
     });
 
     describe(".release(mol, set)", [] {
