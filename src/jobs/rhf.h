@@ -75,8 +75,13 @@ namespace ketcpp::jobs {
     RHF() : prepared(false), initial_guess_type({}) {}
     //! Empty destructor
     ~RHF() {}
-    //! Prepare an RHF job and lock a molecule and a basisset to use.
-    void prepare(std::unique_ptr<const molecule_t> &&, const basisset_t &);
+    //! @brief Prepare an RHF job and lock a molecule and a basisset to use.
+    //! @param mol A wrapper of molecule on which the job will be executed.
+    //! The solver acquires ownership of the molecule to prevent any change
+    //! the job.
+    //! @param set A reference to a basis-set to be used.
+    void prepare(std::unique_ptr<const molecule_t> &&mol,
+                 const basisset_t &set);
     //! Release resources that job has locked
     void release(std::unique_ptr<molecule_t> &);
     //! Release resources that job has locked
