@@ -324,7 +324,7 @@ namespace ketcpp::wrapper::matrix {
     Matrix<T> transpose() const;
 
     //! Returns a trace @f$ \operatorname{Tr} A@f$
-    T trace() {
+    T trace() const {
       const size_t n = std::min(get_num_rows(), get_num_columns());
       T trace = 0;
       for (size_t i = 0; i < n; i++) {
