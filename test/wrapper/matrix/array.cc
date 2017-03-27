@@ -449,6 +449,11 @@ go_bandit([] {
          });
     });
 
+    describe("::trace()", [&matrix1] {
+      it("should return a correct trace of a matrix",
+         [&matrix1] { matrix1.trace() must equal(1 + 4); });
+    });
+
     it("should comparable as a container", [&] {
       std::array<float, 6> array1 = {{1, 2, 3, 4, 5, 6}},
                            array2 = {{2, 4, 6, 8, 10, 12}},
