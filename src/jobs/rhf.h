@@ -91,6 +91,8 @@ namespace ketcpp::jobs {
       release(mol);
       return mol;
     }
+    //! Accessor to @t prepared
+    bool is_prepared() { return prepared; }
     //! Accessor to the basis
     const auto &get_basis() { return basis; }
     //! Accessor to the overlap matrix

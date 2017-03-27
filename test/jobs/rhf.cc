@@ -164,6 +164,14 @@ go_bandit([] {
     });
 
     describe(".prepare(mol, set)", [] {
+      it("should mark itself as prepared", [] {
+        TestSuite t;
+        RHF job;
+        job.is_prepared() must be_falsy;
+        job.prepare(std::move(t.mol), *t.set);
+        job.is_prepared() must be_truthy;
+      });
+
       it("should prepare basis", [] {
         TestSuite t;
         RHF job;
