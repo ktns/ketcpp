@@ -147,4 +147,16 @@ go_bandit([] {
       diag must equal(correct);
     });
   });
+
+  describe("make_diagonal_matrix", [] {
+    auto correct = make_dummy_matrix<float>();
+    before_each([&correct] {
+      correct = make_matrix<float, 3>({{1, 0, 0}, {0, 1, 0}, {0, 0, 1}});
+    });
+
+    it("should return a unit matrix", [&correct] {
+      auto I = make_unit_matrix<float>(3);
+      I must equal(correct);
+    });
+  });
 });

@@ -156,4 +156,12 @@ namespace ketcpp::wrapper::matrix {
   make_diagonal_matrix(const Container &container) {
     return make_diagonal_matrix(std::begin(container), std::end(container));
   }
+
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size unit matrix.
+  //! @param n Size of the returned matrix.
+  template <typename T> Matrix<T> make_unit_matrix(size_t n) {
+    std::vector<T> v(n, 1);
+    return make_diagonal_matrix(v);
+  }
 }
