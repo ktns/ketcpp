@@ -17,6 +17,7 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <forward_list>
 #include <iterator>
 #include <sstream>
 
@@ -131,6 +132,18 @@ go_bandit([] {
     it("should accept iterators from MatrixBase", [&correct] {
       auto vec = make_matrix<float, 1, 3>({1, 2, 3});
       auto diag = make_diagonal_matrix(vec.cbegin(), vec.cend());
+      diag must equal(correct);
+    });
+
+    it("should accept any contaniner", [&correct] {
+      std::vector<float> vec = {1, 2, 3};
+      auto diag = make_diagonal_matrix(vec);
+      diag must equal(correct);
+      std::array<float, 3> array = {{1, 2, 3}};
+      diag = make_diagonal_matrix(array);
+      diag must equal(correct);
+      std::forward_list<float> list = {{1, 2, 3}};
+      diag = make_diagonal_matrix(list);
       diag must equal(correct);
     });
   });

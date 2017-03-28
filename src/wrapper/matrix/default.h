@@ -146,4 +146,14 @@ namespace ketcpp::wrapper::matrix {
   Matrix<T> make_diagonal_matrix(std::initializer_list<T> list) {
     return make_diagonal_matrix(list.begin(), list.end());
   }
+
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size diagonal matrix.
+  //! @param [in] container A container that contains diagonal elements of the
+  //! returned matrix.
+  template <typename Container>
+  Matrix<typename Container::value_type>
+  make_diagonal_matrix(const Container &container) {
+    return make_diagonal_matrix(std::begin(container), std::end(container));
+  }
 }
