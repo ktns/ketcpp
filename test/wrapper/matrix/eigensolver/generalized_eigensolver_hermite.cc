@@ -89,6 +89,19 @@ go_bandit([] {
         AssertThat(a * vectors,
                    EqualsContainer(b * vectors * diag, with_delta));
       });
+
+      it("should return eigenvectors orthonormal with b as the metric", [&] {
+        GEH solver(a, b);
+        auto vectors = solver.solve().second;
+        auto I = vectors->transpose() * b * vectors;
+        auto n = I->get_num_columns();
+        typedef decltype(I)::value_type T;
+        auto with_delta = [](T tolerance) {
+          return [tolerance](T a, T b) { return std::abs(a - b) < tolerance; };
+        };
+        AssertThat(I,
+                   EqualsContainer(make_unit_matrix<T>(n), with_delta(1e-5)));
+      });
     });
   });
 });
