@@ -140,10 +140,28 @@ namespace ketcpp::wrapper::matrix {
 
   //! Factory method that creates an instance of default implementation of
   //! a dynamic-size diagonal matrix.
-  //! @param [in] list Nested initializer list that contains lower
-  //! triangular elements of the matrix in the row-major order.
+  //! @param [in] list A initializer list that holds diagonal elements of the
+  //! returned matrix.
   template <typename T>
   Matrix<T> make_diagonal_matrix(std::initializer_list<T> list) {
     return make_diagonal_matrix(list.begin(), list.end());
+  }
+
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size diagonal matrix.
+  //! @param [in] container A container that contains diagonal elements of the
+  //! returned matrix.
+  template <typename Container>
+  Matrix<typename Container::value_type>
+  make_diagonal_matrix(const Container &container) {
+    return make_diagonal_matrix(std::begin(container), std::end(container));
+  }
+
+  //! Factory method that creates an instance of default implementation of
+  //! a dynamic-size unit matrix.
+  //! @param n Size of the returned matrix.
+  template <typename T> Matrix<T> make_unit_matrix(size_t n) {
+    std::vector<T> v(n, 1);
+    return make_diagonal_matrix(v);
   }
 }
