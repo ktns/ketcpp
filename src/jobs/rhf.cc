@@ -36,6 +36,7 @@ void RHF::prepare(std::unique_ptr<const molecule_t> &&mol,
       basis->get_overlap());
   core_hamiltonian = std::make_unique<wrapper::matrix::Matrix<double>>(
       basis->get_kinetic() + basis->get_nuclear(*molecule));
+  assert(num_electrons() % 2 == 0);
   prepared = true;
 }
 
@@ -80,8 +81,9 @@ void RHF::update_density() {
   std::sort(v.begin(), v.end());
   const T thresh = v.at(num_electrons() / 2);
   std::transform(E.cbegin(), E.cend(), v.begin(),
-                 [thresh](T e) -> T { return e <= thresh ? 2 : 0; });
+                 [thresh](T e) -> T { return e < thresh ? 2 : 0; });
   const auto n = wrapper::matrix::make_diagonal_matrix(v.cbegin(), v.cend());
+  assert(n->trace() == num_electrons());
   density.reset(new matrix_t(C->transpose() * n * C));
 }
 

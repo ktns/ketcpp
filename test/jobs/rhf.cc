@@ -90,7 +90,7 @@ public:
     static const std::vector<wrapper::molecule::atom_t> empty;
     return empty;
   };
-  size_t total_nuclear_charge() const override { return 1; }
+  size_t total_nuclear_charge() const override { return 2; }
   int formal_charge() const override { return 0; }
 };
 
