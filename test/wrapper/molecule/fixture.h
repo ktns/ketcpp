@@ -32,7 +32,7 @@ namespace ketcpp {
             /*H*/ {LengthUnit::Angstrom, +0.65487, +0.67691, -0.49939, 1}};
 
       public:
-        const std::vector<atom_t> &atoms() const { return h2o_atoms; }
+        const std::vector<atom_t> &atoms() const override { return h2o_atoms; }
       };
     }
   }
