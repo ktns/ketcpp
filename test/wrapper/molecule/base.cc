@@ -24,7 +24,14 @@ namespace bandit::Matchers {
   std::basic_ostream<C, T> &
   operator<<(std::basic_ostream<C, T> &s,
              const std::tuple<double, double, double, unsigned int> &t) {
+#ifdef __cpp_structured_bindings
     auto[x, y, z, Z] = t;
+#else
+    auto x = std::get<0>(t);
+    auto y = std::get<1>(t);
+    auto z = std::get<2>(t);
+    auto Z = std::get<3>(t);
+#endif
     s << x << ',' << y << ',' << z << ',' << Z;
     return s;
   }
