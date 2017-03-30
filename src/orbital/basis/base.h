@@ -34,12 +34,13 @@ namespace ketcpp::orbital::basis {
   public:
     virtual ~Base() {}
     //! @return Overlap matrix of basis functions.
-    virtual matrix_t get_overlap() = 0;
+    virtual matrix_t get_overlap() const = 0;
     //! @return Kinetic energy matrix of basis functions.
-    virtual matrix_t get_kinetic() = 0;
+    virtual matrix_t get_kinetic() const = 0;
     //! @return Nuclear attraction energy matrix of basis functions.
     //! @details Uses atoms or point-charges in the passed vector.
-    virtual matrix_t get_nuclear(const std::vector<pointcharge_t> &charges) = 0;
+    virtual matrix_t
+    get_nuclear(const std::vector<pointcharge_t> &charges) const = 0;
     //! @return Nuclear attraction energy matrix of basis functions.
     //! @tparam Iter Iterator over point-charges.
     template <typename Iter>
@@ -47,7 +48,7 @@ namespace ketcpp::orbital::basis {
         std::is_convertible_v<typename std::iterator_traits<Iter>::value_type,
                               const pointcharge_t &>,
         matrix_t>
-    get_nuclear(const Iter &begin, const Iter &end) {
+    get_nuclear(const Iter &begin, const Iter &end) const {
       std::vector<pointcharge_t> charges;
       if (std::is_base_of_v<
               std::forward_iterator_tag,
@@ -58,7 +59,7 @@ namespace ketcpp::orbital::basis {
     }
     //! @return Nuclear attraction energy matrix of basis functions.
     //! @param mol An instance representing a molecule.
-    matrix_t get_nuclear(const wrapper::molecule::Base &mol) {
+    matrix_t get_nuclear(const wrapper::molecule::Base &mol) const {
       return get_nuclear(mol.atoms().cbegin(), mol.atoms().cend());
     }
     //! Compute the electron repulsion energy part of the Fock matrix for
@@ -66,14 +67,15 @@ namespace ketcpp::orbital::basis {
     //! @param[in,out] fock The matrix to add up electron repulsion matrix
     //! @param[in] density The population matrix of electrons
     //! @return A reference to @p fock
-    virtual matrix_t &add_rhf_electron_repulsion(matrix_t &fock,
-                                                 const matrix_t &density) = 0;
+    virtual matrix_t &
+    add_rhf_electron_repulsion(matrix_t &fock,
+                               const matrix_t &density) const = 0;
     //! Compute the Fock matrix for the specified electron population.
     //! @param[in] density The population matrix of electrons
     //! @param[in] args Parameters to be passed to \p get_nuclear(args)
     //! @return Fock matrix
     template <typename... Args>
-    matrix_t get_rhf_fock(const matrix_t &density, const Args &... args) {
+    matrix_t get_rhf_fock(const matrix_t &density, const Args &... args) const {
       auto fock = get_kinetic() + get_nuclear(args...);
       return add_rhf_electron_repulsion(fock, density);
     }

@@ -57,12 +57,14 @@ namespace ketcpp::orbital::basis {
     ~Libint2Basis();
 
     typedef wrapper::matrix::Matrix<double> matrix_t;
-    matrix_t get_overlap() override;
-    matrix_t get_kinetic() override;
-    matrix_t get_nuclear(const std::vector<pointcharge_t> &charges) override;
+    matrix_t get_overlap() const override;
+    matrix_t get_kinetic() const override;
+    matrix_t
+    get_nuclear(const std::vector<pointcharge_t> &charges) const override;
     using Base::get_nuclear;
-    matrix_t &add_rhf_electron_repulsion(matrix_t &fock,
-                                         const matrix_t &density) override;
+    matrix_t &
+    add_rhf_electron_repulsion(matrix_t &fock,
+                               const matrix_t &density) const override;
   };
 }
 

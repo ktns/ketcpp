@@ -208,13 +208,14 @@ Libint2Basis::Libint2Basis(const wrapper::molecule::Base &mol,
 
 Libint2Basis::~Libint2Basis() {}
 
-matrix_t Libint2Basis::get_overlap() {
+matrix_t Libint2Basis::get_overlap() const {
   return impl->get_1el_matrix(libint2::Operator::overlap);
 }
-matrix_t Libint2Basis::get_kinetic() {
+matrix_t Libint2Basis::get_kinetic() const {
   return impl->get_1el_matrix(libint2::Operator::kinetic);
 }
-matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
+matrix_t
+Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) const {
   decltype(libint2::make_point_charges(impl->atoms)) libint2_charges;
   libint2_charges.reserve(charges.size());
   std::transform(charges.cbegin(), charges.cend(),
@@ -227,8 +228,9 @@ matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
   return impl->get_1el_matrix(libint2::Operator::nuclear, libint2_charges);
 }
 
-matrix_t &Libint2Basis::add_rhf_electron_repulsion(matrix_t &fock,
-                                                   const matrix_t &density) {
+matrix_t &
+Libint2Basis::add_rhf_electron_repulsion(matrix_t &fock,
+                                         const matrix_t &density) const {
   return impl->add_rhf_electron_repulsion(fock, density);
 }
 #endif

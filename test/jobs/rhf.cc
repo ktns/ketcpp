@@ -123,14 +123,14 @@ static const matrix_t electron_repulsion_matrix = [] {
 }();
 
 class TestBasis : public orbital::basis::Base {
-  matrix_t get_overlap() override { return overlap_matrix; }
-  matrix_t get_kinetic() override { return kinetic_matrix; }
-  matrix_t
-  get_nuclear(const std::vector<wrapper::molecule::pointcharge_t> &) override {
+  matrix_t get_overlap() const override { return overlap_matrix; }
+  matrix_t get_kinetic() const override { return kinetic_matrix; }
+  matrix_t get_nuclear(
+      const std::vector<wrapper::molecule::pointcharge_t> &) const override {
     return nuclear_attraction_matrix;
   }
   matrix_t &add_rhf_electron_repulsion(matrix_t &fock,
-                                       const matrix_t &density) override {
+                                       const matrix_t &density) const override {
     return fock += electron_repulsion_matrix;
   }
 };
