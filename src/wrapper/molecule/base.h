@@ -37,6 +37,8 @@ namespace ketcpp::wrapper::molecule {
       return 1;
     case LengthUnit::Angstrom:
       return 1.0 / BOHR_RADIUS_IN_ANGSTROM;
+    default:
+      throw std::logic_error("Unknown value of wrapper::molecule::LengthUnit");
     }
   }
 
