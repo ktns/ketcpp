@@ -21,9 +21,8 @@
 #include <tuple>
 
 namespace bandit::Matchers {
-  template <typename C, typename T>
-  std::basic_ostream<C, T> &
-  operator<<(std::basic_ostream<C, T> &s,
+  std::ostream &
+  operator<<(std::ostream &s,
              const std::tuple<double, double, double, unsigned int> &t) {
 #ifdef __cpp_structured_bindings
     auto[x, y, z, Z] = t;
