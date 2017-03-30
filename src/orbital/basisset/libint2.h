@@ -40,7 +40,7 @@ namespace ketcpp::orbital::basisset {
     Libint2BasisSet(const std::string &basisset_name) : name(basisset_name) {}
     //! Factory method for Libint2Basis
     std::unique_ptr<orbital::basis::Base>
-    get_basis(const wrapper::molecule::Base &mol) const {
+    get_basis(const wrapper::molecule::Base &mol) const override {
       return std::make_unique<orbital::basis::Libint2Basis>(mol, name);
     }
   };
