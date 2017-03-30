@@ -64,7 +64,7 @@ void RHF::update_orbital() {
   assert(overlap);
   assert(fock);
   const auto &S = *overlap, &F = *fock;
-  wrapper::matrix::eigensolver::GeneralizedEigensolverHermite geh(S, F);
+  wrapper::matrix::eigensolver::GeneralizedEigensolverHermite geh(F, S);
   auto[E, C] = geh.solve();
   energies.reset(new matrix_t(std::move(E)));
   coefficients.reset(new matrix_t(std::move(C)));
