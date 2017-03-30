@@ -17,6 +17,7 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <ostream>
 #include <tuple>
 
 namespace bandit::Matchers {
