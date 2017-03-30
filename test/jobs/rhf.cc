@@ -38,6 +38,8 @@ namespace bandit::Matchers {
         return "InitialGuessType::Density";
       case InitialGuessType::Fock:
         return "InitialGuessType::Fock";
+      default:
+        throw std::logic_error("Unknown value of InitialGuessType");
       }
     }();
   }
@@ -49,6 +51,8 @@ namespace bandit::Matchers {
       switch (method) {
       case InitialGuessMethod::CoreHamiltonian:
         return "InitialGuessMethod::CoreHamiltonian";
+      default:
+        throw std::logic_error("Unknown value of InitialGuessMethod");
       }
     }();
   }
