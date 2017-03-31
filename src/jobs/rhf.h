@@ -67,7 +67,7 @@ namespace ketcpp::jobs {
     std::unique_ptr<matrix_t> energies;
     //! Orbital coefficients matrix
     std::unique_ptr<matrix_t> coefficients;
-    //! Density matrix
+    //! Density matrix of alpha-spin electrons
     std::unique_ptr<matrix_t> density;
 
   public:
@@ -102,17 +102,21 @@ namespace ketcpp::jobs {
     bool is_prepared() { return prepared; }
     //! Accessor to the basis
     const auto &get_basis() { return basis; }
-    //! Accessor to the overlap matrix
+    //! Accessor to the overlap matrix @f$ S @f$
     const auto &get_overlap() { return overlap; }
-    //! Accessor to the core hamiltonian matrix
+    //! Accessor to the core hamiltonian matrix @f$ H_\mathrm{core} @f$
     const auto &get_core_hamiltonian() { return core_hamiltonian; }
-    //! Accessor to the Fock matrix
+    //! Accessor to the Fock matrix @f$ F @f$
     const auto &get_fock() { return fock; }
-    //! Accessor to the orbital energies
+    //! @brief Accessor to the orbital energies @f$ E_k @f$
+    //! @note Not guaranteed to be sorted
     const auto &get_energies() { return energies; }
-    //! Accessor to the orbital coefficients
+    //! Accessor to the orbital coefficients @f$ C_{i\alpha} @f$
     const auto &get_coefficients() { return coefficients; }
-    //! Accessor to the orbital coefficients
+    //! @brief Accessor to the density matrix @f$ P @f$ of alpha-spin electrons
+    //! @note Due to non-orthogonality of the basis, idempotency of a density
+    //! matrix is expressed as
+    //! @f$ (S^{\frac 1 2} P S^{\frac 1 2})^n =S^{\frac 1 2} P S^{\frac 1 2}.@f$
     const auto &get_density() { return density; }
 
     //! Number of electrons
