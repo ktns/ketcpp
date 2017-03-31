@@ -287,6 +287,25 @@ go_bandit([] {
         job.update_density();
         job.get_density() must be_truthy;
       });
+
+      it("should keep idempotency of the density matrix", [] {
+        auto within = [](double delta) {
+          return
+              [delta](double a, double b) { return std::abs(a - b) < delta; };
+        };
+        TestSuite t;
+        RHF job;
+        job.prepare(std::move(t.mol), t.set);
+        job.get_initial_guess_type() must be_falsy;
+        job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+        job.update_orbital();
+        job.update_density();
+        job.get_overlap() must be_truthy;
+        job.get_density() must be_truthy;
+        const auto &S = *job.get_overlap(), &P = *job.get_density(),
+                   PSP = P * S * P;
+        AssertThat(PSP, EqualsContainer(P, within(1e-5)));
+      });
     });
 
     describe(".update_fock()", [] {
