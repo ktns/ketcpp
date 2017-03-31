@@ -100,7 +100,7 @@ namespace ketcpp::jobs {
     }
     //! Accessor to @t prepared
     bool is_prepared() { return prepared; }
-    //! Accessor to the basis
+    //! Accessor to the basis @f$ {|\chi_\alpha\rangle} @f$
     const auto &get_basis() { return basis; }
     //! Accessor to the overlap matrix @f$ S @f$
     const auto &get_overlap() { return overlap; }
@@ -108,10 +108,14 @@ namespace ketcpp::jobs {
     const auto &get_core_hamiltonian() { return core_hamiltonian; }
     //! Accessor to the Fock matrix @f$ F @f$
     const auto &get_fock() { return fock; }
-    //! @brief Accessor to the orbital energies @f$ E_k @f$
+    //! @brief Accessor to the orbital energies @f$ E_i @f$
     //! @note Not guaranteed to be sorted
     const auto &get_energies() { return energies; }
-    //! Accessor to the orbital coefficients @f$ C_{i\alpha} @f$
+    //! @brief Accessor to the orbital coefficients @f$ C_{i\alpha} @f$
+    //! @details
+    //! @f$ |\phi_i\rangle = \sum_\alpha C_{i\alpha} |\chi_\alpha\rangle @f$
+    //! where @f$ |\phi_i\rangle @f$ is a MO and @f$ |\chi_\alpha\rangle @f$
+    //! is a basis funciton.
     const auto &get_coefficients() { return coefficients; }
     //! @brief Accessor to the density matrix @f$ P @f$ of alpha-spin electrons
     //! @note Due to non-orthogonality of the basis, idempotency of a density
