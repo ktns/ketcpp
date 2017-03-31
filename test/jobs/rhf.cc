@@ -276,30 +276,33 @@ go_bandit([] {
     });
 
     describe(".update_density()", [] {
-      it("should set density matrix", [] {
-        TestSuite t;
-        RHF job;
+      TestSuite t;
+      RHF job;
+      before_each([&] {
         job.prepare(std::move(t.mol), t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
         job.update_orbital();
-        job.get_density() must be_falsy;
         job.update_density();
-        job.get_density() must be_truthy;
       });
 
-      it("should keep idempotency of the density matrix", [] {
+      after_each([&] { job.release(t.mol); });
+
+      it("should set density matrix",
+         [&job] { job.get_density() must be_truthy; });
+
+      it("should keep trace of density matrices", [&job] {
+        job.get_overlap() must be_truthy;
+        job.get_density() must be_truthy;
+        const auto &S = *job.get_overlap(), &P = *job.get_density(), PS = P * S;
+        AssertThat(PS->trace(), EqualsWithDelta(job.num_electrons() / 2, 1e-5));
+      });
+
+      it("should keep idempotency of density matrices", [&job] {
         auto within = [](double delta) {
           return
               [delta](double a, double b) { return std::abs(a - b) < delta; };
         };
-        TestSuite t;
-        RHF job;
-        job.prepare(std::move(t.mol), t.set);
-        job.get_initial_guess_type() must be_falsy;
-        job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
-        job.update_orbital();
-        job.update_density();
         job.get_overlap() must be_truthy;
         job.get_density() must be_truthy;
         const auto &S = *job.get_overlap(), &P = *job.get_density(),
