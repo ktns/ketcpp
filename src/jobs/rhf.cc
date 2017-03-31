@@ -61,11 +61,18 @@ InitialGuessType RHF::make_initial_guess(InitialGuessMethod method) {
 }
 
 void RHF::update_orbital() {
+  typedef matrix_t::value_type T;
+  auto make_unit_matrix = wrapper::matrix::make_unit_matrix<T>;
   assert(overlap);
   assert(fock);
   const auto &S = *overlap, &F = *fock;
   wrapper::matrix::eigensolver::GeneralizedEigensolverHermite geh(F, S);
   auto[E, C] = geh.solve();
+
+  const auto I[[maybe_unused]] = make_unit_matrix(S->get_num_rows()),
+             error[[maybe_unused]] = C->transpose() * S * C - I;
+  assert(error->max_absolute() < 1e-5);
+
   energies.reset(new matrix_t(std::move(E)));
   coefficients.reset(new matrix_t(std::move(C)));
 }

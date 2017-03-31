@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <functional>
 #include <list>
 #include <memory>
@@ -331,6 +332,13 @@ namespace ketcpp::wrapper::matrix {
         trace += at(i, i);
       }
       return trace;
+    }
+
+    //! Returns a maximum absolute value among elements
+    T max_absolute() const {
+      return std::abs(*std::max_element(cbegin(), cend(), [](T a, T b) {
+        return std::abs(a) < std::abs(b);
+      }));
     }
 
   protected:
