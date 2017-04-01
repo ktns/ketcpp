@@ -45,6 +45,15 @@ void RHF::release(std::unique_ptr<wrapper::molecule::Base> &mol) {
   mol.reset(const_cast<wrapper::molecule::Base *>(molecule.release()));
 }
 
+double RHF::calc_energy() const {
+  assert(prepared);
+  assert(fock);
+  assert(density);
+  const auto &Hc = *core_hamiltonian, &F = *fock, &P = *density, FHc = F + Hc,
+             PFHc = P * FHc;
+  return PFHc->trace() + molecule->nuclear_repulsion_energy();
+}
+
 InitialGuessType RHF::make_initial_guess(InitialGuessMethod method) {
   assert(prepared);
   initial_guess_type = [this, method] {

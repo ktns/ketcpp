@@ -122,6 +122,12 @@ namespace ketcpp::jobs {
     //! matrix is expressed as
     //! @f$ (S^{\frac 1 2} P S^{\frac 1 2})^n =S^{\frac 1 2} P S^{\frac 1 2}.@f$
     const auto &get_density() { return density; }
+    //! @brief Calculate the molecular energy
+    //! @return @f$ \mathrm{Tr} P(F+H_\mathrm{core}) + E_\mathrm{nucl} @f$,
+    //! where @f$ E_\mathrm{nucl}@f$ is the nuclear repulsion energy.
+    //! @pre The solver should be prepared, and the Fock matrix and the
+    //! Density matrix should have been calculated already.
+    double calc_energy() const;
 
     //! Number of electrons
     size_t num_electrons() {
