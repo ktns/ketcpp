@@ -2,7 +2,7 @@ Source: ketcpp
 Section: science
 Priority: optional
 Maintainer: Katsuhiko Nishimra <ktns.87@gmail.com>
-Build-Depends: debhelper (>= 9), cmake (>= 3.1), pkg-config, clang (>= 3.4) | g++ (>=4.8) | c++-compiler, libeigen3-dev, libint2-dev (>=2.1.0)
+Build-Depends: debhelper (>= 9), cmake (>= 3.8), pkg-config, clang (>= 3.4) | g++ (>=4.8) | c++-compiler, libeigen3-dev, libint2-dev (>=2.1.0)
 Build-Depends-Indep: doxygen, graphviz
 Standards-Version: 3.9.6
 #Homepage: <insert the upstream URL, if relevant>
