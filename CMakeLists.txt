@@ -74,12 +74,16 @@ file(GLOB_RECURSE SRCS src/*.cc)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
-add_executable (ket_cpp main.cc ${SRCS})
+add_library(ketcpp STATIC ${SRCS})
+
+add_executable (ket_cpp main.cc)
+target_link_libraries(ket_cpp PRIVATE ketcpp)
 
 file(GLOB_RECURSE TEST_SRCS test/*.cc)
 
 enable_testing()
-add_executable (run_tests ${SRCS} ${TEST_SRCS})
+add_executable (run_tests ${TEST_SRCS})
+target_link_libraries(run_tests PRIVATE ketcpp)
 target_include_directories(run_tests PRIVATE ${PROJECT_SOURCE_DIR}/test/)
 target_include_directories(run_tests SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/extlib/bandit)
 if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.1)
@@ -93,8 +97,8 @@ configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/test/config/ketcpp_test_config.h.in
 	${CMAKE_CURRENT_BINARY_DIR}/test/config/ketcpp_test_config.h)
 
-set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD 17)
-set_property(TARGET ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
+set_property(TARGET ketcpp ket_cpp run_tests PROPERTY CXX_STANDARD 17)
+set_property(TARGET ketcpp ket_cpp run_tests PROPERTY CXX_STANDARD_REQUIRED TRUE)
 
 set(ENABLE_COTIRE YES CACHE BOOL "Use cotire in the build or not")
 if("${COTIRE_CMAKE_MODULE_VERSION}" VERSION_GREATER "1.7.2.99" AND "${ENABLE_COTIRE}")
