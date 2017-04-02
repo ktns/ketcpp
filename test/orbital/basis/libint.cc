@@ -111,6 +111,8 @@ go_bandit([] {
            {-1.1626713e+00, -1.0043104e+00, +1.0865265e-01, -4.0289126e-01,
             +3.3679915e-01, -3.8176459e-01, -5.6350754e-01}});
       correct_repulsion = correct_fock - correct_coreh;
+      auto PS = density * correct_overlap;
+      AssertThat(PS->trace(), EqualsWithDelta(5, 1e-5));
     });
 
     after_each([&] { basis.reset(); });
