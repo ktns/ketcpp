@@ -341,6 +341,17 @@ namespace ketcpp::wrapper::matrix {
       }));
     }
 
+    //! Frobenius norm of the matrix.
+    virtual T frobenius_norm() const {
+      T norm = 0;
+      prepare_reflist_const();
+      assert(reflist);
+      for (T v : *reflist) {
+        norm += v * v;
+      }
+      return std::sqrt(norm);
+    }
+
   protected:
     //! Protected default constructor.
     MatrixBase() : reflist(nullptr) {}

@@ -446,6 +446,23 @@ go_bandit([] {
          });
     });
 
+    describe("::frobenius_norm()", [&matrix1] {
+      it("should return a correct Frobenius norm of a matrix", [&matrix1] {
+        matrix1
+            .frobenius_norm() must be_close_to(
+                std::sqrt(1 * 1 + 2 * 2 + 3 * 3 + 4 * 4 + 5 * 5 + 6 * 6))
+            .within(1e-5);
+      });
+
+      it("should be callable for a constant matrix", [&matrix1] {
+        const auto &matrix2 = matrix1;
+        matrix2
+            .frobenius_norm() must be_close_to(
+                std::sqrt(1 * 1 + 2 * 2 + 3 * 3 + 4 * 4 + 5 * 5 + 6 * 6))
+            .within(1e-5);
+      });
+    });
+
     describe("::trace()", [&matrix1] {
       it("should return a correct trace of a matrix",
          [&matrix1] { matrix1.trace() must equal(1 + 4); });
