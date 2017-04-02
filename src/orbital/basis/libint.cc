@@ -102,7 +102,8 @@ private:
     std::transform(begin, end, std::back_inserter(atoms),
                    [](const atom_t &a) -> libint2::Atom {
                      libint2::Atom o;
-                     std::tie(o.x, o.y, o.z, o.atomic_number) = a;
+                     std::tie(o.x, o.y, o.z, o.atomic_number) =
+                         std::make_tuple(a.x(), a.y(), a.z(), a.Z());
                      return o;
                    });
     auto coutbuf = std::cout.rdbuf();

@@ -75,7 +75,7 @@ void RHF::update_orbital() {
   assert(overlap);
   assert(fock);
   const auto &S = *overlap, &F = *fock;
-  wrapper::matrix::eigensolver::GeneralizedEigensolverHermite geh(F, S);
+  wrapper::matrix::eigensolver::GeneralizedEigensolverHermite<T> geh(F, S);
   auto[E, C] = geh.solve();
 
   const auto I[[maybe_unused]] = make_unit_matrix(S->get_num_rows()),
