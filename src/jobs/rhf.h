@@ -99,29 +99,29 @@ namespace ketcpp::jobs {
       return mol;
     }
     //! Accessor to @t prepared
-    bool is_prepared() { return prepared; }
+    bool is_prepared() const { return prepared; }
     //! Accessor to the basis @f$ {|\chi_\alpha\rangle} @f$
-    const auto &get_basis() { return basis; }
+    const auto &get_basis() const { return basis; }
     //! Accessor to the overlap matrix @f$ S @f$
-    const auto &get_overlap() { return overlap; }
+    const auto &get_overlap() const { return overlap; }
     //! Accessor to the core hamiltonian matrix @f$ H_\mathrm{core} @f$
-    const auto &get_core_hamiltonian() { return core_hamiltonian; }
+    const auto &get_core_hamiltonian() const { return core_hamiltonian; }
     //! Accessor to the Fock matrix @f$ F @f$
-    const auto &get_fock() { return fock; }
+    const auto &get_fock() const { return fock; }
     //! @brief Accessor to the orbital energies @f$ E_i @f$
     //! @note Not guaranteed to be sorted
-    const auto &get_energies() { return energies; }
+    const auto &get_energies() const { return energies; }
     //! @brief Accessor to the orbital coefficients @f$ C_{i\alpha} @f$
     //! @details
     //! @f$ |\phi_i\rangle = \sum_\alpha C_{i\alpha} |\chi_\alpha\rangle @f$
     //! where @f$ |\phi_i\rangle @f$ is a MO and @f$ |\chi_\alpha\rangle @f$
     //! is a basis funciton.
-    const auto &get_coefficients() { return coefficients; }
+    const auto &get_coefficients() const { return coefficients; }
     //! @brief Accessor to the density matrix @f$ P @f$ of alpha-spin electrons
     //! @note Due to non-orthogonality of the basis, idempotency of a density
     //! matrix is expressed as
     //! @f$ (S^{\frac 1 2} P S^{\frac 1 2})^n =S^{\frac 1 2} P S^{\frac 1 2}.@f$
-    const auto &get_density() { return density; }
+    const auto &get_density() const { return density; }
     //! @brief Calculate the molecular energy
     //! @return @f$ \mathrm{Tr} P(F+H_\mathrm{core}) + E_\mathrm{nucl} @f$,
     //! where @f$ E_\mathrm{nucl}@f$ is the nuclear repulsion energy.
@@ -130,7 +130,7 @@ namespace ketcpp::jobs {
     double calc_energy() const;
 
     //! Number of electrons
-    size_t num_electrons() {
+    size_t num_electrons() const {
       assert(molecule);
       return molecule->total_nuclear_charge() - molecule->formal_charge();
     }
