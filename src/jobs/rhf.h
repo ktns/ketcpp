@@ -69,6 +69,8 @@ namespace ketcpp::jobs {
     std::unique_ptr<matrix_t> coefficients;
     //! Density matrix of alpha-spin electrons
     std::unique_ptr<matrix_t> density;
+    //! Previousr density matrix;
+    std::unique_ptr<matrix_t> previous_density;
 
   public:
     //! Default constructor
@@ -89,6 +91,8 @@ namespace ketcpp::jobs {
             const std::unique_ptr<BS> &set) {
       return prepare(std::move(mol), *set);
     }
+    //! Solve the problem
+    void solve();
     //! Release resources that job has locked
     void release(std::unique_ptr<molecule_t> &);
     //! Release resources that job has locked
@@ -100,6 +104,8 @@ namespace ketcpp::jobs {
     }
     //! Accessor to @t prepared
     bool is_prepared() const { return prepared; }
+    //! Check whether calculation has converged
+    bool has_converged() const;
     //! Accessor to the basis @f$ {|\chi_\alpha\rangle} @f$
     const auto &get_basis() const { return basis; }
     //! Accessor to the overlap matrix @f$ S @f$

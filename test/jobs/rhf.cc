@@ -325,5 +325,15 @@ go_bandit([] {
         *job.get_fock() must_not equal(fock);
       });
     });
+
+    describe(".solve()", [] {
+      it("should set energies", [] {
+        TestSuite t;
+        RHF job;
+        job.prepare(std::move(t.mol), t.set);
+        job.solve();
+        job.get_energies() must be_truthy;
+      });
+    });
   });
 });

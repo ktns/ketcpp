@@ -107,3 +107,37 @@ void RHF::update_fock() {
   assert(density);
   fock.reset(new matrix_t(basis->get_rhf_fock(*density, *molecule)));
 }
+
+void RHF::solve() {
+  assert(prepared);
+  auto initial_guess_type =
+      make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+  switch (initial_guess_type) {
+  case InitialGuessType::Fock:
+    update_orbital();
+    update_density();
+    update_fock();
+    update_orbital();
+    std::swap(density, previous_density);
+    update_density();
+    break;
+  case InitialGuessType::Density:
+    update_fock();
+    std::swap(density, previous_density);
+    update_density();
+    break;
+  default:
+    throw std::logic_error("Unknown type of initial guess");
+  }
+  for (size_t i = 0; i < 100 && !has_converged(); i++) {
+    update_fock();
+    update_orbital();
+    std::swap(density, previous_density);
+    update_density();
+  }
+}
+
+bool RHF::has_converged() const {
+  const auto &Pn = *density, &Pn_1 = *previous_density, dP = Pn - Pn_1;
+  return dP->frobenius_norm() < 1e-5;
+}
