@@ -56,15 +56,14 @@ double RHF::calc_energy() const {
 
 InitialGuessType RHF::make_initial_guess(InitialGuessMethod method) {
   assert(prepared);
-  initial_guess_type = [this, method] {
-    switch (method) {
-    case InitialGuessMethod::CoreHamiltonian:
-      fock.reset(new matrix_t(*core_hamiltonian));
-      return InitialGuessType::Fock;
-    default:
-      throw std::logic_error("Unknown initial guess method");
-    }
-  }();
+  switch (method) {
+  case InitialGuessMethod::CoreHamiltonian:
+    fock.reset(new matrix_t(*core_hamiltonian));
+    initial_guess_type = InitialGuessType::Fock;
+    break;
+  default:
+    throw std::logic_error("Unknown initial guess method");
+  }
   assert(initial_guess_type.has_value());
   return initial_guess_type.value();
 }
@@ -110,8 +109,8 @@ void RHF::update_fock() {
 
 void RHF::solve() {
   assert(prepared);
-  auto initial_guess_type =
-      make_initial_guess(InitialGuessMethod::CoreHamiltonian);
+  auto initial_guess_type = make_initial_guess(config.initial_guess_method);
+  assert(this->initial_guess_type.has_value());
   switch (initial_guess_type) {
   case InitialGuessType::Fock:
     update_orbital();
@@ -129,7 +128,7 @@ void RHF::solve() {
   default:
     throw std::logic_error("Unknown type of initial guess");
   }
-  for (size_t i = 0; i < 100 && !has_converged(); i++) {
+  for (size_t i = 0; i < config.max_iterations && !has_converged(); i++) {
     update_fock();
     update_orbital();
     std::swap(density, previous_density);
@@ -139,5 +138,5 @@ void RHF::solve() {
 
 bool RHF::has_converged() const {
   const auto &Pn = *density, &Pn_1 = *previous_density, dP = Pn - Pn_1;
-  return dP->frobenius_norm() < 1e-5;
+  return dP->frobenius_norm() < config.convergence_criterion;
 }

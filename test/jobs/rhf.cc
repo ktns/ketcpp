@@ -149,7 +149,8 @@ struct TestSuite {
   bool mol_alive;
   std::unique_ptr<wrapper::molecule::Base> mol;
   std::unique_ptr<orbital::basisset::Base> set;
-  TestSuite() {
+  const RHF::Configuration config;
+  TestSuite() : config({InitialGuessMethod::CoreHamiltonian, 1e-5, 100}) {
     mol_alive = false;
     mol = std::make_unique<TestMolecule>(mol_alive);
     set = std::make_unique<TestBasisSet>();
@@ -161,7 +162,7 @@ go_bandit([] {
   describe("RHF", [] {
     it("should destruct its resources", [] {
       TestSuite t;
-      std::unique_ptr<RHF> pjob(new RHF);
+      std::unique_ptr<RHF> pjob(new RHF(t.config));
       pjob->prepare(std::move(t.mol), t.set);
       t.mol_alive must be_truthy;
       pjob.reset();
@@ -171,7 +172,7 @@ go_bandit([] {
     describe(".prepare(mol, set)", [] {
       it("should mark itself as prepared", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.is_prepared() must be_falsy;
         job.prepare(std::move(t.mol), t.set);
         job.is_prepared() must be_truthy;
@@ -179,7 +180,7 @@ go_bandit([] {
 
       it("should prepare basis", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.get_basis() must be_falsy;
         job.prepare(std::move(t.mol), t.set);
         job.get_basis() must be_truthy;
@@ -187,7 +188,7 @@ go_bandit([] {
 
       it("should prepare overlap matrix", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.get_overlap() must be_falsy;
         job.prepare(std::move(t.mol), t.set);
         job.get_overlap() must be_truthy;
@@ -196,7 +197,7 @@ go_bandit([] {
 
       it("should prepare core_hamiltonian matrix", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.get_core_hamiltonian() must be_falsy;
         job.prepare(std::move(t.mol), t.set);
         job.get_core_hamiltonian() must be_truthy;
@@ -206,7 +207,7 @@ go_bandit([] {
 
       it("should accept a unique_ptr to a derived basis-set class", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         std::unique_ptr<TestBasisSet> set = std::make_unique<TestBasisSet>();
         job.prepare(std::move(t.mol), set);
         job.is_prepared() must be_truthy;
@@ -217,7 +218,7 @@ go_bandit([] {
       it("should release resources", [] {
         TestSuite t;
         void *mol_ptr = t.mol.get(), *set_ptr = t.set.get();
-        RHF job;
+        RHF job(t.config);
         job.prepare(std::move(t.mol), t.set);
         t.mol must be_falsy;
         job.release(t.mol);
@@ -231,7 +232,7 @@ go_bandit([] {
       it("should release resources", [] {
         TestSuite t;
         void *mol_ptr = t.mol.get();
-        RHF job;
+        RHF job(t.config);
         job.prepare(std::move(t.mol), t.set);
         t.mol must be_falsy;
         t.mol = job.release();
@@ -243,7 +244,7 @@ go_bandit([] {
     describe(".make_initial_guess()", [] {
       it("should set the type of initial guess made", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.prepare(std::move(t.mol), t.set);
         job.get_initial_guess_type() must be_falsy;
         auto ret = job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
@@ -256,7 +257,7 @@ go_bandit([] {
     describe(".update_orbital()", [] {
       it("should set orbital energies", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.prepare(std::move(t.mol), t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
@@ -266,7 +267,7 @@ go_bandit([] {
 
       it("should set orbital coefficients", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.prepare(std::move(t.mol), t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
@@ -277,7 +278,7 @@ go_bandit([] {
 
     describe(".update_density()", [] {
       TestSuite t;
-      RHF job;
+      RHF job(t.config);
       before_each([&] {
         job.prepare(std::move(t.mol), t.set);
         job.get_initial_guess_type() must be_falsy;
@@ -314,7 +315,7 @@ go_bandit([] {
     describe(".update_fock()", [] {
       it("should change Fock matrix", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.prepare(std::move(t.mol), t.set);
         job.get_initial_guess_type() must be_falsy;
         job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
@@ -329,7 +330,7 @@ go_bandit([] {
     describe(".solve()", [] {
       it("should set energies", [] {
         TestSuite t;
-        RHF job;
+        RHF job(t.config);
         job.prepare(std::move(t.mol), t.set);
         job.solve();
         job.get_energies() must be_truthy;

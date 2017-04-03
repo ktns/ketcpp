@@ -105,7 +105,7 @@ go_bandit([] {
       auto within = [](double delta) {
         return [delta](double a, double b) { return std::abs(a - b) < delta; };
       };
-      RHF job;
+      RHF job({InitialGuessMethod::CoreHamiltonian, 1e-5, 100});
       job.prepare(std::move(mol), basisset);
       job.make_initial_guess(InitialGuessMethod::CoreHamiltonian);
       {

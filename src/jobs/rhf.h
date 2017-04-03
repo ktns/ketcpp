@@ -49,6 +49,22 @@ namespace ketcpp::jobs {
 
   //! Administrates a job that solves a Restricted Hartree Forck problem.
   class RHF {
+  public:
+    //! Configuration values for an RHF job.
+    struct Configuration {
+      Configuration() = delete;
+      //! Method to make an initial guess
+      InitialGuessMethod initial_guess_method;
+      //! Convergence criterion for Frobenius norm of density matrix change
+      //! @f$ ||P_n - P_{n-1}|| @f$
+      matrix_t::value_type convergence_criterion;
+      //! Max number of iterations
+      size_t max_iterations;
+    };
+
+  private:
+    //! Configuration values
+    Configuration config;
     //! Whether the job is prepared to run
     bool prepared;
     //! Which type of initialguess have made
@@ -74,7 +90,10 @@ namespace ketcpp::jobs {
 
   public:
     //! Default constructor
-    RHF() : prepared(false), initial_guess_type({}) {}
+    RHF(const Configuration &config) : config(config), prepared(false) {
+      assert(config.max_iterations > 0);
+      assert(config.convergence_criterion > 0);
+    }
     //! Empty destructor
     ~RHF() {}
     //! @brief Prepare an RHF job with a molecule and a basisset to use.
