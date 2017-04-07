@@ -98,7 +98,7 @@ void RHF::update_density() {
   std::transform(E.cbegin(), E.cend(), v.begin(),
                  [thresh](T e) -> T { return e < thresh ? 1 : 0; });
   const auto n = wrapper::matrix::make_diagonal_matrix(v.cbegin(), v.cend());
-  assert(n->trace() == num_electrons() / 2);
+  assert(std::abs(n->trace() - num_electrons() / 2) < 1e-5);
   density.reset(new matrix_t(C * n * C->transpose()));
 }
 
