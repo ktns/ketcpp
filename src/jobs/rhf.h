@@ -121,7 +121,7 @@ namespace ketcpp::jobs {
       release(mol);
       return mol;
     }
-    //! Accessor to @t prepared
+    //! Accessor to @p prepared
     bool is_prepared() const { return prepared; }
     //! Check whether calculation has converged
     bool has_converged() const;
