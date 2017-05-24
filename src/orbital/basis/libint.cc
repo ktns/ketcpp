@@ -102,7 +102,8 @@ private:
     std::transform(begin, end, std::back_inserter(atoms),
                    [](const atom_t &a) -> libint2::Atom {
                      libint2::Atom o;
-                     std::tie(o.x, o.y, o.z, o.atomic_number) = a;
+                     std::tie(o.x, o.y, o.z, o.atomic_number) =
+                         std::make_tuple(a.x(), a.y(), a.z(), a.Z());
                      return o;
                    });
     auto coutbuf = std::cout.rdbuf();
@@ -208,17 +209,14 @@ Libint2Basis::Libint2Basis(const wrapper::molecule::Base &mol,
 
 Libint2Basis::~Libint2Basis() {}
 
-matrix_t Libint2Basis::get_overlap() {
+matrix_t Libint2Basis::get_overlap() const {
   return impl->get_1el_matrix(libint2::Operator::overlap);
 }
-matrix_t Libint2Basis::get_kinetic() {
+matrix_t Libint2Basis::get_kinetic() const {
   return impl->get_1el_matrix(libint2::Operator::kinetic);
 }
-matrix_t Libint2Basis::get_nuclear() {
-  return impl->get_1el_matrix(libint2::Operator::nuclear,
-                              make_point_charges(impl->atoms));
-}
-matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
+matrix_t
+Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) const {
   decltype(libint2::make_point_charges(impl->atoms)) libint2_charges;
   libint2_charges.reserve(charges.size());
   std::transform(charges.cbegin(), charges.cend(),
@@ -231,8 +229,9 @@ matrix_t Libint2Basis::get_nuclear(const std::vector<pointcharge_t> &charges) {
   return impl->get_1el_matrix(libint2::Operator::nuclear, libint2_charges);
 }
 
-matrix_t &Libint2Basis::add_rhf_electron_repulsion(matrix_t &fock,
-                                                   const matrix_t &density) {
+matrix_t &
+Libint2Basis::add_rhf_electron_repulsion(matrix_t &fock,
+                                         const matrix_t &density) const {
   return impl->add_rhf_electron_repulsion(fock, density);
 }
 #endif

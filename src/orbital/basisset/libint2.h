@@ -1,3 +1,4 @@
+
 /*
  * ketcpp: Quantum chemical toolset made of C++
  * Copyright (C) 2017 Katsuhiko Nishimra
@@ -19,23 +20,30 @@
 
 #pragma once
 
-#include "wrapper/molecule/base.h"
+#include "config/ketcpp_config.h"
 
-namespace ketcpp {
-  namespace wrapper {
-    namespace molecule {
-      class FixtureH2O : public Base {
-      private:
-        const std::vector<atom_t> h2o_atoms = {
-            /*O*/ {LengthUnit::Angstrom, +0.93372, -0.03509, +0.09581, 8},
-            /*H*/ {LengthUnit::Angstrom, +1.90161, +0.00053, +0.06603, 1},
-            /*H*/ {LengthUnit::Angstrom, +0.65487, +0.67691, -0.49939, 1}};
+#ifdef LIBINT2_FOUND
 
-      public:
-        const std::vector<atom_t> &atoms() const override { return h2o_atoms; }
-        size_t total_nuclear_charge() const override { return 8 + 1 + 1; }
-        int formal_charge() const override { return 0; }
-      };
+#include <string>
+
+#include "orbital/basis/libint.h"
+#include "orbital/basisset/base.h"
+
+namespace ketcpp::orbital::basisset {
+  //! Create Libint2Basis
+  class Libint2BasisSet : public Base {
+  private:
+    const std::string name;
+
+  public:
+    //! Load a basisset from its name using libint2
+    Libint2BasisSet(const std::string &basisset_name) : name(basisset_name) {}
+    //! Factory method for Libint2Basis
+    std::unique_ptr<orbital::basis::Base>
+    get_basis(const wrapper::molecule::Base &mol) const override {
+      return std::make_unique<orbital::basis::Libint2Basis>(mol, name);
     }
-  }
+  };
 }
+
+#endif

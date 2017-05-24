@@ -35,14 +35,32 @@ namespace bandit::Matchers {
     s << x << ',' << y << ',' << z << ',' << Z;
     return s;
   }
+
+  std::ostream &
+  operator<<(std::ostream &s,
+             const std::tuple<double, double, double, double> &t) {
+#ifdef __cpp_structured_bindings
+    auto[x, y, z, q] = t;
+#else
+    auto x = std::get<0>(t);
+    auto y = std::get<1>(t);
+    auto z = std::get<2>(t);
+    auto q = std::get<3>(t);
+#endif
+    s << x << ',' << y << ',' << z << ',' << q;
+    return s;
+  }
 }
 
 #include <bandit/bandit.h>
 
+#include "wrapper/matrix.h"
 #include "wrapper/molecule/base.h"
+#include "wrapper/molecule/fixture.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
+using namespace ketcpp;
 using namespace ketcpp::wrapper::molecule;
 
 go_bandit([] {
@@ -75,6 +93,15 @@ go_bandit([] {
         atom.Z() = 42;
         atom.atomic_number() = 42;
         atom must equal(std::make_tuple(1.0, 2.0, 3.0, 42u));
+      });
+    });
+
+    describe("::coordinates", [] {
+      it("should return correct matrix", [] {
+        atom_t atom(1, 2, 3, 42);
+        auto coordinates =
+            wrapper::matrix::make_matrix<double, 1, 3>({1, 2, 3});
+        AssertThat(atom.coordinates(), EqualsContainer(coordinates));
       });
     });
   });
@@ -116,6 +143,16 @@ go_bandit([] {
         pointcharge.z() = 3;
         pointcharge.q() = 42;
         pointcharge must equal(std::make_tuple(1.0, 2.0, 3.0, 42u));
+      });
+    });
+  });
+
+  describe("wrapper::molecule::Base", [] {
+    describe("::nuclear_repulsion_energy()", [] {
+      it("should return the correct value", [] {
+        FixtureH2O mol;
+        mol.nuclear_repulsion_energy() must be_close_to(9.0842433585)
+            .within(1e-7);
       });
     });
   });

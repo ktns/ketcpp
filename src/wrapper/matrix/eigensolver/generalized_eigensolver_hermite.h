@@ -47,19 +47,8 @@ namespace ketcpp::wrapper::matrix::eigensolver {
     //! \f$B\f$.
     //! @note Solvers do not hold copies of the matrices.
     GeneralizedEigensolverHermite(const M &a, const M &b) : a(a), b(b) {
-      assert(a.for_each([&a](size_t i, size_t j) -> optional<bool> {
-                if (a.at(i, j) != a.at(j, i))
-                  return false;
-                else
-                  return {};
-              }).value_or(true));
-
-      assert(b.for_each([&b](size_t i, size_t j) -> optional<bool> {
-                if (b.at(i, j) != b.at(j, i))
-                  return false;
-                else
-                  return {};
-              }).value_or(true));
+      assert(a.transpose() == a);
+      assert(b.transpose() == b);
       assert(a.dimension() == b.dimension());
     }
     //! @brief Solve the generalized eigenproblem.

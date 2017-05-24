@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <functional>
 #include <list>
 #include <memory>
@@ -331,6 +332,24 @@ namespace ketcpp::wrapper::matrix {
         trace += at(i, i);
       }
       return trace;
+    }
+
+    //! Returns a maximum absolute value among elements
+    T max_absolute() const {
+      return std::abs(*std::max_element(cbegin(), cend(), [](T a, T b) {
+        return std::abs(a) < std::abs(b);
+      }));
+    }
+
+    //! Frobenius norm of the matrix.
+    virtual T frobenius_norm() const {
+      T norm = 0;
+      prepare_reflist_const();
+      assert(reflist);
+      for (T v : *reflist) {
+        norm += v * v;
+      }
+      return std::sqrt(norm);
     }
 
   protected:

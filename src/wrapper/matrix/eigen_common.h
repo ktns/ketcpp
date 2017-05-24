@@ -58,6 +58,8 @@ namespace ketcpp::wrapper::matrix {
       this->matrix_instance() = other.matrix_instance();
       return *this;
     }
+
+    T frobenius_norm() const override { return matrix_instance().norm(); }
   };
 }
 #else

@@ -19,23 +19,20 @@
 
 #pragma once
 
+#include <string>
+
+#include "orbital/basis/base.h"
 #include "wrapper/molecule/base.h"
 
-namespace ketcpp {
-  namespace wrapper {
-    namespace molecule {
-      class FixtureH2O : public Base {
-      private:
-        const std::vector<atom_t> h2o_atoms = {
-            /*O*/ {LengthUnit::Angstrom, +0.93372, -0.03509, +0.09581, 8},
-            /*H*/ {LengthUnit::Angstrom, +1.90161, +0.00053, +0.06603, 1},
-            /*H*/ {LengthUnit::Angstrom, +0.65487, +0.67691, -0.49939, 1}};
-
-      public:
-        const std::vector<atom_t> &atoms() const override { return h2o_atoms; }
-        size_t total_nuclear_charge() const override { return 8 + 1 + 1; }
-        int formal_charge() const override { return 0; }
-      };
+namespace ketcpp::orbital::basisset {
+  class Base {
+  public:
+    virtual ~Base() {}
+    virtual std::unique_ptr<orbital::basis::Base>
+    get_basis(const wrapper::molecule::Base &) const = 0;
+    std::unique_ptr<orbital::basis::Base>
+    get_basis(std::unique_ptr<const wrapper::molecule::Base> &pmol) const {
+      return get_basis(*pmol);
     }
-  }
+  };
 }

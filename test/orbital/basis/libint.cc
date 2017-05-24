@@ -111,6 +111,8 @@ go_bandit([] {
            {-1.1626713e+00, -1.0043104e+00, +1.0865265e-01, -4.0289126e-01,
             +3.3679915e-01, -3.8176459e-01, -5.6350754e-01}});
       correct_repulsion = correct_fock - correct_coreh;
+      auto PS = density * correct_overlap;
+      AssertThat(PS->trace(), EqualsWithDelta(5, 1e-5));
     });
 
     after_each([&] { basis.reset(); });
@@ -148,7 +150,7 @@ go_bandit([] {
 
     describe("::get_nuclear", [&] {
       it("Should return correct nuclear matrix", [&] {
-        auto kinetic = basis->get_nuclear();
+        auto kinetic = basis->get_nuclear(FixtureH2O());
         auto within_delta = [](double a, double b) -> bool {
           return std::abs(a - b) < 1e-5;
         };
@@ -170,7 +172,7 @@ go_bandit([] {
     describe("::get_rhf_fock", [&] {
       describe("()", [&] {
         it("Should return correct fock matrix", [&] {
-          auto fock = basis->get_rhf_fock(density);
+          auto fock = basis->get_rhf_fock(density, FixtureH2O());
           auto within_delta = [](double a, double b) -> bool {
             return std::abs(a - b) < 1e-5;
           };

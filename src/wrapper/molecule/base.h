@@ -19,7 +19,10 @@
 
 #pragma once
 
+#include <cmath>
 #include <tuple>
+
+#include "wrapper/matrix/array.h"
 
 //! molecule adaptors
 namespace ketcpp::wrapper::molecule {
@@ -43,6 +46,8 @@ namespace ketcpp::wrapper::molecule {
   //! @details Holds coordinates in atomic units and an atomic number.
   struct atom_t : public std::tuple<double, double, double, unsigned int> {
   private:
+    template <typename T, size_t m, size_t n>
+    using MatrixArray = wrapper::matrix::MatrixArray<T, m, n>;
     typedef std::tuple<double, double, double, unsigned int> tuple;
 
   public:
@@ -70,6 +75,12 @@ namespace ketcpp::wrapper::molecule {
     auto Z() const { return const_cast<atom_t *>(this)->Z(); }
     //! @brief Accessor to atomic_number
     auto atomic_number() const { return Z(); }
+
+    //! @brief Returns coordinates of the atom
+    MatrixArray<double, 1, 3> coordinates() const {
+      MatrixArray<double, 1, 3> coordinates = {x(), y(), z()};
+      return coordinates;
+    }
 
     //! Initialize an atom with a coordinates with specified units
     atom_t(LengthUnit u, double x, double y, double z, unsigned int Z)
@@ -129,5 +140,28 @@ namespace ketcpp::wrapper::molecule {
   public:
     //! @brief Returns all atoms in the molecule
     virtual const std::vector<atom_t> &atoms() const = 0;
+    //! @brief Total nuclear charge
+    virtual size_t total_nuclear_charge() const = 0;
+    //! @brief Formal molecular charge
+    virtual int formal_charge() const = 0;
+    //! @brief Returns nuclear repulsion energy
+    virtual double nuclear_repulsion_energy() const {
+      const auto &atoms = this->atoms();
+      double nuclear_repulsion_energy = 0;
+      for (auto ai = atoms.begin(); ai < atoms.end(); ai++) {
+        for (auto aj = ai + 1; aj < atoms.end(); aj++) {
+          auto coordinates = ai->coordinates() - aj->coordinates();
+          const auto x = coordinates->at(0, 0), y = coordinates->at(0, 1),
+                     z = coordinates->at(0, 2);
+          const auto Zi = ai->atomic_number(), Zj = aj->atomic_number();
+          const auto r = std::sqrt(x * x + y * y + z * z);
+          nuclear_repulsion_energy += Zi * Zj / r;
+        }
+      }
+      return nuclear_repulsion_energy;
+    }
+
+    //! @brief Empty virtual destructor
+    virtual ~Base() {}
   };
 }
