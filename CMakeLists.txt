@@ -73,12 +73,12 @@ if(LIBINT2_FOUND)
 endif(LIBINT2_FOUND)
 
 configure_file(
-	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h.in
-	${PROJECT_SOURCE_DIR}/src/config/ketcpp_config.h)
+	src/config/ketcpp_config.h.in
+	src/config/ketcpp_config.h)
 
 file(GLOB_RECURSE SRCS src/*.cc)
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/src)
 
 add_library(ketcpp STATIC ${SRCS})
 
