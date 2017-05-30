@@ -46,6 +46,7 @@ if(DOXYGEN_FOUND)
 
 	add_custom_command(OUTPUT ${KETCPP_DOC_OUTPUT} DEPENDS ${KETCPP_DOC_INPUT} COMMAND ${DOXYGEN_EXECUTABLE})
 	add_custom_target(doc DEPENDS ${KETCPP_DOC_OUTPUT})
+	add_custom_target(docs DEPENDS ${KETCPP_DOC_OUTPUT})
 endif(DOXYGEN_FOUND)
 
 find_package(PkgConfig REQUIRED)
