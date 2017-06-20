@@ -19,7 +19,7 @@
 
 /*!
  * \mainpage
- * |C++> (ketcpp) is a program suite for ab-initio quantum chemistry written in C++14.
+ * |C++> (ketcpp) is a program suite for ab-initio quantum chemistry written in C++17.
  */
 
 int main(void) { return 0; }
