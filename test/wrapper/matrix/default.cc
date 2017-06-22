@@ -19,7 +19,15 @@
 
 #include <forward_list>
 #include <iterator>
+#include <ostream>
 #include <sstream>
+
+namespace bandit::Matchers {
+  template <typename T, typename U>
+  std::ostream &operator<<(std::ostream &o, const std::pair<T, U> &p) {
+    return o << '(' << p.first << ',' << p.second << ')';
+  }
+}
 
 #include <bandit/bandit.h>
 
@@ -81,6 +89,11 @@ go_bandit([] {
 
   describe("make_zero_matrix", [] {
     describe("(2, 3)", [] {
+      it("should return a 2x3 matrix", [] {
+        auto mat = make_zero_matrix<float>(2, 3);
+        mat->dimension() must equal(std::make_pair(2lu, 3lu));
+      });
+
       it("should return a matrix whose elements are all zero", [] {
         auto mat = make_zero_matrix<float>(2, 3);
         mat->for_each(
@@ -88,6 +101,11 @@ go_bandit([] {
       });
     });
     describe("(2)", [] {
+      it("should return a 2x2 matrix", [] {
+        auto mat = make_zero_matrix<float>(2);
+        mat->dimension() must equal(std::make_pair(2lu, 2lu));
+      });
+
       it("should return a matrix whose elements are all zero", [] {
         auto mat = make_zero_matrix<float>(2);
         mat->for_each(

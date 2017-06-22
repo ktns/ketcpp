@@ -60,13 +60,13 @@ namespace ketcpp::wrapper::matrix {
 
   //! Factory method that creates an instance of default implementation of
   //! a dynamic-size zero-matrix.
-  //! @param [in] m Number of rows in a matrix
-  //! @param [in] n Number of columns in a matrix
+  //! @param [in] m Number of columns in a matrix
+  //! @param [in] n Number of rows in a matrix
   template <typename T> Matrix<T> make_zero_matrix(size_t m, size_t n) {
     if (n == 0)
       n = m;
     assert(n > 0 && m > 0);
-    auto ptr = std::make_unique<MatrixVector<T>>(n, m);
+    auto ptr = std::make_unique<MatrixVector<T>>(m, n);
     assert(ptr->for_each([&ptr](size_t i, size_t j) -> util::optional<bool> {
                 if (ptr->at(i, j) == 0)
                   return {};
