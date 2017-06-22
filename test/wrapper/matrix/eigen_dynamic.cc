@@ -172,6 +172,13 @@ go_bandit([] {
         (matrix2 == array) must be_falsy;
         (array == matrix2) must be_falsy;
       });
+      it("should be comparable with MatrixArray", [&matrix1, &matrix2] {
+        MatrixArray<float, 3, 2> array = {1, 2, 3, 4, 5, 6};
+        (matrix1 == array) must be_truthy;
+        (array == matrix1) must be_truthy;
+        (matrix2 == array) must be_falsy;
+        (array == matrix2) must be_falsy;
+      });
       it("should be comparable with MatrixVector", [&matrix1, &matrix2] {
         MatrixVector<float> vector = {{1, 2}, {3, 4}, {5, 6}};
         (matrix1 == vector) must be_truthy;
@@ -287,6 +294,13 @@ go_bandit([] {
         matrix4 -= matrix1;
         matrix4 must_not equal(matrix3);
         matrix4 must equal(matrix2);
+      });
+      it("should work with MatrixArrayCore", [&matrix1] {
+        MatrixArrayCore<float, 3, 2> array1 = {{6, 5}, {4, 3}, {2, 1}},
+                                     array2 = {{-5, -3}, {-1, 1}, {3, 5}};
+        matrix1 must_not equal(array2);
+        matrix1 -= array1;
+        matrix1 must equal(array2);
       });
       it("should work with MatrixArray", [&matrix1] {
         MatrixArray<float, 3, 2> array = {6, 5, 4, 3, 2, 1},
