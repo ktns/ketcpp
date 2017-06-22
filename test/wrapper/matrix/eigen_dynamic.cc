@@ -500,6 +500,15 @@ go_bandit([] {
            matrix1.get_row_size() must equal(matrix2->get_column_size());
            matrix1.get_column_size() must equal(matrix2->get_row_size());
          });
+
+      it("should be multiplied by a matrix correctly", [&matrix1] {
+        auto matrix2 = matrix1.transpose() * matrix1;
+        matrix2 must equal(make_matrix<float, 2, 2>({{35, 44}, {44, 56}}));
+
+        auto matrix3 = matrix1 * matrix1.transpose();
+        matrix3 must equal(make_matrix<float, 3, 3>(
+            {{5, 11, 17}, {11, 25, 39}, {17, 39, 61}}));
+      });
     });
 
     describe("::frobenius_norm()", [&matrix1] {
