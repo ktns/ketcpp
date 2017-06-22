@@ -362,31 +362,20 @@ go_bandit([] {
 
       describe("(Matrix)", [] {
         auto matrix_a = make_dummy_matrix<float>(), matrix_b = matrix_a,
-             matrix_c = matrix_a, matrix_d = matrix_a;
-        before_each([&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
-          matrix_a = MatrixArray<float, 3, 2>({-1, 2, 3, -1, 0, 3});
-          matrix_b = MatrixArray<float, 2, 3>({1, 1, 3, -1, 1, 0});
-          matrix_c = MatrixArray<float, 3, 3>({-3, 1, -3, 4, 2, 9, -3, 3, 0});
-          matrix_d = MatrixArray<float, 2, 2>({2, 10, 4, -3});
+             matrix_c = matrix_a;
+        before_each([&matrix_a, &matrix_b, &matrix_c] {
+          matrix_a = MatrixArray<float, 3, 2>({{-1, 2}, {3, -1}, {0, 3}});
+          matrix_b = MatrixArray<float, 2, 4>({{1, 1, 3, -1}, {1, 0, 1, 1}});
+          matrix_c = MatrixArray<float, 3, 4>(
+              {{1, -1, -1, 3}, {2, 3, 8, -4}, {3, 0, 3, 3}});
         });
         it("should return a correct matrix product",
-           [&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
+           [&matrix_a, &matrix_b, &matrix_c] {
              (matrix_a * matrix_b) must equal(matrix_c);
-             (matrix_b * matrix_a) must equal(matrix_d);
-           });
-        it("should return a correct matrix product for transposed matrices",
-           [&matrix_a, &matrix_b, &matrix_c, &matrix_d] {
-             (matrix_a->transpose() * matrix_b->transpose())
-                 must equal(matrix_d->transpose());
-             (matrix_b->transpose() * matrix_a->transpose())
-                 must equal(matrix_c->transpose());
            });
         it("should not change elements", [&matrix_a, &matrix_b] {
-          auto matrix_a2 = matrix_a;
-          auto matrix_b2 = matrix_b;
-          matrix_a must equal(matrix_a2);
-          matrix_b must equal(matrix_b2);
-          matrix_a *matrix_b;
+          const auto matrix_a2 = matrix_a;
+          const auto matrix_b2 = matrix_b;
           matrix_a must equal(matrix_a2);
           matrix_b must equal(matrix_b2);
           matrix_a *matrix_b;
