@@ -17,32 +17,25 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "config/ketcpp_config.h"
 
-#include <map>
-#include <ostream>
-#include <stack>
+#include <sstream>
 
-namespace ketcpp::logger {
-  //! Output a log of a job in CML CompChem convention
-  class CMLLogger {
-  private:
-    struct element {
-      std::string name;
-      std::map<std::string, std::string> attributes;
-    };
+#include <bandit/bandit.h>
 
-    static const element compchem_root;
+#include "logger/cml.h"
 
-    std::ostream &ostr;
-    std::stack<element> stack;
+using namespace bandit;
+using namespace bandit::Matchers;
+using namespace ketcpp;
+using namespace ketcpp::logger;
 
-    CMLLogger &operator<<(const element &element);
-    CMLLogger &push(const element &element);
-    CMLLogger &pop();
-
-  public:
-    CMLLogger(std::ostream &ostr);
-    ~CMLLogger();
-  };
-}
+go_bandit([] {
+  describe("CMLLogger", [] {
+    it("should be constructed and destructed without error", [] {
+      std::stringstream ss;
+      auto logger = new CMLLogger(ss);
+      delete logger;
+    });
+  });
+});
