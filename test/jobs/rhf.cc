@@ -149,7 +149,7 @@ struct TestSuite {
   bool mol_alive;
   std::unique_ptr<wrapper::molecule::Base> mol;
   std::unique_ptr<orbital::basisset::Base> set;
-  const RHF::Configuration config;
+  const SCF::Configuration config;
   TestSuite() : config({InitialGuessMethod::CoreHamiltonian, 1e-5, 100}) {
     mol_alive = false;
     mol = std::make_unique<TestMolecule>(mol_alive);

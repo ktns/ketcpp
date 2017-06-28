@@ -22,6 +22,7 @@
 #include <memory>
 #include <type_traits>
 
+#include "jobs/scf.h"
 #include "logger/null.h"
 #include "orbital/basisset/base.h"
 #include "wrapper/matrix.h"
@@ -29,43 +30,11 @@
 
 //! Job administrators
 namespace ketcpp::jobs {
-  //! Type of initial guess.
-  enum class InitialGuessType {
-    //! Guess density matrix.
-    Density,
-    //! Guess Fock matrix.
-    Fock
-  };
-
-  //! Enumerates implemented initial guess method.
-  enum class InitialGuessMethod {
-    //! Use core hamiltonian as initial guess of Fock matrix.
-    CoreHamiltonian
-  };
-
-  typedef wrapper::molecule::Base molecule_t;
-  typedef orbital::basisset::Base basisset_t;
-  typedef orbital::basis::Base basis_t;
-  typedef wrapper::matrix::Matrix<double> matrix_t;
-
   //! Administrates a job that solves a Restricted Hartree Forck problem.
   class RHF {
-  public:
-    //! Configuration values for an RHF job.
-    struct Configuration {
-      Configuration() = delete;
-      //! Method to make an initial guess
-      InitialGuessMethod initial_guess_method;
-      //! Convergence criterion for Frobenius norm of density matrix change
-      //! @f$ ||P_n - P_{n-1}|| @f$
-      matrix_t::value_type convergence_criterion;
-      //! Max number of iterations
-      size_t max_iterations;
-    };
-
   private:
     //! Configuration values
-    Configuration config;
+    SCF::Configuration config;
     //! Whether the job is prepared to run
     bool prepared;
     //! Which type of initialguess have made
@@ -95,13 +64,14 @@ namespace ketcpp::jobs {
 
   public:
     //! Construct an RHF job with the given configuration and the logger
-    RHF(const Configuration &config, Logger &logger)
+    RHF(const SCF::Configuration &config, Logger &logger)
         : config(config), prepared(false), logger(logger) {
       assert(config.max_iterations > 0);
       assert(config.convergence_criterion > 0);
     }
     //! Construct an RHF job with the given onfiguration and the null logger
-    RHF(const Configuration &config) : RHF(config, logger::get_null_logger()) {}
+    RHF(const SCF::Configuration &config)
+        : RHF(config, logger::get_null_logger()) {}
     //! Empty destructor
     ~RHF() {}
     //! @brief Prepare an RHF job with a molecule and a basisset to use.
