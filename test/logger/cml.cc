@@ -32,11 +32,11 @@ using namespace ketcpp::logger;
 
 go_bandit([] {
   describe("CMLLogger", [] {
-    it("should be constructed and destructed without error", [] {
-      std::stringstream ss;
-      auto logger = std::make_unique<CMLLogger>(ss);
-      logger.reset();
-    });
+    it("should not be copy constructible",
+       [] { std::is_copy_constructible_v<CMLLogger> must be_falsy; });
+
+    it("should be move constructible",
+       [] { std::is_move_constructible_v<CMLLogger> must be_truthy; });
 
     it("should emit closing tags while destruction", [] {
       std::stringstream ss;

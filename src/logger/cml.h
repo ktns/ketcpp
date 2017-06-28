@@ -46,6 +46,8 @@ namespace ketcpp::logger {
 
   public:
     CMLLogger(std::ostream &ostr);
+    CMLLogger(const CMLLogger &) = delete;
+    CMLLogger(CMLLogger &&) = default;
     ~CMLLogger();
   };
 }
