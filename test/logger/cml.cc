@@ -34,8 +34,27 @@ go_bandit([] {
   describe("CMLLogger", [] {
     it("should be constructed and destructed without error", [] {
       std::stringstream ss;
-      auto logger = new CMLLogger(ss);
-      delete logger;
+      auto logger = std::make_unique<CMLLogger>(ss);
+      logger.reset();
+    });
+
+    it("should emit closing tags while destruction", [] {
+      std::stringstream ss;
+      auto logger = std::make_unique<CMLLogger>(ss);
+      const std::string closing_tag = "</module>";
+      const auto n = closing_tag.length();
+      ss.seekg(-n, std::ios_base::end);
+      std::string end1;
+      end1.resize(n);
+      ss.read(&end1[0], n);
+      AssertThat(end1, Is().Not().EqualTo(closing_tag));
+
+      logger.reset();
+      ss.seekg(-n, std::ios_base::end);
+      std::string end2;
+      end2.resize(n);
+      ss.read(&end2[0], n);
+      AssertThat(end2, Is().EqualTo(closing_tag));
     });
   });
 });
