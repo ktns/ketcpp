@@ -56,7 +56,7 @@ CMLLogger &CMLLogger::push(const element &element) {
 }
 CMLLogger &CMLLogger::pop() {
   const auto element = stack.top();
-  ostr << "</" << element.name << '>';
+  ostr << "</" << element.name << '>' << std::flush;
   stack.pop();
   return *this;
 }
