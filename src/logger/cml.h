@@ -33,6 +33,7 @@ namespace ketcpp::logger {
     };
 
     static const element compchem_root;
+    static const element joblist;
 
     std::ostream &ostr;
     std::stack<element> stack;

@@ -31,7 +31,10 @@ const CMLLogger::element CMLLogger::compchem_root = {
      {"xmlns:cml", "http://www.xml-cml.org/schema"},
      {"xmlns:convention", "http://www.xml-cml.org/convention/"},
      {"xmlns:nonsi", "http://www.xml-cml.org/unit/nonSi/"},
-     {"xmlns:si", "http://www.xml-cml.org/unit/si/"}}};
+     {"xmlns:si", "http://www.xml-cml.org/unit/si/"}}},
+                         CMLLogger::joblist = {"module",
+                                               {{"dictRef", "compchem:jobList"},
+                                                {"id", "jobList1"}}};
 
 CMLLogger &CMLLogger::operator<<(const element &element) {
   ostr << '<' << element.name;
@@ -58,7 +61,10 @@ CMLLogger &CMLLogger::pop() {
   return *this;
 }
 
-CMLLogger::CMLLogger(std::ostream &ostr) : ostr(ostr) { push(compchem_root); }
+CMLLogger::CMLLogger(std::ostream &ostr) : ostr(ostr) {
+  push(compchem_root);
+  push(joblist);
+}
 
 CMLLogger::~CMLLogger() {
   while (!stack.empty()) {
