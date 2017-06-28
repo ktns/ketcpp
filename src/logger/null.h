@@ -19,33 +19,23 @@
 
 #pragma once
 
-#include <map>
-#include <ostream>
-#include <stack>
-
 #include "logger/base.h"
 
 namespace ketcpp::logger {
-  //! Output a log of a job in CML CompChem convention
-  class CMLLogger : public Logger {
+
+  Logger &get_null_logger();
+
+  //! Null logger discarding all logs
+  class NullLogger : public Logger {
   private:
-    struct element {
-      std::string name;
-      std::map<std::string, std::string> attributes;
-    };
+    NullLogger(){};
+    NullLogger(const NullLogger &) = delete;
+    NullLogger(NullLogger &&) = delete;
+    virtual ~NullLogger() {}
 
-    static const element compchem_root;
-    static const element joblist;
-
-    std::ostream &ostr;
-    std::stack<element> stack;
-
-    CMLLogger &operator<<(const element &element);
-    CMLLogger &push(const element &element);
-    CMLLogger &pop();
-
-  public:
-    CMLLogger(std::ostream &ostr);
-    ~CMLLogger();
+    static NullLogger the_null_logger;
+    friend Logger & ::ketcpp::logger::get_null_logger();
   };
+
+  inline Logger &get_null_logger() { return NullLogger::the_null_logger; }
 }

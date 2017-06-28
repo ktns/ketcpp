@@ -19,33 +19,13 @@
 
 #pragma once
 
-#include <map>
-#include <ostream>
-#include <stack>
-
-#include "logger/base.h"
-
 namespace ketcpp::logger {
-  //! Output a log of a job in CML CompChem convention
-  class CMLLogger : public Logger {
-  private:
-    struct element {
-      std::string name;
-      std::map<std::string, std::string> attributes;
-    };
-
-    static const element compchem_root;
-    static const element joblist;
-
-    std::ostream &ostr;
-    std::stack<element> stack;
-
-    CMLLogger &operator<<(const element &element);
-    CMLLogger &push(const element &element);
-    CMLLogger &pop();
+  //! Base class for all loggers
+  class Logger {
+  protected:
+    Logger(){};
 
   public:
-    CMLLogger(std::ostream &ostr);
-    ~CMLLogger();
+    virtual ~Logger() {}
   };
 }

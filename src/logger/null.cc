@@ -17,35 +17,8 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "logger/null.h"
 
-#include <map>
-#include <ostream>
-#include <stack>
+using namespace ketcpp::logger;
 
-#include "logger/base.h"
-
-namespace ketcpp::logger {
-  //! Output a log of a job in CML CompChem convention
-  class CMLLogger : public Logger {
-  private:
-    struct element {
-      std::string name;
-      std::map<std::string, std::string> attributes;
-    };
-
-    static const element compchem_root;
-    static const element joblist;
-
-    std::ostream &ostr;
-    std::stack<element> stack;
-
-    CMLLogger &operator<<(const element &element);
-    CMLLogger &push(const element &element);
-    CMLLogger &pop();
-
-  public:
-    CMLLogger(std::ostream &ostr);
-    ~CMLLogger();
-  };
-}
+NullLogger NullLogger::the_null_logger;
