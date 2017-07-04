@@ -37,6 +37,7 @@ void RHF::prepare(std::unique_ptr<const molecule_t> &&mol,
   core_hamiltonian = std::make_unique<wrapper::matrix::Matrix<double>>(
       basis->get_kinetic() + basis->get_nuclear(*molecule));
   assert(num_electrons() % 2 == 0);
+  logger.initialize_scf(config);
   prepared = true;
 }
 

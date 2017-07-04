@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "jobs/scf.h"
+
 namespace ketcpp::logger {
   //! Base class for all loggers
   class Logger {
@@ -27,5 +29,8 @@ namespace ketcpp::logger {
 
   public:
     virtual ~Logger() {}
+
+    //! Logs initialization of a SCF job
+    virtual void initialize_scf(const jobs::SCF::Configuration &) = 0;
   };
 }

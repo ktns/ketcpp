@@ -49,5 +49,9 @@ namespace ketcpp::logger {
     CMLLogger(const CMLLogger &) = delete;
     CMLLogger(CMLLogger &&) = default;
     ~CMLLogger();
+
+    void initialize_scf(const jobs::SCF::Configuration &) {
+      throw std::logic_error("Not yet implemented");
+    }
   };
 }
