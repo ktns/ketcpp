@@ -32,15 +32,23 @@ using namespace ketcpp::logger;
 
 go_bandit([] {
   describe("CMLLogger", [] {
+    std::stringstream ss;
+    std::unique_ptr<CMLLogger> logger;
+
+    before_each([&] { logger = std::make_unique<CMLLogger>(ss); });
+
+    after_each([&] {
+      logger.reset();
+      ss.str("");
+    });
+
     it("should not be copy constructible",
        [] { std::is_copy_constructible_v<CMLLogger> must be_falsy; });
 
     it("should be move constructible",
        [] { std::is_move_constructible_v<CMLLogger> must be_truthy; });
 
-    it("should emit closing tags while destruction", [] {
-      std::stringstream ss;
-      auto logger = std::make_unique<CMLLogger>(ss);
+    it("should emit closing tags while destruction", [&] {
       const std::string closing_tag = "</module>";
       const auto n = closing_tag.length();
       ss.seekg(-n, std::ios_base::end);
@@ -55,6 +63,17 @@ go_bandit([] {
       end2.resize(n);
       ss.read(&end2[0], n);
       AssertThat(end2, Is().EqualTo(closing_tag));
+    });
+
+    describe("::initialize_scf()", [&] {
+      it("should output compchem initialize module", [&] {
+        ss.str("");
+        jobs::SCF::Configuration config = {};
+        logger->initialize_scf(config);
+        ss.flush();
+        const auto log = ss.str();
+
+      });
     });
   });
 });
