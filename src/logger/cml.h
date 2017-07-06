@@ -50,7 +50,7 @@ namespace ketcpp::logger {
     CMLLogger(CMLLogger &&) = default;
     ~CMLLogger();
 
-    void initialize_scf(const scf_conf_t &) {
+    void initialize_scf(const mol_t &, const scf_conf_t &) override {
       throw std::logic_error("Not yet implemented");
     }
   };

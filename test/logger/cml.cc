@@ -25,6 +25,7 @@
 
 #include "jobs/scf.h"
 #include "logger/cml.h"
+#include "wrapper/molecule/fixture.h"
 
 using namespace bandit;
 using namespace bandit::Matchers;
@@ -70,7 +71,8 @@ go_bandit([] {
       it("should output compchem initialize module", [&] {
         ss.str("");
         jobs::SCFConfiguration config = {};
-        logger->initialize_scf(config);
+        wrapper::molecule::FixtureH2O mol;
+        logger->initialize_scf(mol, config);
         ss.flush();
         const auto log = ss.str();
 

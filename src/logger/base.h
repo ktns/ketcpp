@@ -23,11 +23,16 @@ namespace ketcpp::jobs {
   struct SCFConfiguration;
 }
 
+namespace ketcpp::wrapper::molecule {
+  class Base;
+}
+
 namespace ketcpp::logger {
   //! Base class for all loggers
   class Logger {
   protected:
     typedef jobs::SCFConfiguration scf_conf_t;
+    typedef wrapper::molecule::Base mol_t;
 
     Logger(){};
 
@@ -35,6 +40,6 @@ namespace ketcpp::logger {
     virtual ~Logger() {}
 
     //! Logs initialization of a SCF job
-    virtual void initialize_scf(const scf_conf_t &) = 0;
+    virtual void initialize_scf(const mol_t &, const scf_conf_t &) = 0;
   };
 }
