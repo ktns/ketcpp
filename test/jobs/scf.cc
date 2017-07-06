@@ -40,9 +40,8 @@ go_bandit([] {
        [] { std::is_move_constructible_v<SCF> must be_falsy; });
   });
 
-  describe("SCF::Configuration", [] {
-    it("should not be default constructible", [] {
-      std::is_default_constructible_v<SCF::Configuration> must be_falsy;
-    });
+  describe("SCFConfiguration", [] {
+    it("should not be default constructible",
+       [] { std::is_default_constructible_v<SCFConfiguration> must be_falsy; });
   });
 });

@@ -33,7 +33,7 @@ namespace ketcpp::logger {
     NullLogger(NullLogger &&) = delete;
     virtual ~NullLogger() {}
 
-    void initialize_scf(const jobs::SCF::Configuration &) override {}
+    void initialize_scf(const scf_conf_t &) override {}
 
     static NullLogger the_null_logger;
     friend Logger & ::ketcpp::logger::get_null_logger();

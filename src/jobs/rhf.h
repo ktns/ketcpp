@@ -31,10 +31,10 @@
 //! Job administrators
 namespace ketcpp::jobs {
   //! Administrates a job that solves a Restricted Hartree Forck problem.
-  class RHF {
+  class RHF : protected SCF {
   private:
     //! Configuration values
-    SCF::Configuration config;
+    conf_t config;
     //! Whether the job is prepared to run
     bool prepared;
     //! Which type of initialguess have made
@@ -64,14 +64,13 @@ namespace ketcpp::jobs {
 
   public:
     //! Construct an RHF job with the given configuration and the logger
-    RHF(const SCF::Configuration &config, Logger &logger)
+    RHF(const conf_t &config, Logger &logger)
         : config(config), prepared(false), logger(logger) {
       assert(config.max_iterations > 0);
       assert(config.convergence_criterion > 0);
     }
     //! Construct an RHF job with the given onfiguration and the null logger
-    RHF(const SCF::Configuration &config)
-        : RHF(config, logger::get_null_logger()) {}
+    RHF(const conf_t &config) : RHF(config, logger::get_null_logger()) {}
     //! Empty destructor
     ~RHF() {}
     //! @brief Prepare an RHF job with a molecule and a basisset to use.

@@ -19,18 +19,22 @@
 
 #pragma once
 
-#include "jobs/scf.h"
+namespace ketcpp::jobs {
+  struct SCFConfiguration;
+}
 
 namespace ketcpp::logger {
   //! Base class for all loggers
   class Logger {
   protected:
+    typedef jobs::SCFConfiguration scf_conf_t;
+
     Logger(){};
 
   public:
     virtual ~Logger() {}
 
     //! Logs initialization of a SCF job
-    virtual void initialize_scf(const jobs::SCF::Configuration &) = 0;
+    virtual void initialize_scf(const scf_conf_t &) = 0;
   };
 }

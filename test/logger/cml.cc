@@ -23,6 +23,7 @@
 
 #include <bandit/bandit.h>
 
+#include "jobs/scf.h"
 #include "logger/cml.h"
 
 using namespace bandit;
@@ -68,7 +69,7 @@ go_bandit([] {
     describe("::initialize_scf()", [&] {
       it("should output compchem initialize module", [&] {
         ss.str("");
-        jobs::SCF::Configuration config = {};
+        jobs::SCFConfiguration config = {};
         logger->initialize_scf(config);
         ss.flush();
         const auto log = ss.str();

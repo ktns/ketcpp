@@ -44,23 +44,27 @@ namespace ketcpp::jobs {
   typedef orbital::basis::Base basis_t;
   typedef wrapper::matrix::Matrix<double> matrix_t;
 
+  //! Configuration values for an SCF job.
+  struct SCFConfiguration {
+    SCFConfiguration() = delete;
+    //! Method to make an initial guess
+    InitialGuessMethod initial_guess_method;
+    //! Convergence criterion for Frobenius norm of density matrix change
+    //! @f$ ||P_n - P_{n-1}|| @f$
+    matrix_t::value_type convergence_criterion;
+    //! Max number of iterations
+    size_t max_iterations;
+  };
+
   //! Base class for various type of SCF jobs
   class SCF {
-    SCF() = delete;
+  protected:
+    typedef SCFConfiguration conf_t;
+
+    SCF() = default;
+
+  private:
     SCF(const SCF &) = delete;
     SCF(SCF &&) = delete;
-
-  public:
-    //! Configuration values for an SCF job.
-    struct Configuration {
-      Configuration() = delete;
-      //! Method to make an initial guess
-      InitialGuessMethod initial_guess_method;
-      //! Convergence criterion for Frobenius norm of density matrix change
-      //! @f$ ||P_n - P_{n-1}|| @f$
-      matrix_t::value_type convergence_criterion;
-      //! Max number of iterations
-      size_t max_iterations;
-    };
   };
 }
