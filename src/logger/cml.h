@@ -29,19 +29,19 @@ namespace ketcpp::logger {
   //! Output a log of a job in CML CompChem convention
   class CMLLogger : public Logger {
   private:
-    struct element {
+    struct element_t {
       std::string name;
       std::map<std::string, std::string> attributes;
     };
 
-    static const element compchem_root;
-    static const element joblist;
+    static const element_t compchem_root;
+    static const element_t joblist;
 
     std::ostream &ostr;
-    std::stack<element> stack;
+    std::stack<element_t> stack;
 
-    CMLLogger &operator<<(const element &element);
-    CMLLogger &push(const element &element);
+    CMLLogger &operator<<(const element_t &element);
+    CMLLogger &push(const element_t &element);
     CMLLogger &pop();
 
   public:

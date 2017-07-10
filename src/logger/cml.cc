@@ -21,22 +21,23 @@
 
 using namespace ketcpp::logger;
 
-const CMLLogger::element CMLLogger::compchem_root = {
-    "module",
-    {{"convention", "convention:compchem"},
-     {"xmlns", "http://www.xml-cml.org/schema"},
-     {"xmlns:conventions", "http://www.xml-cml.org/convention/"},
-     {"xmlns:compchem", "http://www.xml-cml.org/dictionary/compchem/"},
-     {"xmlns:cc", "http://www.xml-cml.org/dictionary/compchem/"},
-     {"xmlns:cml", "http://www.xml-cml.org/schema"},
-     {"xmlns:convention", "http://www.xml-cml.org/convention/"},
-     {"xmlns:nonsi", "http://www.xml-cml.org/unit/nonSi/"},
-     {"xmlns:si", "http://www.xml-cml.org/unit/si/"}}},
-                         CMLLogger::joblist = {"module",
-                                               {{"dictRef", "compchem:jobList"},
-                                                {"id", "jobList1"}}};
+const CMLLogger::element_t CMLLogger::compchem_root =
+    {"module",
+     {{"convention", "convention:compchem"},
+      {"xmlns", "http://www.xml-cml.org/schema"},
+      {"xmlns:conventions", "http://www.xml-cml.org/convention/"},
+      {"xmlns:compchem", "http://www.xml-cml.org/dictionary/compchem/"},
+      {"xmlns:cc", "http://www.xml-cml.org/dictionary/compchem/"},
+      {"xmlns:cml", "http://www.xml-cml.org/schema"},
+      {"xmlns:convention", "http://www.xml-cml.org/convention/"},
+      {"xmlns:nonsi", "http://www.xml-cml.org/unit/nonSi/"},
+      {"xmlns:si", "http://www.xml-cml.org/unit/si/"}}},
+                           CMLLogger::joblist = {
+                               "module",
+                               {{"dictRef", "compchem:jobList"},
+                                {"id", "jobList1"}}};
 
-CMLLogger &CMLLogger::operator<<(const element &element) {
+CMLLogger &CMLLogger::operator<<(const element_t &element) {
   ostr << '<' << element.name;
   for (const auto[k, v] : element.attributes) {
     ostr << ' ' << k << '=' << '"' << v << '"';
@@ -45,7 +46,7 @@ CMLLogger &CMLLogger::operator<<(const element &element) {
   return *this;
 }
 
-CMLLogger &CMLLogger::push(const element &element) {
+CMLLogger &CMLLogger::push(const element_t &element) {
   stack.push(element);
   ostr << '<' << element.name;
   for (auto const[k, v] : element.attributes) {
