@@ -140,10 +140,25 @@ namespace ketcpp::wrapper::molecule {
   public:
     //! @brief Returns all atoms in the molecule
     virtual const std::vector<atom_t> &atoms() const = 0;
+    //! @return Number of atoms in the molecule
+    virtual size_t get_num_atoms() const { return atoms().size(); }
     //! @brief Total nuclear charge
-    virtual size_t total_nuclear_charge() const = 0;
+    virtual size_t total_nuclear_charge() const {
+      const auto as = atoms();
+      return std::accumulate(
+          as.begin(), as.end(), 0u,
+          [](size_t q, const atom_t &a) { return q + a.Z(); });
+    }
     //! @brief Formal molecular charge
     virtual int formal_charge() const = 0;
+    //! @brief Number of electrons
+    virtual size_t get_num_electrons() const {
+      const auto fc = formal_charge();
+      const auto nc = total_nuclear_charge();
+      assert(fc < 0 ||
+             static_cast<std::make_unsigned_t<decltype(fc)>>(fc) < nc);
+      return nc - fc;
+    }
     //! @brief Returns nuclear repulsion energy
     virtual double nuclear_repulsion_energy() const {
       const auto &atoms = this->atoms();

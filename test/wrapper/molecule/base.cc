@@ -148,11 +148,50 @@ go_bandit([] {
   });
 
   describe("wrapper::molecule::Base", [] {
+    describe("::get_num_atoms()", [] {
+      it("should return the correct value", [] {
+        FixtureH2O mol1;
+        FixtureH3OP mol2;
+        mol1.get_num_atoms() must equal(3);
+        mol2.get_num_atoms() must equal(4);
+      });
+    });
+
+    describe("::get_num_electrons()", [] {
+      it("should return the correct value", [] {
+        FixtureH2O mol1;
+        FixtureH3OP mol2;
+        mol1.get_num_electrons() must equal(1 + 1 + 8);
+        mol2.get_num_electrons() must equal(1 + 1 + 8);
+      });
+    });
+
+    describe("::formal_charge()", [] {
+      it("should return the correct value", [] {
+        FixtureH2O mol1;
+        FixtureH3OP mol2;
+        mol1.formal_charge() must equal(0);
+        mol2.formal_charge() must equal(1);
+      });
+    });
+
     describe("::nuclear_repulsion_energy()", [] {
       it("should return the correct value", [] {
-        FixtureH2O mol;
-        mol.nuclear_repulsion_energy() must be_close_to(9.0842433585)
+        FixtureH2O mol1;
+        FixtureH3OP mol2;
+        mol1.nuclear_repulsion_energy() must be_close_to(9.0842433585)
             .within(1e-7);
+        mol2.nuclear_repulsion_energy() must be_close_to(13.785011).within(
+            1e-4);
+      });
+    });
+
+    describe("::total_nuclear_charge()", [] {
+      it("should return the correct value", [] {
+        FixtureH2O mol1;
+        FixtureH3OP mol2;
+        mol1.total_nuclear_charge() must equal(1 + 1 + 8);
+        mol2.total_nuclear_charge() must equal(1 + 1 + 1 + 8);
       });
     });
   });

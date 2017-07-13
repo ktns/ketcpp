@@ -33,8 +33,20 @@ namespace ketcpp {
 
       public:
         const std::vector<atom_t> &atoms() const override { return h2o_atoms; }
-        size_t total_nuclear_charge() const override { return 8 + 1 + 1; }
         int formal_charge() const override { return 0; }
+      };
+
+      class FixtureH3OP : public Base {
+      private:
+        const std::vector<atom_t> h3o_atoms = {
+            /*H*/ {LengthUnit::Angstrom, +0.996267, +0.074625, +0.059771, 1},
+            /*O*/ {LengthUnit::Angstrom, +1.986638, +0.106014, +0.043777, 8},
+            /*H*/ {LengthUnit::Angstrom, +2.333373, +0.123485, -0.884432, 1},
+            /*H*/ {LengthUnit::Angstrom, +2.333379, +0.867918, +0.574190, 1}};
+
+      public:
+        const std::vector<atom_t> &atoms() const override { return h3o_atoms; }
+        int formal_charge() const override { return 1; }
       };
     }
   }
