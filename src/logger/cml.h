@@ -22,6 +22,7 @@
 #include <map>
 #include <ostream>
 #include <stack>
+#include <type_traits>
 
 #include "logger/base.h"
 
@@ -33,6 +34,9 @@ namespace ketcpp::logger {
       std::string name;
       std::map<std::string, std::string> attributes;
     };
+#ifdef __cpp_lib_is_aggregate
+    static_assert(std::is_aggregate_v<element_t>);
+#endif
 
     static const element_t compchem_root;
     static const element_t joblist;
