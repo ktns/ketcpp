@@ -159,6 +159,22 @@ namespace ketcpp::wrapper::molecule {
              static_cast<std::make_unsigned_t<decltype(fc)>>(fc) < nc);
       return nc - fc;
     }
+    //! @return Spin multiplicity of the molecule
+    virtual unsigned int get_multiplicity() const = 0;
+    //! @return Number of \f$ \alpha \f$ spin electrons \f$ N_\alpha \f$
+    //! @notes \f$ N_\alpha > N_\beta \f$
+    size_t get_num_alpha_electrons() const {
+      const auto tmp = get_num_electrons() + get_multiplicity() - 1;
+      assert(tmp % 2 == 0);
+      return tmp / 2;
+    }
+    //! @return Number of \f$ \beta \f$ spin electrons \f$ N_\beta \f$
+    //! @notes \f$ N_\alpha > N_\beta \f$
+    size_t get_num_beta_electrons() const {
+      const auto tmp = get_num_electrons() - get_multiplicity() + 1;
+      assert(tmp % 2 == 0);
+      return tmp / 2;
+    }
     //! @brief Returns nuclear repulsion energy
     virtual double nuclear_repulsion_energy() const {
       const auto &atoms = this->atoms();

@@ -34,6 +34,7 @@ namespace ketcpp {
       public:
         const std::vector<atom_t> &atoms() const override { return h2o_atoms; }
         int formal_charge() const override { return 0; }
+        unsigned int get_multiplicity() const override { return 1; }
       };
 
       class FixtureH3OP : public Base {
@@ -47,6 +48,20 @@ namespace ketcpp {
       public:
         const std::vector<atom_t> &atoms() const override { return h3o_atoms; }
         int formal_charge() const override { return 1; }
+        unsigned int get_multiplicity() const override { return 1; }
+      };
+
+      class FixtureO2T : public Base {
+      private:
+        const std::vector<atom_t> o2_atoms = {
+            /*O*/ {LengthUnit::Angstrom, 0.91732, 0.07596, 0.06387, 8},
+            /*O*/ {LengthUnit::Angstrom, 2.19932, 0.07596, 0.06387, 8},
+        };
+
+      public:
+        const std::vector<atom_t> &atoms() const override { return o2_atoms; }
+        int formal_charge() const override { return 0; }
+        unsigned int get_multiplicity() const override { return 3; }
       };
     }
   }

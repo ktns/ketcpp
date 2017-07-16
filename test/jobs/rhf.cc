@@ -96,6 +96,7 @@ public:
   };
   size_t total_nuclear_charge() const override { return 2; }
   int formal_charge() const override { return 0; }
+  unsigned int get_multiplicity() const override { return 1; }
 };
 
 static const matrix_t overlap_matrix = [] {

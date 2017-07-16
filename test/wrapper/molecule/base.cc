@@ -148,37 +148,76 @@ go_bandit([] {
   });
 
   describe("wrapper::molecule::Base", [] {
-    describe("::get_num_atoms()", [] {
+    describe("::get_num_atoms() const", [] {
       it("should return the correct value", [] {
-        FixtureH2O mol1;
-        FixtureH3OP mol2;
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
+        const FixtureO2T mol3;
         mol1.get_num_atoms() must equal(3);
         mol2.get_num_atoms() must equal(4);
+        mol3.get_num_atoms() must equal(2);
       });
     });
 
-    describe("::get_num_electrons()", [] {
+    describe("::get_multiplicity() const", [] {
       it("should return the correct value", [] {
-        FixtureH2O mol1;
-        FixtureH3OP mol2;
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
+        const FixtureO2T mol3;
+        mol1.get_multiplicity() must equal(1);
+        mol2.get_multiplicity() must equal(1);
+        mol3.get_multiplicity() must equal(3);
+      });
+    });
+
+    describe("::get_num_electrons() const", [] {
+      it("should return the correct value", [] {
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
+        const FixtureO2T mol3;
         mol1.get_num_electrons() must equal(1 + 1 + 8);
         mol2.get_num_electrons() must equal(1 + 1 + 8);
+        mol3.get_num_electrons() must equal(8 + 8);
       });
     });
 
-    describe("::formal_charge()", [] {
+    describe("::get_num_alpha_electrons() const", [] {
       it("should return the correct value", [] {
-        FixtureH2O mol1;
-        FixtureH3OP mol2;
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
+        const FixtureO2T mol3;
+        mol1.get_num_alpha_electrons() must equal((1 + 1 + 8) / 2);
+        mol2.get_num_alpha_electrons() must equal((1 + 1 + 8) / 2);
+        mol3.get_num_alpha_electrons() must equal((8 + 8) / 2 + 1);
+      });
+    });
+
+    describe("::get_num_beta_electrons() const", [] {
+      it("should return the correct value", [] {
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
+        const FixtureO2T mol3;
+        mol1.get_num_beta_electrons() must equal((1 + 1 + 8) / 2);
+        mol2.get_num_beta_electrons() must equal((1 + 1 + 8) / 2);
+        mol3.get_num_beta_electrons() must equal((8 + 8) / 2 - 1);
+      });
+    });
+
+    describe("::formal_charge() const", [] {
+      it("should return the correct value", [] {
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
+        const FixtureO2T mol3;
         mol1.formal_charge() must equal(0);
         mol2.formal_charge() must equal(1);
+        mol3.formal_charge() must equal(0);
       });
     });
 
-    describe("::nuclear_repulsion_energy()", [] {
+    describe("::nuclear_repulsion_energy() const", [] {
       it("should return the correct value", [] {
-        FixtureH2O mol1;
-        FixtureH3OP mol2;
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
         mol1.nuclear_repulsion_energy() must be_close_to(9.0842433585)
             .within(1e-7);
         mol2.nuclear_repulsion_energy() must be_close_to(13.785011).within(
@@ -186,12 +225,14 @@ go_bandit([] {
       });
     });
 
-    describe("::total_nuclear_charge()", [] {
+    describe("::total_nuclear_charge() const", [] {
       it("should return the correct value", [] {
-        FixtureH2O mol1;
-        FixtureH3OP mol2;
+        const FixtureH2O mol1;
+        const FixtureH3OP mol2;
+        const FixtureO2T mol3;
         mol1.total_nuclear_charge() must equal(1 + 1 + 8);
         mol2.total_nuclear_charge() must equal(1 + 1 + 1 + 8);
+        mol3.total_nuclear_charge() must equal(8 + 8);
       });
     });
   });
