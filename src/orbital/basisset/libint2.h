@@ -33,16 +33,18 @@ namespace ketcpp::orbital::basisset {
   //! Create Libint2Basis
   class Libint2BasisSet : public Base {
   private:
-    const std::string name;
+    const std::string label;
 
   public:
-    //! Load a basisset from its name using libint2
-    Libint2BasisSet(const std::string &basisset_name) : name(basisset_name) {}
+    //! Load a basisset from its label using libint2
+    Libint2BasisSet(const std::string &basisset_label)
+        : label(basisset_label) {}
     //! Factory method for Libint2Basis
     std::unique_ptr<orbital::basis::Base>
     get_basis(const wrapper::molecule::Base &mol) const override {
-      return std::make_unique<orbital::basis::Libint2Basis>(mol, name);
+      return std::make_unique<orbital::basis::Libint2Basis>(mol, label);
     }
+    virtual const std::string &get_label() const override { return label; }
   };
 }
 

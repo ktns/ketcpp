@@ -52,6 +52,12 @@ go_bandit([] {
         dynamic_cast<Libint2Basis *>(pb.get()) must_not be_null;
       });
     });
+
+    describe(".get_label", [&pbs] {
+      it("should return the correct label", [&pbs] {
+        pbs->get_label() must equal("STO-3G"); //
+      });
+    });
   });
 });
 

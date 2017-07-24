@@ -34,5 +34,10 @@ namespace ketcpp::orbital::basisset {
     get_basis(std::unique_ptr<const wrapper::molecule::Base> &pmol) const {
       return get_basis(*pmol);
     }
+    //! @return The label of basisset (e.g. STO-3G, 6-31G, etc.)
+    virtual const std::string &get_label() const {
+      static const std::string empty_string = "";
+      return empty_string;
+    }
   };
 }
