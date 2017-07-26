@@ -20,6 +20,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "wrapper/matrix.h"
 #include "wrapper/molecule/base.h"
@@ -78,6 +79,12 @@ namespace ketcpp::orbital::basis {
     matrix_t get_rhf_fock(const matrix_t &density, const Args &... args) const {
       auto fock = get_kinetic() + get_nuclear(args...);
       return add_rhf_electron_repulsion(fock, density);
+    }
+
+    //! @return The label of the basisset on which it is based
+    virtual const std::string &get_label() const {
+      static const std::string empty_string = "";
+      return empty_string;
     }
   };
 }

@@ -204,8 +204,9 @@ private:
 // Libint2Basis::~Libint2Basis() {}
 
 Libint2Basis::Libint2Basis(const wrapper::molecule::Base &mol,
-                           const std::string &basisset_name)
-    : impl(new Impl(mol.atoms().cbegin(), mol.atoms().cend(), basisset_name)) {}
+                           const std::string &basisset_label)
+    : impl(new Impl(mol.atoms().cbegin(), mol.atoms().cend(), basisset_label)),
+      basisset_label(basisset_label) {}
 
 Libint2Basis::~Libint2Basis() {}
 

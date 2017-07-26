@@ -41,6 +41,8 @@ namespace ketcpp::orbital::basis {
     class Impl;
     std::unique_ptr<Impl> impl;
     //! @endcond
+    //! basisset label
+    const std::string basisset_label;
 
   public:
     //// for test
@@ -49,10 +51,10 @@ namespace ketcpp::orbital::basis {
 
     //! @brief Initialize a basis object for a molecule
     //! @param[in] mol A molecule
-    //! @param[in] basisset_name Specify the basisset to be used by the name
+    //! @param[in] basisset_label Specify the basisset to be used by the name
     //! @todo Implement a parser for basisset definition files
     Libint2Basis(const wrapper::molecule::Base &mol,
-                 const std::string &basisset_name);
+                 const std::string &basisset_label);
 
     ~Libint2Basis();
 
@@ -65,6 +67,8 @@ namespace ketcpp::orbital::basis {
     matrix_t &
     add_rhf_electron_repulsion(matrix_t &fock,
                                const matrix_t &density) const override;
+
+    const std::string &get_label() const override { return basisset_label; }
   };
 }
 

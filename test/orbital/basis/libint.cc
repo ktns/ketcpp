@@ -194,6 +194,12 @@ go_bandit([] {
         });
       });
     });
+
+    describe("::get_label()", [&basis] {
+      it("should return the correct label", [&] {
+        basis->get_label() must equal("STO-3G"); //
+      });
+    });
   });
 });
 
