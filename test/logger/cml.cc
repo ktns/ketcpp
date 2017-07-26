@@ -25,6 +25,7 @@
 
 #include "jobs/scf.h"
 #include "logger/cml.h"
+#include "orbital/basisset/fixture.h"
 #include "wrapper/molecule/fixture.h"
 
 using namespace bandit;
@@ -72,7 +73,8 @@ go_bandit([] {
         ss.str("");
         jobs::SCFConfiguration config = {};
         wrapper::molecule::FixtureH2O mol;
-        logger->initialize_scf(mol, config);
+        orbital::basisset::FixtureSTO3G set;
+        logger->initialize_scf(mol, set, config);
         ss.flush();
         const auto log = ss.str();
 

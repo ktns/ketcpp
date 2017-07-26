@@ -17,28 +17,11 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "orbital/basisset/fixture.h"
 
-#include "logger/base.h"
-
-namespace ketcpp::logger {
-
-  Logger &get_null_logger();
-
-  //! Null logger discarding all logs
-  class NullLogger : public Logger {
-  private:
-    NullLogger(){};
-    NullLogger(const NullLogger &) = delete;
-    NullLogger(NullLogger &&) = delete;
-    virtual ~NullLogger() {}
-
-    void initialize_scf(const mol_t &, const basisset_t &set,
-                        const scf_conf_t &) override {}
-
-    static NullLogger the_null_logger;
-    friend Logger & ::ketcpp::logger::get_null_logger();
-  };
-
-  inline Logger &get_null_logger() { return NullLogger::the_null_logger; }
+using namespace ketcpp;
+using namespace ketcpp::orbital::basisset;
+std::unique_ptr<orbital::basis::Base>
+FixtureSTO3G::get_basis(const wrapper::molecule::Base &) const {
+  return nullptr;
 }

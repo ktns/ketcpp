@@ -19,26 +19,18 @@
 
 #pragma once
 
-#include "logger/base.h"
+#include "orbital/basisset/base.h"
 
-namespace ketcpp::logger {
-
-  Logger &get_null_logger();
-
-  //! Null logger discarding all logs
-  class NullLogger : public Logger {
-  private:
-    NullLogger(){};
-    NullLogger(const NullLogger &) = delete;
-    NullLogger(NullLogger &&) = delete;
-    virtual ~NullLogger() {}
-
-    void initialize_scf(const mol_t &, const basisset_t &set,
-                        const scf_conf_t &) override {}
-
-    static NullLogger the_null_logger;
-    friend Logger & ::ketcpp::logger::get_null_logger();
+namespace ketcpp::orbital::basisset {
+  class FixtureSTO3G : public Base {
+  public:
+    FixtureSTO3G() {}
+    ~FixtureSTO3G() {}
+    std::unique_ptr<orbital::basis::Base>
+    get_basis(const wrapper::molecule::Base &) const override;
+    const std::string &get_label() const override {
+      static const std::string label = "STO-3G";
+      return label;
+    }
   };
-
-  inline Logger &get_null_logger() { return NullLogger::the_null_logger; }
 }
