@@ -26,14 +26,29 @@
 
 #include "logger/base.h"
 
+namespace ketcpp::test {
+  struct CMLLoggerElementTester;
+}
+
 namespace ketcpp::logger {
   //! Output a log of a job in CML CompChem convention
   class CMLLogger : public Logger {
   private:
+    friend ketcpp::test::CMLLoggerElementTester;
     struct element_t {
       std::string name;
       std::map<std::string, std::string> attributes;
+      bool operator==(const element_t &other) const {
+        return name == other.name && attributes == other.attributes;
+      }
     };
+    friend std::ostream &operator<<(std::ostream &os, const element_t &e) {
+      os << '<' << e.name;
+      for (const auto a : e.attributes) {
+        os << ' ' << a.first << "=\"" << a.second << '"';
+      }
+      return os << "/>";
+    }
 #ifdef __cpp_lib_is_aggregate
     static_assert(std::is_aggregate_v<element_t>);
 #endif
