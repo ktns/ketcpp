@@ -17,25 +17,33 @@
  * ketcpp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+
+#include "jobs/scf.h"
 #include "logger/cml.h"
 
 using namespace ketcpp::logger;
 
-const CMLLogger::element_t CMLLogger::compchem_root =
-    {"module",
-     {{"convention", "convention:compchem"},
-      {"xmlns", "http://www.xml-cml.org/schema"},
-      {"xmlns:conventions", "http://www.xml-cml.org/convention/"},
-      {"xmlns:compchem", "http://www.xml-cml.org/dictionary/compchem/"},
-      {"xmlns:cc", "http://www.xml-cml.org/dictionary/compchem/"},
-      {"xmlns:cml", "http://www.xml-cml.org/schema"},
-      {"xmlns:convention", "http://www.xml-cml.org/convention/"},
-      {"xmlns:nonsi", "http://www.xml-cml.org/unit/nonSi/"},
-      {"xmlns:si", "http://www.xml-cml.org/unit/si/"}}},
-                           CMLLogger::joblist = {
-                               "module",
-                               {{"dictRef", "compchem:jobList"},
-                                {"id", "jobList1"}}};
+const CMLLogger::element_t
+    CMLLogger::compchem_root =
+        {"module",
+         {{"convention", "convention:compchem"},
+          {"xmlns", "http://www.xml-cml.org/schema"},
+          {"xmlns:conventions", "http://www.xml-cml.org/convention/"},
+          {"xmlns:compchem", "http://www.xml-cml.org/dictionary/compchem/"},
+          {"xmlns:cc", "http://www.xml-cml.org/dictionary/compchem/"},
+          {"xmlns:cml", "http://www.xml-cml.org/schema"},
+          {"xmlns:convention", "http://www.xml-cml.org/convention/"},
+          {"xmlns:nonsi", "http://www.xml-cml.org/unit/nonSi/"},
+          {"xmlns:si", "http://www.xml-cml.org/unit/si/"}}},
+    CMLLogger::joblist = {"module",
+                          {{"id", "jobList1"},
+                           {"dictRef", "compchem:jobList"}}},
+    CMLLogger::job = {"module", {{"dictRef", "compchem:job"}, {"id", "job"}}},
+    CMLLogger::jobinit = {"module",
+                          {{"id", "jobInitialization"},
+                           {"dictRef", "compchem:initialization"}}},
+    CMLLogger::paramlist = {"parameterList", {}};
 
 CMLLogger &CMLLogger::operator<<(const element_t &element) {
   ostr << '<' << element.name;
@@ -71,4 +79,84 @@ CMLLogger::~CMLLogger() {
   while (!stack.empty()) {
     pop();
   }
+}
+
+template <typename DictRef, typename Parameter>
+void CMLLogger::emit_parameter(DictRef dictref, Parameter parameter,
+                               const char *unit) {
+  assert(stack.top().name == "parameterList");
+  using namespace std::literals::string_literals;
+  const element_t tag = {"parameter", {{"dictRef", "compchem:"s + dictref}}};
+  push(tag);
+  emit_scalar(parameter, unit);
+  assert(stack.top().name == "parameter" &&
+         stack.top().attributes.at("dictRef") == tag.attributes.at("dictRef"));
+  pop();
+}
+
+template <typename...> inline constexpr bool false_v[[maybe_unused]] = false;
+
+template <typename Scalar>
+void CMLLogger::emit_scalar(Scalar scalar, const char *unit) {
+  element_t tag;
+
+  if
+#ifdef __cpp_if_constexpr
+      constexpr
+#endif
+      (std::is_convertible_v<Scalar, const std::string &>) {
+    tag = {"scalar", {{"dataType", "xsd:string"}}};
+  } else if
+#ifdef __cpp_if_constexpr
+      constexpr
+#endif
+      (std::is_integral_v<Scalar>) {
+    tag = {"scalar", {{"dataType", "xsd:integer"}}};
+  } else if
+#ifdef __cpp_if_constexpr
+      constexpr
+#endif
+      (std::is_floating_point_v<Scalar>) {
+    tag = {"scalar", {{"dataType", "xsd:double"}}};
+  } else {
+#ifdef __cpp_if_constexpr
+    static_assert(false_v<Scalar>, "Unknown type of scalar!");
+#endif
+  }
+
+  if (unit != nullptr) {
+    tag.attributes["units"] = unit;
+  }
+
+  push(tag);
+  ostr << scalar;
+  pop();
+}
+
+void CMLLogger::initialize_scf(const mol_t &mol, const basisset_t &set,
+                               const scf_conf_t &conf) {
+  static const element_t task = {"parameter", {{"dictRef", "compchem:task"}}},
+                         num_atoms = {"paramlist",
+                                      {{"dictRef", "compchem:numAtoms"}}};
+  push(job);
+  push(jobinit);
+  emit_scf_parameters(conf, mol);
+  assert(stack.top() == jobinit);
+  pop();
+  assert(stack.top() == job);
+}
+
+void CMLLogger::emit_scf_parameters(const scf_conf_t &conf, const mol_t &mol) {
+  push(paramlist);
+  emit_parameter("method", "scf");
+  emit_parameter("task", "energy");
+  emit_parameter("numAtoms", mol.get_num_atoms());
+  emit_parameter("numElectrons", mol.get_num_electrons());
+  emit_parameter("numAlphaElectrons", mol.get_num_alpha_electrons());
+  emit_parameter("numBetaElectrons", mol.get_num_beta_electrons());
+  emit_parameter("charge", static_cast<double>(mol.formal_charge()),
+                 "nonsi:elementary_charge");
+  emit_parameter("spinMultiplicty", mol.get_multiplicity());
+  assert(stack.top() == paramlist);
+  pop();
 }

@@ -53,15 +53,26 @@ namespace ketcpp::logger {
     static_assert(std::is_aggregate_v<element_t>);
 #endif
 
-    static const element_t compchem_root;
-    static const element_t joblist;
+    static const element_t compchem_root, joblist, job, jobinit, paramlist;
 
     std::ostream &ostr;
     std::stack<element_t> stack;
 
+    //! Emit a self-closing tag
     CMLLogger &operator<<(const element_t &element);
+    //! Emit a opening tag and push it into the stack
     CMLLogger &push(const element_t &element);
+    //! Pop a tag from the stack and emit it
     CMLLogger &pop();
+
+    //! Emit a parameter tag with the specified DictRef in its attributes and
+    //! with a scalar tag specified by parameter in it
+    template <typename DictRef, typename Parameter>
+    void emit_parameter(DictRef, Parameter, const char *unit = nullptr);
+    //! Emit a scalar tag with the "dataType" attribute determined by the
+    //! specified type Scalar
+    template <typename Scalar>
+    void emit_scalar(Scalar scalar, const char *unit = nullptr);
 
   public:
     CMLLogger(std::ostream &ostr);
@@ -69,8 +80,10 @@ namespace ketcpp::logger {
     CMLLogger(CMLLogger &&) = default;
     ~CMLLogger();
 
-    void initialize_scf(const mol_t &, const basisset_t &, const scf_conf_t &) {
-      throw std::logic_error("Not yet implemented");
-    }
+    void initialize_scf(const mol_t &, const basisset_t &,
+                        const scf_conf_t &) override;
+
+  private:
+    void emit_scf_parameters(const scf_conf_t &, const mol_t &);
   };
 }
