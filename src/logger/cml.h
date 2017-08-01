@@ -53,7 +53,8 @@ namespace ketcpp::logger {
     static_assert(std::is_aggregate_v<element_t>);
 #endif
 
-    static const element_t compchem_root, joblist, job, jobinit, paramlist;
+    static const element_t compchem_root, joblist, job, jobinit, paramlist,
+        molecule, atomarray;
 
     std::ostream &ostr;
     std::stack<element_t> stack;
@@ -85,5 +86,6 @@ namespace ketcpp::logger {
 
   private:
     void emit_scf_parameters(const scf_conf_t &, const mol_t &);
+    void emit_molecule(const mol_t &);
   };
 }

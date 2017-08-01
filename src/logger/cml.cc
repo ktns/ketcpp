@@ -21,6 +21,9 @@
 
 #include "jobs/scf.h"
 #include "logger/cml.h"
+#include "util/element.h"
+
+using namespace std::literals::string_literals;
 
 using namespace ketcpp::logger;
 
@@ -43,7 +46,9 @@ const CMLLogger::element_t
     CMLLogger::jobinit = {"module",
                           {{"id", "jobInitialization"},
                            {"dictRef", "compchem:initialization"}}},
-    CMLLogger::paramlist = {"parameterList", {}};
+    CMLLogger::paramlist = {"parameterList", {}},
+    CMLLogger::molecule = {"molecule", {{"id", "molgeom"}}},
+    CMLLogger::atomarray = {"atomArray", {}};
 
 CMLLogger &CMLLogger::operator<<(const element_t &element) {
   ostr << '<' << element.name;
@@ -63,6 +68,7 @@ CMLLogger &CMLLogger::push(const element_t &element) {
   ostr << '>';
   return *this;
 }
+
 CMLLogger &CMLLogger::pop() {
   const auto element = stack.top();
   ostr << "</" << element.name << '>' << std::flush;
@@ -142,6 +148,8 @@ void CMLLogger::initialize_scf(const mol_t &mol, const basisset_t &set,
   push(jobinit);
   emit_scf_parameters(conf, mol);
   assert(stack.top() == jobinit);
+  emit_molecule(mol);
+  assert(stack.top() == jobinit);
   pop();
   assert(stack.top() == job);
 }
@@ -159,4 +167,28 @@ void CMLLogger::emit_scf_parameters(const scf_conf_t &conf, const mol_t &mol) {
   emit_parameter("spinMultiplicty", mol.get_multiplicity());
   assert(stack.top() == paramlist);
   pop();
+}
+
+void CMLLogger::emit_molecule(const mol_t &mol) {
+  push(molecule);
+  push(atomarray);
+  size_t i = 0;
+  for (const wrapper::molecule::atom_t a : mol.atoms()) {
+    element_t e = {"atom",
+                   {
+                       {"id", "a"s + std::to_string(++i)},
+                       {"elementType", util::Z_to_element_symbol(a.Z())},
+                       {"x3", std::to_string(a.x())},
+                       {"y3", std::to_string(a.y())},
+                       {"z3", std::to_string(a.z())},
+                   }};
+    assert(stack.top() == atomarray);
+    *this << e;
+    assert(stack.top() == atomarray);
+  }
+  assert(stack.top() == atomarray);
+  pop();
+  assert(stack.top() == molecule);
+  pop();
+  assert(stack.top() == jobinit);
 }
